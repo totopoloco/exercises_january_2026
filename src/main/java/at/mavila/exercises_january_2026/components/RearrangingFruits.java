@@ -7,10 +7,7 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Component
-@Slf4j
 public class RearrangingFruits {
 
     private static final int MAX_BASKET_LENGTH = 100_000;
@@ -33,7 +30,7 @@ public class RearrangingFruits {
      * @param basket2
      * @return
      */
-    int rearrange(int[] basket1, int[] basket2) {
+    long rearrange(int[] basket1, int[] basket2) {
         validations(basket1, basket2);
 
         // Step 1: Create frequency map
@@ -62,9 +59,6 @@ public class RearrangingFruits {
             int currentValueBasketTwo = basket2[n];
             freqMap2.put(currentValueBasketTwo, freqMap2.getOrDefault(currentValueBasketTwo, 0) + 1);
         }
-        // Logging the frequency maps
-        log.debug("Frequency Map Basket 1: {}", freqMap1);
-        log.debug("Frequency Map Basket 2: {}", freqMap2);
 
         // ------------------------------------------------------------
         // 2. Feasibility test - any odd total count → impossible
@@ -83,7 +77,6 @@ public class RearrangingFruits {
         for (Map.Entry<Integer, Integer> entry : unionKeys.entrySet()) {
             int total = entry.getValue();
             if (total % 2 != 0) {
-                log.debug("Total count for fruit cost {} is odd ({}). Cannot split evenly.", entry.getKey(), total);
                 return -1; // cannot split evenly
             }
         }
@@ -143,7 +136,6 @@ public class RearrangingFruits {
             int key = entry.getKey();
             int total = freqMap1.getOrDefault(key, 0) + freqMap2.getOrDefault(key, 0);
             int targetEach = total / 2;
-            log.debug("Processing fruit cost {}: total={}, targetEach={}", key, total, targetEach);
             // surplus1 ← freq1.get(k, 0) - targetEach
             Integer currentValueAtKeyFreqMap1 = freqMap1.getOrDefault(key, 0);
             int surplus1 = currentValueAtKeyFreqMap1 - targetEach;
@@ -207,7 +199,7 @@ public class RearrangingFruits {
 
         int i = 0;
         int j = excess2.size() - 1;
-        int totalCost = 0;
+        long totalCost = 0;
 
         while (i <= (excess1.size() - 1)) {
             int a = excess1.get(i); // element that must leave basket1

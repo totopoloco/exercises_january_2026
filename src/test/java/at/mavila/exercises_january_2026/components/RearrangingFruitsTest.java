@@ -16,13 +16,13 @@ class RearrangingFruitsTest {
 
     @Test
     void testRearrange() {
-        int result1 = this.rearrangingFruits.rearrange(new int[] { 4, 2, 2, 2 }, new int[] { 1, 4, 1, 2 });
+        long result1 = this.rearrangingFruits.rearrange(new int[] { 4, 2, 2, 2 }, new int[] { 1, 4, 1, 2 });
         assertThat(result1).isEqualTo(1);
     }
 
     @Test
     void testRearrange_Impossible() {
-        int result2 = this.rearrangingFruits.rearrange(new int[] { 2, 3, 4, 1 }, new int[] { 3, 2, 5, 1 });
+        long result2 = this.rearrangingFruits.rearrange(new int[] { 2, 3, 4, 1 }, new int[] { 3, 2, 5, 1 });
         assertThat(result2).isEqualTo(-1);
     }
 
@@ -30,25 +30,25 @@ class RearrangingFruitsTest {
 
     @Test
     void testRearrange_AlreadyIdentical_SingleElement() {
-        int result = this.rearrangingFruits.rearrange(new int[] { 5 }, new int[] { 5 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 5 }, new int[] { 5 });
         assertThat(result).isZero();
     }
 
     @Test
     void testRearrange_AlreadyIdentical_MultipleElements() {
-        int result = this.rearrangingFruits.rearrange(new int[] { 1, 2, 3 }, new int[] { 1, 2, 3 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 1, 2, 3 }, new int[] { 1, 2, 3 });
         assertThat(result).isZero();
     }
 
     @Test
     void testRearrange_AlreadyIdentical_DifferentOrder() {
-        int result = this.rearrangingFruits.rearrange(new int[] { 3, 1, 2 }, new int[] { 2, 3, 1 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 3, 1, 2 }, new int[] { 2, 3, 1 });
         assertThat(result).isZero();
     }
 
     @Test
     void testRearrange_AlreadyIdentical_WithDuplicates() {
-        int result = this.rearrangingFruits.rearrange(new int[] { 2, 2, 3, 3 }, new int[] { 3, 2, 3, 2 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 2, 2, 3, 3 }, new int[] { 3, 2, 3, 2 });
         assertThat(result).isZero();
     }
 
@@ -57,7 +57,7 @@ class RearrangingFruitsTest {
     @Test
     void testRearrange_SimpleSwap_TwoElements() {
         // Basket1: [1, 2], Basket2: [2, 1] -> already identical by frequency
-        int result = this.rearrangingFruits.rearrange(new int[] { 1, 2 }, new int[] { 2, 1 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 1, 2 }, new int[] { 2, 1 });
         assertThat(result).isZero();
     }
 
@@ -65,7 +65,7 @@ class RearrangingFruitsTest {
     void testRearrange_SimpleSwap_NeedsOneSwap() {
         // Basket1: [1, 1], Basket2: [2, 2] -> need to swap one 1 with one 2, cost =
         // min(1,2) = 1
-        int result = this.rearrangingFruits.rearrange(new int[] { 1, 1 }, new int[] { 2, 2 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 1, 1 }, new int[] { 2, 2 });
         assertThat(result).isEqualTo(1);
     }
 
@@ -73,7 +73,7 @@ class RearrangingFruitsTest {
     void testRearrange_SimpleSwap_CostIsSmaller() {
         // Basket1: [5, 5], Basket2: [10, 10] -> swap one 5 with one 10, cost =
         // min(5,10) = 5
-        int result = this.rearrangingFruits.rearrange(new int[] { 5, 5 }, new int[] { 10, 10 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 5, 5 }, new int[] { 10, 10 });
         assertThat(result).isEqualTo(5);
     }
 
@@ -84,7 +84,7 @@ class RearrangingFruitsTest {
         // Basket1: [1, 100, 100], Basket2: [100, 1, 1]
         // freq1: {1:1, 100:2}, freq2: {100:1, 1:2}
         // union: {1:3, 100:3} -> both odd -> impossible to split evenly
-        int result = this.rearrangingFruits.rearrange(new int[] { 1, 100, 100 }, new int[] { 100, 1, 1 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 1, 100, 100 }, new int[] { 100, 1, 1 });
         assertThat(result).isEqualTo(-1);
     }
 
@@ -94,7 +94,7 @@ class RearrangingFruitsTest {
         // freq1: {1:2, 100:2}, freq2: {100:2, 1:2}
         // union: {1:4, 100:4} -> both even, target each = 2
         // Already balanced! No swaps needed.
-        int result = this.rearrangingFruits.rearrange(new int[] { 1, 1, 100, 100 }, new int[] { 100, 100, 1, 1 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 1, 1, 100, 100 }, new int[] { 100, 100, 1, 1 });
         assertThat(result).isZero();
     }
 
@@ -102,7 +102,7 @@ class RearrangingFruitsTest {
     void testRearrange_ViaMinUsedForExpensiveSwap() {
         // Basket1: [1, 50, 50, 50, 50], Basket2: [50, 50, 50, 50, 1]
         // Both have same frequency - already balanced
-        int result = this.rearrangingFruits.rearrange(
+        long result = this.rearrangingFruits.rearrange(
                 new int[] { 1, 50, 50, 50, 50 },
                 new int[] { 50, 50, 50, 50, 1 });
         assertThat(result).isZero();
@@ -112,7 +112,7 @@ class RearrangingFruitsTest {
     void testRearrange_ActualViaMinCase() {
         // Basket1: [84,80,18,32], Basket2: [61,7,36,72]
         // This is a case where baskets cannot be made equal
-        int result = this.rearrangingFruits.rearrange(
+        long result = this.rearrangingFruits.rearrange(
                 new int[] { 84, 80, 18, 32 },
                 new int[] { 61, 7, 36, 72 });
         assertThat(result).isEqualTo(-1);
@@ -121,7 +121,7 @@ class RearrangingFruitsTest {
     @Test
     void testRearrange_MixedDirectAndViaMin() {
         // Some swaps are cheaper direct, others via minimum
-        int result = this.rearrangingFruits.rearrange(new int[] { 1, 2, 50, 50 }, new int[] { 50, 50, 1, 2 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 1, 2, 50, 50 }, new int[] { 50, 50, 1, 2 });
         assertThat(result).isZero(); // already balanced
     }
 
@@ -130,14 +130,14 @@ class RearrangingFruitsTest {
     @Test
     void testRearrange_OddTotalCount_SingleValue() {
         // Total count of 3 is odd (1 + 2 = 3), cannot split evenly
-        int result = this.rearrangingFruits.rearrange(new int[] { 3 }, new int[] { 4 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 3 }, new int[] { 4 });
         assertThat(result).isEqualTo(-1);
     }
 
     @Test
     void testRearrange_OddTotalCount_InLargerBasket() {
         // One fruit type has odd total
-        int result = this.rearrangingFruits.rearrange(new int[] { 1, 1, 1 }, new int[] { 2, 2, 2 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 1, 1, 1 }, new int[] { 2, 2, 2 });
         assertThat(result).isEqualTo(-1);
     }
 
@@ -145,7 +145,7 @@ class RearrangingFruitsTest {
 
     @Test
     void testRearrange_LargeValues() {
-        int result = this.rearrangingFruits.rearrange(
+        long result = this.rearrangingFruits.rearrange(
                 new int[] { 1000000, 1000000 },
                 new int[] { 1, 1 });
         // Need to swap one 1000000 with one 1, cost = min(1, 1000000) = 1
@@ -157,7 +157,7 @@ class RearrangingFruitsTest {
         // Basket1: [1, 500000, 500000], Basket2: [500000, 1, 1]
         // freq1: {1:1, 500000:2}, freq2: {500000:1, 1:2}
         // union: {1:3, 500000:3} -> both odd -> impossible
-        int result = this.rearrangingFruits.rearrange(
+        long result = this.rearrangingFruits.rearrange(
                 new int[] { 1, 500000, 500000 },
                 new int[] { 500000, 1, 1 });
         assertThat(result).isEqualTo(-1);
@@ -173,7 +173,7 @@ class RearrangingFruitsTest {
         // basket2 excess: [100] (has 2, needs 1)
         // swap 50<->100: direct cost = min(50,100) = 50, via min = 2*1 = 2
         // Choose via min = 2
-        int result = this.rearrangingFruits.rearrange(
+        long result = this.rearrangingFruits.rearrange(
                 new int[] { 1, 1, 50, 50 },
                 new int[] { 1, 1, 100, 100 });
         assertThat(result).isEqualTo(2);
@@ -183,24 +183,92 @@ class RearrangingFruitsTest {
 
     @Test
     void testRearrange_AllSameValue() {
-        int result = this.rearrangingFruits.rearrange(new int[] { 7, 7, 7 }, new int[] { 7, 7, 7 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 7, 7, 7 }, new int[] { 7, 7, 7 });
         assertThat(result).isZero();
     }
 
     @Test
     void testRearrange_TwoDistinctValues() {
-        int result = this.rearrangingFruits.rearrange(new int[] { 1, 1, 2, 2 }, new int[] { 1, 1, 2, 2 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 1, 1, 2, 2 }, new int[] { 1, 1, 2, 2 });
         assertThat(result).isZero();
     }
 
     @Test
     void testRearrange_MultipleSwapsNeeded() {
         // Multiple swaps required
-        int result = this.rearrangingFruits.rearrange(
+        long result = this.rearrangingFruits.rearrange(
                 new int[] { 1, 1, 1, 1 },
                 new int[] { 2, 2, 2, 2 });
         // Need 2 swaps: each costs min(1, 2) = 1, total = 2
         assertThat(result).isEqualTo(2);
+    }
+
+    // ==================== Large Array Overflow Test ====================
+
+    @Test
+    void testRearrange_LargeArraysNoOverflow() {
+        // Test to verify no integer overflow with large arrays
+        // basket1: 100000 elements of value 1
+        // basket2: 100000 elements of value 2
+        // freq1: {1: 100000}, freq2: {2: 100000}
+        // union: {1: 100000, 2: 100000} - both even
+        // target each: 50000 of value 1, 50000 of value 2
+        // excess1: 50000 of value 1 (has 100000, needs 50000)
+        // excess2: 50000 of value 2 (has 100000, needs 50000)
+        // globalMin = 1
+        // each swap: direct = min(1, 2) = 1, via min = 2 * 1 = 2
+        // Direct is cheaper: 50000 * 1 = 50000
+        int[] basket1 = new int[100_000];
+        int[] basket2 = new int[100_000];
+        java.util.Arrays.fill(basket1, 1);
+        java.util.Arrays.fill(basket2, 2);
+
+        long result = this.rearrangingFruits.rearrange(basket1, basket2);
+        // Cost = 50000 swaps * min(1, 2) = 50000
+        assertThat(result).isEqualTo(50_000L);
+    }
+
+    @Test
+    void testRearrange_LargeArraysVeryLargeCostNoOverflow() {
+        // Test specifically for the overflow case where result > Integer.MAX_VALUE
+        // basket1: all value 1_000_000_000
+        // basket2: all value 1
+        // Need to swap half the elements: 50000 swaps
+        // Each swap via min = 2 * 1 = 2 (since direct cost = min(1, 10^9) = 1 is
+        // cheaper)
+        // Wait, direct cost = 1 is cheaper than via min = 2
+        // So total = 50000 * 1 = 50000
+        // This doesn't overflow... need different values
+
+        // For overflow test: use values where via min isn't cheaper
+        // basket1: 100000 elements of value 2
+        // basket2: 100000 elements of value 1_000_000_000
+        // Need 50000 swaps, direct cost = min(2, 10^9) = 2 each
+        // via min would need globalMin which is 2, so 2*2 = 4 (more expensive)
+        // Total = 50000 * 2 = 100000 - still no overflow
+
+        // To trigger overflow, we need many swaps with large costs
+        // Example: 50000 swaps each costing 1_000_000_000
+        // Result = 50000 * 10^9 = 5 * 10^13 > Integer.MAX_VALUE
+        int[] basket1 = new int[100_000];
+        int[] basket2 = new int[100_000];
+        for (int i = 0; i < 100_000; i++) {
+            // Both baskets have the same globalMin (1_000_000_000)
+            basket1[i] = 1_000_000_000;
+            basket2[i] = 999_999_999;
+        }
+        // freq1: {10^9: 100000}, freq2: {10^9-1: 100000}
+        // union: {10^9: 100000, 10^9-1: 100000} - both even
+        // target each: 50000 of each
+        // excess1: 50000 of 10^9 (has 100000, needs 50000)
+        // excess2: 50000 of (10^9-1) (has 100000, needs 50000)
+        // globalMin = 999_999_999
+        // each swap: direct = min(10^9, 10^9-1) = 999_999_999
+        // via min = 2 * 999_999_999 = 1_999_999_998 (more expensive)
+        // Total = 50000 * 999_999_999 = 49_999_999_950_000
+
+        long result = this.rearrangingFruits.rearrange(basket1, basket2);
+        assertThat(result).isEqualTo(49_999_999_950_000L);
     }
 
     // ==================== Validation Tests ====================
@@ -283,7 +351,7 @@ class RearrangingFruitsTest {
         java.util.Arrays.fill(maxBasket1, 1);
         java.util.Arrays.fill(maxBasket2, 1);
 
-        int result = this.rearrangingFruits.rearrange(maxBasket1, maxBasket2);
+        long result = this.rearrangingFruits.rearrange(maxBasket1, maxBasket2);
         assertThat(result).isZero(); // Already identical
     }
 
@@ -336,7 +404,7 @@ class RearrangingFruitsTest {
 
     @Test
     void testRearrange_AtMaxValue() {
-        int result = this.rearrangingFruits.rearrange(
+        long result = this.rearrangingFruits.rearrange(
                 new int[] { 1_000_000_000, 1_000_000_000 },
                 new int[] { 1_000_000_000, 1_000_000_000 });
         assertThat(result).isZero();
@@ -344,14 +412,14 @@ class RearrangingFruitsTest {
 
     @Test
     void testRearrange_AtMinValue() {
-        int result = this.rearrangingFruits.rearrange(new int[] { 1, 1 }, new int[] { 1, 1 });
+        long result = this.rearrangingFruits.rearrange(new int[] { 1, 1 }, new int[] { 1, 1 });
         assertThat(result).isZero();
     }
 
     @Test
     void testRearrange_BoundaryValues() {
         // Mix of min and max values
-        int result = this.rearrangingFruits.rearrange(
+        long result = this.rearrangingFruits.rearrange(
                 new int[] { 1, 1_000_000_000 },
                 new int[] { 1, 1_000_000_000 });
         assertThat(result).isZero();
