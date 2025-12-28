@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '4.0.1'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'info.solidsoft.pitest' version '1.19.0-rc.2'
 }
 
 group = 'at.mavila'
@@ -12,6 +13,9 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
     }
+    // For Pitest compatibility, set source/target to 21 (Pitest doesn't support Java 25 yet)
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 configurations {
@@ -42,5 +46,37 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-// Disable continuous build file watching for better debugging performance
-gradle.startParameter.continuous = false
+// ==================== Pitest Mutation Testing ====================
+// Run with: ./gradlew pitest
+// Report: build/reports/pitest/index.html
+
+pitest {
+    // Target classes to mutate
+    targetClasses = ['at.mavila.exercises_january_2026.components.*']
+    // Target tests to run
+    targetTests = ['at.mavila.exercises_january_2026.components.*']
+    // JUnit 5 support
+    junit5PluginVersion = '1.2.1'
+    // Pitest version - use latest for best Java version support
+    pitestVersion = '1.17.3'
+    // Mutation operators
+    mutators = ['DEFAULTS']
+    // Output formats
+    outputFormats = ['HTML', 'XML']
+    // Threads for parallel execution
+    threads = 4
+    // Timeout for mutations
+    timeoutConstInMillis = 30000
+    // Fail build if mutation coverage is below threshold
+    mutationThreshold = 80
+    // Coverage threshold
+    coverageThreshold = 80
+    // Verbose output
+    verbose = true
+    // Timestamp in report directory
+    timestampedReports = false
+    // JVM args for forked process
+    jvmArgs = ['-Xmx1024m']
+}
+
+build.dependsOn 'pitest'

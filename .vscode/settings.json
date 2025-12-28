@@ -81,7 +81,7 @@
 
   // Gradle Settings
   "gradle.javaDebug.cleanOutput": false,
-  "gradle.autoDetect": "off",
+  "gradle.autoDetect": "on",
   "gradle.nestedProjects": false,
   "gradle.reuseTerminals": "all",
 
