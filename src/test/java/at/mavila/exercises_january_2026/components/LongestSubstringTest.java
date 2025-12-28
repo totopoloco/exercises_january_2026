@@ -37,17 +37,15 @@ class LongestSubstringTest {
     // ==================== Null and Empty Input ====================
 
     @Test
-    void testLongestUniqueSubstringLength_NullInput_ThrowsException() {
-        assertThatThrownBy(() -> longestSubstring.longestUniqueSubstringLength(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Input cannot be null");
+    void testLongestUniqueSubstringLength_NullInput_Then_0() {
+        int result = longestSubstring.longestUniqueSubstringLength(null);
+        assertThat(result).isZero();
     }
 
     @Test
-    void testLongestUniqueSubstringLength_EmptyString_ThrowsException() {
-        assertThatThrownBy(() -> longestSubstring.longestUniqueSubstringLength(""))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Input cannot be empty");
+    void testLongestUniqueSubstringLength_EmptyString_Then_0() {
+        int result = longestSubstring.longestUniqueSubstringLength("");
+        assertThat(result).isZero();
     }
 
     @Test
@@ -67,11 +65,11 @@ class LongestSubstringTest {
     @Test
     void testLongestUniqueSubstringLength_NullAndEmptyBothThrow() {
         // Both null and empty throw IllegalArgumentException
-        assertThatThrownBy(() -> longestSubstring.longestUniqueSubstringLength(null))
-                .isInstanceOf(IllegalArgumentException.class);
+        int result = longestSubstring.longestUniqueSubstringLength(null);
+        assertThat(result).isZero();
 
-        assertThatThrownBy(() -> longestSubstring.longestUniqueSubstringLength(""))
-                .isInstanceOf(IllegalArgumentException.class);
+        int resultEmpty = longestSubstring.longestUniqueSubstringLength("");
+        assertThat(resultEmpty).isZero();
     }
 
     // ==================== Single Character ====================
