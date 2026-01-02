@@ -15,15 +15,13 @@ public class LinkedListMerger {
 
         ListNode merged = null;
         for (int n = 0; n < lists.length; n++) {
-            if (Objects.isNull(lists[n])) {
-                continue;
+            if (Objects.nonNull(lists[n])) {
+                if (Objects.isNull(merged)) {
+                    merged = lists[n];
+                } else {
+                    merged = mergeTwoLists(merged, lists[n]);
+                }
             }
-
-            if (n == 0) {
-                merged = lists[n];
-                continue;
-            }
-            merged = mergeTwoLists(merged, lists[n]);
         }
 
         return merged;
@@ -78,7 +76,6 @@ public class LinkedListMerger {
             }
 
             // tempListNode's value is smaller, so append tempListNode's node
-            // tail.setNext(tempListNode);
             tail.next = tempListNode;
             // Move tempListNode pointer to the next node in its list
             tempListNode = tempListNode.next;
@@ -91,11 +88,9 @@ public class LinkedListMerger {
         // Append the remaining nodes from the non-empty list (if any).
         if (Objects.nonNull(tempMerged)) {
             // tempMerged still has nodes, append the rest of tempMerged
-            // tail.setNext(tempMerged);
             tail.next = tempMerged;
         } else {
             // tempListNode still has nodes (or is null), append the rest of tempListNode
-            // tail.setNext(tempListNode);
             tail.next = tempListNode;
         }
 
