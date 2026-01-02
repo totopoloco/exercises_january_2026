@@ -46,56 +46,68 @@ public class LinkedListMerger {
      * space.
      * </p>
      *
-     * @param merged   the first sorted linked list to merge
-     * @param listNode the second sorted linked list to merge
+     * @param source1 the first sorted linked list to merge
+     * @param source2 the second sorted linked list to merge
      * @return a new sorted linked list containing all nodes from both input lists
      */
-    private ListNode mergeTwoLists(final ListNode merged, final ListNode listNode) {
-        // Create a dummy node to serve as the starting point of the merged list.
-        // This simplifies handling the head of the result list.
-        ListNode dummy = new ListNode(0);
+    private ListNode mergeTwoLists(final ListNode source1, final ListNode source2) {
+        // Handle edge cases - if one list is empty, return the other
+        if (Objects.isNull(source1)) {
+            return source2;
+        }
+        if (Objects.isNull(source2)) {
+            return source1;
+        }
 
-        // Tail pointer keeps track of the last node in the merged list
-        ListNode tail = dummy;
+        // Working pointers to traverse both input lists
+        ListNode currentStateOfSource1 = source1;
+        ListNode currentStateOfSource2 = source2;
 
-        // Create working pointers for both input lists to traverse them
-        ListNode tempMerged = merged;
-        ListNode tempListNode = listNode;
+        // Determine the head of the merged list (the smaller first node)
+        ListNode head;
+        if (currentStateOfSource1.val <= currentStateOfSource2.val) {
+            head = currentStateOfSource1;
+            currentStateOfSource1 = currentStateOfSource1.next;
+        } else {
+            head = currentStateOfSource2;
+            currentStateOfSource2 = currentStateOfSource2.next;
+        }
+
+        // Tail pointer keeps track of the last node in the merged list.
+        // Note: `head` and `tail` initially point to the same node. As we append nodes
+        // via `tail.next`, the linked list grows. Since `head` holds a reference to the
+        // first node, it remains the entry point to the entire merged list.
+        ListNode tail = head;
 
         // Traverse both lists while both have remaining nodes
-        while (Objects.nonNull(tempMerged) && Objects.nonNull(tempListNode)) {
-            // Compare current nodes and append the smaller one to the merged list
-            if (tempMerged.val <= tempListNode.val) {
-                // tempMerged's value is smaller or equal, so append tempMerged's node
-                tail.next = tempMerged;
-                // Move tempMerged pointer to the next node in its list
-                tempMerged = tempMerged.next;
-                // Advance the tail pointer to the newly added node
-                tail = tail.next;
-                continue;
+        while (Objects.nonNull(currentStateOfSource1) && Objects.nonNull(currentStateOfSource2)) {
+
+            if (currentStateOfSource1.val <= currentStateOfSource2.val) { // Compare only values of nodes and not entire
+                                                                          // nodes
+                // Append source1's node and advance tail in one step, so in the next iteration
+                // we always have the correct tail
+                tail = tail.next = currentStateOfSource1;
+                currentStateOfSource1 = currentStateOfSource1.next; // We deplete source1 one by one
+            } else {
+                // Append source2's node and advance tail in one step, so in the next iteration
+                // we always have the correct tail
+                tail = tail.next = currentStateOfSource2;
+                currentStateOfSource2 = currentStateOfSource2.next; // We deplete source2 one by one
             }
-
-            // tempListNode's value is smaller, so append tempListNode's node
-            tail.next = tempListNode;
-            // Move tempListNode pointer to the next node in its list
-            tempListNode = tempListNode.next;
-            // Advance the tail pointer to the newly added node
-            tail = tail.next;
-
         }
 
         // At this point, at least one list is exhausted.
         // Append the remaining nodes from the non-empty list (if any).
-        if (Objects.nonNull(tempMerged)) {
-            // tempMerged still has nodes, append the rest of tempMerged
-            tail.next = tempMerged;
+        if (Objects.nonNull(currentStateOfSource1)) {
+            // source1 still has nodes, append the rest of source1
+            tail.next = currentStateOfSource1;
         } else {
-            // tempListNode still has nodes (or is null), append the rest of tempListNode
-            tail.next = tempListNode;
+            // source2 still has nodes (or is null), append the rest of source2
+            tail.next = currentStateOfSource2;
         }
 
-        // Return the merged list, skipping the dummy head node
-        return dummy.next;
+        // Return the merged list
+        return head;
     }
 
 }

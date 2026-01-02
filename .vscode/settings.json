@@ -2,7 +2,7 @@
   // Java Settings
   "java.configuration.updateBuildConfiguration": "interactive",
   "java.compile.nullAnalysis.mode": "disabled",
-  "java.autobuild.enabled": false,
+  "java.autobuild.enabled": true,
   "java.jdt.ls.java.home": "/opt/java/openjdk",
   "java.import.gradle.enabled": true,
   "java.import.gradle.wrapper.enabled": true,
