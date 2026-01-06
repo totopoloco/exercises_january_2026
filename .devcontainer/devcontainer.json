@@ -33,7 +33,8 @@
         "mhutchie.git-graph",
         "streetsidesoftware.code-spell-checker",
         "formulahendry.code-runner",
-        "k--kato.intellij-idea-keybindings"
+        "k--kato.intellij-idea-keybindings",
+        "madhavd1.javadoc-tools"
       ],
       // VS Code settings
       "settings": {
