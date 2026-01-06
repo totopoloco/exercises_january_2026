@@ -70,10 +70,9 @@
   },
 
   // Lifecycle scripts
-  "postCreateCommand": "chmod +x ./gradlew && ./gradlew --version",
-  "postStartCommand": "./gradlew dependencies --refresh-dependencies",
+  // "postCreateCommand": "chmod +x ./gradlew && ./gradlew --version",
+  // "postStartCommand": "./gradlew dependencies --refresh-dependencies",
 
   // Set user
   "remoteUser": "vscode"
 }
-

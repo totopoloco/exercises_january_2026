@@ -2,7 +2,7 @@
 
 # Ensure gradle wrapper is executable
 if [ -f "/workspace/gradlew" ]; then
-    chmod +x /workspace/gradlew
+    sudo chmod a+x /workspace/gradlew
 fi
 
 # Create gradle properties directory if not exists
