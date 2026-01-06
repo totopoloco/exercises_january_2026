@@ -418,45 +418,55 @@ The ^ and $ are sentinels to avoid boundary checks.
 
 The algorithm can be broken down into **three scenarios**:
 
-#### Scenario 1: Expansion Only (currentIndex >= right)
+#### Scenario 1: Mirroring (currentIndex < right)
 
-When we're outside any known palindrome, we start fresh:
-
-```java
-// No mirroring possible - start with radius 0
-pradii[currentIndex] = 0;
-
-// Expand outward
-while (s[currentIndex + 1 + pradii[currentIndex]] == s[currentIndex - 1 - pradii[currentIndex]]) {
-    pradii[currentIndex]++;
-}
-```
-
-#### Scenario 2: Expansion + Update center/right
-
-After expansion, if the palindrome extends past the current `right` boundary:
+When we're inside a known palindrome, we can exploit symmetry:
 
 ```java
-int expandedIndex = currentIndex + pradii[currentIndex];
-if (expandedIndex > right) {
-    center = currentIndex;
-    right = expandedIndex;
-}
-```
-
-#### Scenario 3: Mirroring + Expansion + Update (The Magic!)
-
-When `currentIndex < right`, we're inside a known palindrome and can exploit symmetry:
-
-```java
-mirror = 2 * center - currentIndex;
+final int mirror = 2 * center - currentIndex;
 
 if (currentIndex < right) {
     int distanceToRight = right - currentIndex;
     int mirrorRadius = pradii[mirror];
     pradii[currentIndex] = Math.min(distanceToRight, mirrorRadius);
 }
-// Then expand and update as before...
+// Then expand...
+```
+
+#### Scenario 2: No Mirroring (currentIndex >= right)
+
+When we're outside any known palindrome, we start fresh with `pradii[currentIndex] = 0` (already initialized).
+
+#### Scenario 3: Expansion (Always Performed)
+
+After mirroring (or starting fresh), expand outward using the `palindromeDetector` method:
+
+```java
+private void palindromeDetector(char[] preprocessed, int[] pradii, int currentIndex) {
+    while (true) {
+        int offset = pradii[currentIndex] + 1;
+        char charRight = preprocessed[currentIndex + offset];
+        char charLeft = preprocessed[currentIndex - offset];
+
+        if (charRight == charLeft) {
+            pradii[currentIndex]++;
+        } else {
+            break;
+        }
+    }
+}
+```
+
+After expansion, update rightmost palindrome if needed:
+
+```java
+final int currentPalindromeRadius = pradii[currentIndex];
+final int expandedIndex = currentIndex + currentPalindromeRadius;
+
+if (expandedIndex > right) {
+    center = currentIndex;
+    right = expandedIndex;
+}
 ```
 
 **This is the genius of Manacher's Algorithm!**
@@ -523,8 +533,8 @@ The implementation includes detailed logging that shows a visual "animation" of 
   LEGEND: ▲ = currentIndex, C = center, R = right, M = maxCenter
   ───────────────────────────────────────────────────────────────────────────
   VARIABLES:
-    currentIndex = 2  │  center = 2  │  right = 3
-    maxLen = 1  │  maxCenter = 2  │  pradii[2] = 1
+    currentIndex = 2  │  center    = 2  │  right      = 3
+    maxLen       = 1  │  maxCenter = 2  │  pradii[2]  = 1
   ───────────────────────────────────────────────────────────────────────────
   CURRENT PALINDROME RANGE: [1..3] centered at 2
          ─  ●  ─
@@ -572,13 +582,18 @@ STEP 2: INITIALIZE VARIABLES
   maxCenter = 0
 ```
 
-#### Iteration at currentIndex=4 (Scenario 2: Expansion + Update)
+#### Iteration at currentIndex=4 (No Mirroring + Expansion)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ ITERATION: currentIndex = 4 (char = 'a')
 └─────────────────────────────────────────────────────────────────────────────┘
   State: center=2, right=3
+
+  ┌─ MIRROR CALCULATION ───────────────────────────────────────────────────┐
+  │  mirror = 2 * center - currentIndex
+  │        = 2 * 2 - 4 = 0
+  └────────────────────────────────────────────────────────────────────────┘
 
   ┌─ NO MIRRORING (currentIndex >= right) ─────────────────────────────────┐
   │  4 >= 3 → We're OUTSIDE any known palindrome
@@ -588,26 +603,27 @@ STEP 2: INITIALIZE VARIABLES
   ┌─ EXPANSION ────────────────────────────────────────────────────────────┐
   │  Try to expand palindrome centered at currentIndex=4
   │  Expansion #1: offset=1
-  │    charLeft  = preprocessed[3] = '#'
-  │    charRight = preprocessed[5] = '#'
+  │    charLeft  = preprocessed[4 - 1] = preprocessed[3] = '#'
+  │    charRight = preprocessed[4 + 1] = preprocessed[5] = '#'
   │    '#' == '#' → MATCH! pradii[4] incremented to 1
   │  Expansion #2: offset=2
-  │    charLeft  = preprocessed[2] = 'b'
-  │    charRight = preprocessed[6] = 'b'
+  │    charLeft  = preprocessed[4 - 2] = preprocessed[2] = 'b'
+  │    charRight = preprocessed[4 + 2] = preprocessed[6] = 'b'
   │    'b' == 'b' → MATCH! pradii[4] incremented to 2
   │  Expansion #3: offset=3
-  │    charLeft  = preprocessed[1] = '#'
-  │    charRight = preprocessed[7] = '#'
+  │    charLeft  = preprocessed[4 - 3] = preprocessed[1] = '#'
+  │    charRight = preprocessed[4 + 3] = preprocessed[7] = '#'
   │    '#' == '#' → MATCH! pradii[4] incremented to 3
   │  Expansion #4: offset=4
-  │    charLeft  = preprocessed[0] = '^'
-  │    charRight = preprocessed[8] = 'a'
+  │    charLeft  = preprocessed[4 - 4] = preprocessed[0] = '^'
+  │    charRight = preprocessed[4 + 4] = preprocessed[8] = 'a'
   │    '^' != 'a' → MISMATCH. Expansion stops.
   │  Final radius: pradii[4] = 3
   └────────────────────────────────────────────────────────────────────────┘
 
   ┌─ CHECK: Update rightmost palindrome? ──────────────────────────────────┐
-  │  expandedIndex = 4 + 3 = 7
+  │  expandedIndex = currentIndex + pradii[currentIndex]
+  │               = 4 + 3 = 7
   │  Compare: expandedIndex (7) > right (3) ?
   │  → YES! This palindrome extends further right.
   │    center: 2 → 4
@@ -623,7 +639,7 @@ STEP 2: INITIALIZE VARIABLES
   └────────────────────────────────────────────────────────────────────────┘
 ```
 
-#### Iteration at currentIndex=6 (Scenario 3: Mirroring + Expansion)
+#### Iteration at currentIndex=6 (Mirroring + Expansion)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -639,23 +655,48 @@ STEP 2: INITIALIZE VARIABLES
   ┌─ MIRRORING (currentIndex < right) ─────────────────────────────────────┐
   │  6 < 7 → We're INSIDE the rightmost palindrome!
   │
+  │  Key insight: Due to symmetry around 'center', the palindrome at
+  │  'currentIndex' mirrors the one at 'mirror'. But we can only trust
+  │  information up to 'right' boundary.
+  │
   │  distanceToRight = right - currentIndex = 7 - 6 = 1
   │  mirrorRadius    = pradii[mirror] = pradii[2] = 1
   │
-  │  pradii[6] = min(1, 1) = 1  ← Start with radius 1!
+  │  pradii[6] = min(1, 1) = 1
+  │  (We take minimum because mirror's palindrome might extend beyond 'right')
   └────────────────────────────────────────────────────────────────────────┘
 
-  ┌─ EXPANSION (starting from pradii[6]=1) ────────────────────────────────┐
+  ┌─ EXPANSION ────────────────────────────────────────────────────────────┐
+  │  Try to expand palindrome centered at currentIndex=6
   │  Expansion #1: offset=2
-  │    charLeft  = preprocessed[4] = 'a'
-  │    charRight = preprocessed[8] = 'a'
+  │    charLeft  = preprocessed[6 - 2] = preprocessed[4] = 'a'
+  │    charRight = preprocessed[6 + 2] = preprocessed[8] = 'a'
   │    'a' == 'a' → MATCH! pradii[6] incremented to 2
-  │  ... continues expanding ...
+  │  Expansion #2: offset=3
+  │    charLeft  = preprocessed[6 - 3] = preprocessed[3] = '#'
+  │    charRight = preprocessed[6 + 3] = preprocessed[9] = '#'
+  │    '#' == '#' → MATCH! pradii[6] incremented to 3
+  │  Expansion #3: offset=4
+  │    charLeft  = preprocessed[6 - 4] = preprocessed[2] = 'b'
+  │    charRight = preprocessed[6 + 4] = preprocessed[10] = 'd'
+  │    'b' != 'd' → MISMATCH. Expansion stops.
+  │  Expanded 2 time(s).
   │  Final radius: pradii[6] = 3
   └────────────────────────────────────────────────────────────────────────┘
 
-  Update: center = 6, right = 9
-  Note: maxLen stays 3 (palindrome "aba" also valid, same length as "bab")
+  ┌─ CHECK: Update rightmost palindrome? ──────────────────────────────────┐
+  │  expandedIndex = currentIndex + pradii[currentIndex]
+  │               = 6 + 3 = 9
+  │  Compare: expandedIndex (9) > right (7) ?
+  │  → YES! This palindrome extends further right.
+  │    center: 4 → 6
+  │    right:  7 → 9
+  └────────────────────────────────────────────────────────────────────────┘
+
+  ┌─ CHECK: New longest palindrome? ───────────────────────────────────────┐
+  │  Compare: pradii[6] (3) > maxLen (3) ?
+  │  → NO, keeping maxLen=3, maxCenter=4
+  └────────────────────────────────────────────────────────────────────────┘
 ```
 
 #### Final Result
