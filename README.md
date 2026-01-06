@@ -404,78 +404,62 @@ The ^ and $ are sentinels to avoid boundary checks.
 
 ### Step 2: Key Variables
 
-| Variable                        | Description                                                                                                                        |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `palindrome_radii[]` (or `p[]`) | Array storing the radius of the palindrome centered at each index. The radius equals the palindrome length in the original string. |
-| `center`                        | The index of the center of the rightmost palindrome found so far.                                                                  |
-| `right_boundary` (or `right`)   | The rightmost index reached by any palindrome found so far: `right = center + palindrome_radii[center]`                            |
+| Variable       | Description                                                                                                                        |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `pradii[]`     | Array storing the radius of the palindrome centered at each index. The radius equals the palindrome length in the original string. |
+| `center`       | The index of the center of the rightmost palindrome found so far.                                                                  |
+| `right`        | The rightmost index reached by any palindrome found so far: `right = center + pradii[center]`                                      |
+| `currentIndex` | The current position being processed in the main loop.                                                                             |
+| `mirror`       | The mirror position of `currentIndex` relative to `center`: `mirror = 2 * center - currentIndex`                                   |
+| `maxLen`       | The longest palindrome radius found so far.                                                                                        |
+| `maxCenter`    | The center index of the longest palindrome.                                                                                        |
 
 ### Step 3: The Three Scenarios
 
 The algorithm can be broken down into **three scenarios**:
 
-#### Scenario 1: Expansion Only
+#### Scenario 1: Expansion Only (currentIndex >= right)
+
+When we're outside any known palindrome, we start fresh:
 
 ```java
-while (s[i + 1 + p[i]] == s[i - 1 - p[i]]) {
-    p[i]++;
+// No mirroring possible - start with radius 0
+pradii[currentIndex] = 0;
+
+// Expand outward
+while (s[currentIndex + 1 + pradii[currentIndex]] == s[currentIndex - 1 - pradii[currentIndex]]) {
+    pradii[currentIndex]++;
 }
 ```
 
-This is the base case. We take the character at the current index, compare it to its neighbors symmetrically, and expand as long as they match.
+#### Scenario 2: Expansion + Update center/right
 
-```
-Example: i=1 in "^#b#a#..."
-
-Index:  0  1  2  3  4  5
-Char:   ^  #  b  #  a  #
-            ↑
-            i=1
-
-Try to expand: s[0]='^' vs s[2]='b' → DON'T MATCH
-Result: p[1] = 0
-```
-
-#### Scenario 2: Expansion + Update center/right_boundary
+After expansion, if the palindrome extends past the current `right` boundary:
 
 ```java
-// After expansion...
-if (i + p[i] > right_boundary) {
-    center = i;
-    right_boundary = i + p[i];
+int expandedIndex = currentIndex + pradii[currentIndex];
+if (expandedIndex > right) {
+    center = currentIndex;
+    right = expandedIndex;
 }
-```
-
-When the palindrome centered at `i` extends past the current `right_boundary`, we update both `center` and `right_boundary`. This ensures future iterations can reuse this information.
-
-```
-Example: i=4 in "^#b#a#b#a#d#$"
-
-Index:  0  1  2  3  4  5  6  7  8  9  10 11 12
-Char:   ^  #  b  #  a  #  b  #  a  #  d  #  $
-                    ↑
-                    i=4 (center of "bab")
-
-Expansion finds: "#b#a#b#" is a palindrome
-p[4] = 3
-
-Since i + p[i] = 4 + 3 = 7 > right_boundary:
-  → center = 4
-  → right_boundary = 7
 ```
 
 #### Scenario 3: Mirroring + Expansion + Update (The Magic!)
 
-```java
-mirror = 2 * center - i;
+When `currentIndex < right`, we're inside a known palindrome and can exploit symmetry:
 
-if (i < right_boundary) {
-    p[i] = min(right_boundary - i, p[mirror]);
+```java
+mirror = 2 * center - currentIndex;
+
+if (currentIndex < right) {
+    int distanceToRight = right - currentIndex;
+    int mirrorRadius = pradii[mirror];
+    pradii[currentIndex] = Math.min(distanceToRight, mirrorRadius);
 }
 // Then expand and update as before...
 ```
 
-**This is the genius of Manacher's Algorithm!** It exploits the symmetric property of palindromes.
+**This is the genius of Manacher's Algorithm!**
 
 ```
 The Mirror Concept:
@@ -485,20 +469,20 @@ The Mirror Concept:
             │
     ◄───────┼───────►
             │
-  mirror    │    i
-     │      │    │
-     ▼      ▼    ▼
-─────────────────────────────
-     [   palindrome      ]
-                     ◄───► right_boundary
+  mirror    │    currentIndex
+     │      │         │
+     ▼      ▼         ▼
+─────────────────────────────────────
+     [   palindrome         ]
+                         ◄───► right
 
 Since everything within the palindrome centered at 'center' is symmetric,
-the palindrome at position 'i' mirrors the one at position 'mirror'.
+the palindrome at 'currentIndex' mirrors the one at 'mirror'.
 ```
 
-**But why use `min(right_boundary - i, p[mirror])`?**
+**Why use `min(distanceToRight, mirrorRadius)`?**
 
-Because the mirror's palindrome might extend **beyond** the left boundary of the current palindrome. We can only trust information **within** the known palindrome:
+Because the mirror's palindrome might extend beyond the left boundary:
 
 ```
 Case where mirror's palindrome exceeds the boundary:
@@ -508,227 +492,175 @@ Case where mirror's palindrome exceeds the boundary:
                            │
               ◄────────────┼────────────►
                            │
-    mirror                 │           i
-       │                   │           │
-       ▼                   ▼           ▼
+    mirror                 │           currentIndex
+       │                   │               │
+       ▼                   ▼               ▼
 ───────────────────────────────────────────────────────
-  [===palindrome at mirror===]    [===?===]
-  ▲                            ▲           ▲
-  │                            │           │
-extends beyond             left_boundary   right_boundary
+  [===palindrome at mirror===]        [===?===]
+  ▲                                ▲           ▲
+  │                                │           │
+extends beyond              left_boundary    right
 left_boundary!
 
-We can only guarantee p[i] >= min(p[mirror], right_boundary - i)
-The part beyond right_boundary is UNVERIFIED — we must expand to check!
+We can only guarantee pradii[currentIndex] >= min(pradii[mirror], right - currentIndex)
+The part beyond right is UNVERIFIED — we must expand to check!
+```
+
+### Visual State Animation
+
+The implementation includes detailed logging that shows a visual "animation" of the algorithm's state at each iteration:
+
+```
+  ═══════════════════════════════════════════════════════════════════════════
+  📊 VISUAL STATE
+  ═══════════════════════════════════════════════════════════════════════════
+  idx:    0  1  2  3  4  5  6  7  8  9 10 11 12
+  char:   ^  #  b  #  a  #  b  #  a  #  d  #  $
+  P[i]:   0  0  1  0  3  0  3  0  1  0  1  0  0
+                ▲
+               CM  R
+  ───────────────────────────────────────────────────────────────────────────
+  LEGEND: ▲ = currentIndex, C = center, R = right, M = maxCenter
+  ───────────────────────────────────────────────────────────────────────────
+  VARIABLES:
+    currentIndex = 2  │  center = 2  │  right = 3
+    maxLen = 1  │  maxCenter = 2  │  pradii[2] = 1
+  ───────────────────────────────────────────────────────────────────────────
+  CURRENT PALINDROME RANGE: [1..3] centered at 2
+         ─  ●  ─
+  ───────────────────────────────────────────────────────────────────────────
+  RIGHTMOST PALINDROME: [1..3] centered at 2
+         ═  ◆  ═
+  ═══════════════════════════════════════════════════════════════════════════
 ```
 
 ### Why This Achieves O(n)
 
 Each position is visited at most twice:
 
-1. Once when `i` reaches it during iteration
-2. Once during expansion (but this expansion contributes to moving `right_boundary` forward)
+1. Once when `currentIndex` reaches it during iteration
+2. Once during expansion (but this expansion contributes to moving `right` forward)
 
-Since `right_boundary` only moves forward and never backward, the total work is linear.
+Since `right` only moves forward and never backward, the total work is linear.
 
 ### Complexity
 
 -   **Time:** O(n) - each position is visited at most twice
--   **Space:** O(n) - for the preprocessed string and p[] array
+-   **Space:** O(n) - for the preprocessed string and pradii[] array
 
-### Detailed Execution Trace
-
-Below is the actual algorithm execution output for input `"babad"`, organized by the three scenarios:
+### Execution Example: "babad"
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║           MANACHER'S ALGORITHM - LONGEST PALINDROMIC SUBSTRING               ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 INPUT: "babad"
-Preprocessed string: ^#b#a#b#a#d#$
 
 ═══════════════════════════════════════════════════════════════════════════════
 STEP 1: PREPROCESSING
 ═══════════════════════════════════════════════════════════════════════════════
-  Original:     "babad"
-  Preprocessed: "^#b#a#b#a#d#$"
-  Length:       5 → 13
+  Original:     "babad" (length 5)
+  Preprocessed: "^#b#a#b#a#d#$" (length 13)
 
 ═══════════════════════════════════════════════════════════════════════════════
 STEP 2: INITIALIZE VARIABLES
 ═══════════════════════════════════════════════════════════════════════════════
-  n (length)        = 13
-  palindrome_radii  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-  center            = 0
-  right_boundary    = 0
-  maxLen            = 0
-  maxCenter         = 0
-
-═══════════════════════════════════════════════════════════════════════════════
-STEP 3: MAIN LOOP
-═══════════════════════════════════════════════════════════════════════════════
+  pradii[]  = array of 13 zeros
+  center    = 0
+  right     = 0
+  maxLen    = 0
+  maxCenter = 0
 ```
 
-#### Scenario 1: Expansion Only (i=1)
+#### Iteration at currentIndex=4 (Scenario 2: Expansion + Update)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ ITERATION 1: i = 1 (char = '#')  →  SCENARIO 1: Expansion Only
+│ ITERATION: currentIndex = 4 (char = 'a')
 └─────────────────────────────────────────────────────────────────────────────┘
+  State: center=2, right=3
 
-  State: center=0, right_boundary=0
-  Check: i (1) >= right_boundary (0)  →  OUTSIDE known palindrome
+  ┌─ NO MIRRORING (currentIndex >= right) ─────────────────────────────────┐
+  │  4 >= 3 → We're OUTSIDE any known palindrome
+  │  Starting fresh with pradii[4] = 0
+  └────────────────────────────────────────────────────────────────────────┘
 
-  ┌─ EXPANSION ─────────────────────────────────────────────────────────────┐
-  │  Try:  s[0]='^' vs s[2]='b'  →  DON'T MATCH                             │
-  │  Result: p[1] = 0                                                        │
-  └─────────────────────────────────────────────────────────────────────────┘
+  ┌─ EXPANSION ────────────────────────────────────────────────────────────┐
+  │  Try to expand palindrome centered at currentIndex=4
+  │  Expansion #1: offset=1
+  │    charLeft  = preprocessed[3] = '#'
+  │    charRight = preprocessed[5] = '#'
+  │    '#' == '#' → MATCH! pradii[4] incremented to 1
+  │  Expansion #2: offset=2
+  │    charLeft  = preprocessed[2] = 'b'
+  │    charRight = preprocessed[6] = 'b'
+  │    'b' == 'b' → MATCH! pradii[4] incremented to 2
+  │  Expansion #3: offset=3
+  │    charLeft  = preprocessed[1] = '#'
+  │    charRight = preprocessed[7] = '#'
+  │    '#' == '#' → MATCH! pradii[4] incremented to 3
+  │  Expansion #4: offset=4
+  │    charLeft  = preprocessed[0] = '^'
+  │    charRight = preprocessed[8] = 'a'
+  │    '^' != 'a' → MISMATCH. Expansion stops.
+  │  Final radius: pradii[4] = 3
+  └────────────────────────────────────────────────────────────────────────┘
 
-  Update: i + p[i] = 1 > right_boundary = 0
-    → center = 1, right_boundary = 1
+  ┌─ CHECK: Update rightmost palindrome? ──────────────────────────────────┐
+  │  expandedIndex = 4 + 3 = 7
+  │  Compare: expandedIndex (7) > right (3) ?
+  │  → YES! This palindrome extends further right.
+  │    center: 2 → 4
+  │    right:  3 → 7
+  └────────────────────────────────────────────────────────────────────────┘
 
-  palindrome_radii = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  ┌─ CHECK: New longest palindrome? ───────────────────────────────────────┐
+  │  Compare: pradii[4] (3) > maxLen (1) ?
+  │  → YES! New longest found.
+  │    maxLen:    1 → 3
+  │    maxCenter: 4
+  │    palindrome: "bab"
+  └────────────────────────────────────────────────────────────────────────┘
 ```
 
-#### Scenario 2: Expansion + Update (i=2, i=4)
+#### Iteration at currentIndex=6 (Scenario 3: Mirroring + Expansion)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ ITERATION 2: i = 2 (char = 'b')  →  SCENARIO 2: Expansion + Update
+│ ITERATION: currentIndex = 6 (char = 'b')
 └─────────────────────────────────────────────────────────────────────────────┘
+  State: center=4, right=7
 
-  State: center=1, right_boundary=1
-  Check: i (2) >= right_boundary (1)  →  OUTSIDE known palindrome
+  ┌─ MIRROR CALCULATION ───────────────────────────────────────────────────┐
+  │  mirror = 2 * center - currentIndex
+  │        = 2 * 4 - 6 = 2
+  └────────────────────────────────────────────────────────────────────────┘
 
-  ┌─ EXPANSION ─────────────────────────────────────────────────────────────┐
-  │  Try:  s[1]='#' vs s[3]='#'  →  MATCH! p[2]++ = 1                        │
-  │  Try:  s[0]='^' vs s[4]='a'  →  DON'T MATCH                              │
-  │  Result: p[2] = 1                                                        │
-  └─────────────────────────────────────────────────────────────────────────┘
+  ┌─ MIRRORING (currentIndex < right) ─────────────────────────────────────┐
+  │  6 < 7 → We're INSIDE the rightmost palindrome!
+  │
+  │  distanceToRight = right - currentIndex = 7 - 6 = 1
+  │  mirrorRadius    = pradii[mirror] = pradii[2] = 1
+  │
+  │  pradii[6] = min(1, 1) = 1  ← Start with radius 1!
+  └────────────────────────────────────────────────────────────────────────┘
 
-  Update: i + p[i] = 3 > right_boundary = 1
-    → center = 2, right_boundary = 3
+  ┌─ EXPANSION (starting from pradii[6]=1) ────────────────────────────────┐
+  │  Expansion #1: offset=2
+  │    charLeft  = preprocessed[4] = 'a'
+  │    charRight = preprocessed[8] = 'a'
+  │    'a' == 'a' → MATCH! pradii[6] incremented to 2
+  │  ... continues expanding ...
+  │  Final radius: pradii[6] = 3
+  └────────────────────────────────────────────────────────────────────────┘
 
-  ★★ NEW LONGEST: maxLen = 1, palindrome = "b"
-
-  palindrome_radii = [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  Update: center = 6, right = 9
+  Note: maxLen stays 3 (palindrome "aba" also valid, same length as "bab")
 ```
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ ITERATION 4: i = 4 (char = 'a')  →  SCENARIO 2: Expansion + Update
-└─────────────────────────────────────────────────────────────────────────────┘
-
-  State: center=2, right_boundary=3
-  Check: i (4) >= right_boundary (3)  →  OUTSIDE known palindrome
-
-  ┌─ EXPANSION ─────────────────────────────────────────────────────────────┐
-  │  Try:  s[3]='#' vs s[5]='#'  →  MATCH! p[4]++ = 1                        │
-  │  Try:  s[2]='b' vs s[6]='b'  →  MATCH! p[4]++ = 2                        │
-  │  Try:  s[1]='#' vs s[7]='#'  →  MATCH! p[4]++ = 3                        │
-  │  Try:  s[0]='^' vs s[8]='a'  →  DON'T MATCH                              │
-  │  Result: p[4] = 3                                                        │
-  └─────────────────────────────────────────────────────────────────────────┘
-
-  Update: i + p[i] = 7 > right_boundary = 3
-    → center = 4, right_boundary = 7
-
-  ★★ NEW LONGEST: maxLen = 3, palindrome = "bab"
-
-  palindrome_radii = [0, 0, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0]
-```
-
-#### Scenario 3: Mirroring + Expansion + Update (i=5, i=6)
+#### Final Result
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ ITERATION 5: i = 5 (char = '#')  →  SCENARIO 3: Mirroring (no expansion)
-└─────────────────────────────────────────────────────────────────────────────┘
-
-  State: center=4, right_boundary=7
-  Check: i (5) < right_boundary (7)  →  INSIDE known palindrome!
-
-  ┌─ MIRRORING ─────────────────────────────────────────────────────────────┐
-  │  mirror = 2 * center - i = 2 * 4 - 5 = 3                                 │
-  │                                                                          │
-  │  Calculating initial p[5]:                                               │
-  │    right_boundary - i = 7 - 5 = 2                                        │
-  │    p[mirror] = p[3] = 0                                                  │
-  │    p[5] = min(2, 0) = 0                                                  │
-  │                                                                          │
-  │  Visual:                                                                 │
-  │    Index:  0  1  2  3  4  5  6  7  8                                     │
-  │    Char:   ^  #  b  #  a  #  b  #  a                                     │
-  │                     ↑  ↑  ↑                                              │
-  │                  mirror center i                                         │
-  │                     └──┼──┘                                              │
-  │                        └── p[3]=0, so p[5] starts at 0                   │
-  └─────────────────────────────────────────────────────────────────────────┘
-
-  ┌─ EXPANSION ─────────────────────────────────────────────────────────────┐
-  │  Try:  s[4]='a' vs s[6]='b'  →  DON'T MATCH                              │
-  │  Result: p[5] = 0                                                        │
-  └─────────────────────────────────────────────────────────────────────────┘
-
-  No update: i + p[i] = 5 <= right_boundary = 7
-
-  palindrome_radii = [0, 0, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0]
-```
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ ITERATION 6: i = 6 (char = 'b')  →  SCENARIO 3: Mirroring + Expansion
-└─────────────────────────────────────────────────────────────────────────────┘
-
-  State: center=4, right_boundary=7
-  Check: i (6) < right_boundary (7)  →  INSIDE known palindrome!
-
-  ┌─ MIRRORING ─────────────────────────────────────────────────────────────┐
-  │  mirror = 2 * center - i = 2 * 4 - 6 = 2                                 │
-  │                                                                          │
-  │  Calculating initial p[6]:                                               │
-  │    right_boundary - i = 7 - 6 = 1                                        │
-  │    p[mirror] = p[2] = 1                                                  │
-  │    p[6] = min(1, 1) = 1    ← Start with radius 1!                        │
-  │                                                                          │
-  │  Visual:                                                                 │
-  │    Index:  0  1  2  3  4  5  6  7  8                                     │
-  │    Char:   ^  #  b  #  a  #  b  #  a                                     │
-  │               ↑     ↑     ↑                                              │
-  │            mirror center  i                                              │
-  │            p[2]=1        p[6]=1 (inherited!)                             │
-  └─────────────────────────────────────────────────────────────────────────┘
-
-  ┌─ EXPANSION (starting from p[6]=1) ──────────────────────────────────────┐
-  │  Try:  s[4]='a' vs s[8]='a'  →  MATCH! p[6]++ = 2                        │
-  │  Try:  s[3]='#' vs s[9]='#'  →  MATCH! p[6]++ = 3                        │
-  │  Try:  s[2]='b' vs s[10]='d' →  DON'T MATCH                              │
-  │  Result: p[6] = 3                                                        │
-  └─────────────────────────────────────────────────────────────────────────┘
-
-  Update: i + p[i] = 9 > right_boundary = 7
-    → center = 6, right_boundary = 9
-
-  Note: maxLen stays 3 (same as "bab"), palindrome "aba" also valid
-
-  palindrome_radii = [0, 0, 1, 0, 3, 0, 3, 0, 0, 0, 0, 0, 0]
-```
-
-#### Final State
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ ITERATIONS 7-11: Remaining positions...
-└─────────────────────────────────────────────────────────────────────────────┘
-
-  Final palindrome_radii = [0, 0, 1, 0, 3, 0, 3, 0, 1, 0, 1, 0, 0]
-
-  Index:  0  1  2  3  4  5  6  7  8  9  10 11 12
-  Char:   ^  #  b  #  a  #  b  #  a  #  d  #  $
-  p[]:    0  0  1  0  3  0  3  0  1  0  1  0  0
-                    ↑     ↑
-                   "bab" "aba"  (both have radius 3)
-
 ═══════════════════════════════════════════════════════════════════════════════
 STEP 4: EXTRACT RESULT
 ═══════════════════════════════════════════════════════════════════════════════
@@ -737,7 +669,8 @@ STEP 4: EXTRACT RESULT
   Formula: start = (maxCenter - maxLen) / 2
                  = (4 - 3) / 2 = 0
 
-  Result: s.substring(0, 0 + 3) = "bab"
+  Why divide by 2? Because preprocessed string has '#' between each char,
+  so indices in preprocessed are ~2x the indices in original string.
 
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ RESULT: "bab"
@@ -747,24 +680,22 @@ STEP 4: EXTRACT RESULT
 
 ### Even-Length Palindrome Example: "cbbd"
 
-The preprocessing trick shines when handling **even-length** palindromes. In "cbbd", the palindrome "bb" has no center character — but after preprocessing, it becomes "#b#b#" with '#' as the center!
+The preprocessing trick shines when handling **even-length** palindromes:
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ Input: "cbbd"  →  Preprocessed: "^#c#b#b#d#$"
-└─────────────────────────────────────────────────────────────────────────────┘
+Input: "cbbd"  →  Preprocessed: "^#c#b#b#d#$"
 
 Index:  0  1  2  3  4  5  6  7  8  9  10
 Char:   ^  #  c  #  b  #  b  #  d  #  $
                        ↑
-                    i=5 (the '#' BETWEEN the two 'b's)
+                    currentIndex=5 (the '#' BETWEEN the two 'b's)
 
-┌─ EXPANSION at i=5 ────────────────────────────────────────────────────────┐
-│  Try:  s[4]='b' vs s[6]='b'  →  MATCH! p[5]++ = 1                          │
-│  Try:  s[3]='#' vs s[7]='#'  →  MATCH! p[5]++ = 2                          │
-│  Try:  s[2]='c' vs s[8]='d'  →  DON'T MATCH                                │
-│  Result: p[5] = 2                                                          │
-└────────────────────────────────────────────────────────────────────────────┘
+Expansion at currentIndex=5:
+  s[4]='b' vs s[6]='b'  →  MATCH! pradii[5]++ = 1
+  s[3]='#' vs s[7]='#'  →  MATCH! pradii[5]++ = 2
+  s[2]='c' vs s[8]='d'  →  DON'T MATCH
+
+Result: pradii[5] = 2
 
 Extract: start = (5 - 2) / 2 = 1
          Result = "cbbd".substring(1, 1+2) = "bb"
