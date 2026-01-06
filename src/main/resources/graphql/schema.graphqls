@@ -1,0 +1,53 @@
+type Query {
+    """
+    Merges two integer arrays and calculates the median of the combined sorted array.
+    """
+    calculateMedian(array1: [Int!]!, array2: [Int!]!): Float!
+
+    """
+    Calculates the maximum amount of water that can be contained between two lines.
+    Uses the two-pointer technique for O(n) time complexity.
+    """
+    calculateMaxWaterArea(heights: [Int!]!): Int!
+
+    """
+    Counts the number of negative numbers in a 2D grid.
+    """
+    countNegatives(grid: [[Int!]!]!): Int!
+
+    """
+    Returns all possible letter combinations that phone digits (2-9) could represent.
+    Like on a telephone keypad.
+    """
+    getLetterCombinations(digits: String!): [String!]!
+
+    """
+    Merges k sorted linked lists into one sorted linked list.
+    Returns the values of the merged list as an array.
+    """
+    mergeKSortedLists(lists: [[Int!]!]!): [Int!]!
+
+    """
+    Finds the longest palindromic substring in the given string.
+    Uses Manacher's Algorithm for O(n) time complexity.
+    """
+    findLongestPalindrome(input: String!): String!
+
+    """
+    Finds the length of the longest substring without repeating characters.
+    Uses the sliding window technique.
+    """
+    findLongestUniqueSubstringLength(input: String!): Int!
+
+    """
+    Calculates the minimum cost to rearrange fruits between two baskets
+    so both baskets contain identical sets.
+    Returns -1 if impossible.
+    """
+    rearrangeFruits(basket1: [Int!]!, basket2: [Int!]!): Long!
+}
+
+"""
+Custom scalar for Long values (64-bit integers)
+"""
+scalar Long

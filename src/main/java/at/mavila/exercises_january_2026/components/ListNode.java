@@ -3,13 +3,13 @@ package at.mavila.exercises_january_2026.components;
 public class ListNode {
 
     /**
-     * Val is immutable
+     * The value stored in this node
      */
-    int val;
+    public int val;
     /**
-     * But next is mutable
+     * Reference to the next node in the list
      */
-    ListNode next;
+    public ListNode next;
 
     public ListNode(int val) {
         this.val = val;

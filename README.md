@@ -12,6 +12,7 @@ A collection of algorithm exercises implemented in Java with Spring Boot.
 6. [Longest Palindromic Substring](#6-longest-palindromic-substring)
 7. [Longest Substring Without Repeating Characters](#7-longest-substring-without-repeating-characters)
 8. [Rearranging Fruits](#8-rearranging-fruits)
+9. [GraphQL API](#9-graphql-api)
 
 ---
 
@@ -1002,6 +1003,217 @@ Via-Minimum Swap (cost = 2 × globalMin):
 
 -   **Time:** O(n log n) due to sorting
 -   **Space:** O(n) for frequency maps and excess lists
+
+---
+
+## 9. GraphQL API
+
+All algorithms are exposed via a GraphQL API, allowing you to interact with them through HTTP requests or the built-in GraphiQL interface.
+
+### Endpoints
+
+| Endpoint    | Description             |
+| ----------- | ----------------------- |
+| `/graphql`  | GraphQL API endpoint    |
+| `/graphiql` | Interactive GraphQL IDE |
+
+### Available Queries
+
+```graphql
+type Query {
+    # Merges two arrays and calculates the median
+    calculateMedian(array1: [Int!]!, array2: [Int!]!): Float!
+
+    # Calculates max water area (two-pointer technique)
+    calculateMaxWaterArea(heights: [Int!]!): Int!
+
+    # Counts negative numbers in a 2D grid
+    countNegatives(grid: [[Int!]!]!): Int!
+
+    # Returns letter combinations for phone digits
+    getLetterCombinations(digits: String!): [String!]!
+
+    # Merges k sorted linked lists
+    mergeKSortedLists(lists: [[Int!]!]!): [Int!]!
+
+    # Finds longest palindromic substring
+    findLongestPalindrome(input: String!): String!
+
+    # Finds length of longest unique substring
+    findLongestUniqueSubstringLength(input: String!): Int!
+
+    # Calculates min cost to rearrange fruits (-1 if impossible)
+    rearrangeFruits(basket1: [Int!]!, basket2: [Int!]!): Long!
+}
+```
+
+### Example Queries
+
+#### Calculate Median
+
+```graphql
+query {
+    calculateMedian(array1: [1, 3], array2: [2])
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "calculateMedian": 2.0
+    }
+}
+```
+
+#### Container With Most Water
+
+```graphql
+query {
+    calculateMaxWaterArea(heights: [1, 8, 6, 2, 5, 4, 8, 3, 7])
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "calculateMaxWaterArea": 49
+    }
+}
+```
+
+#### Letter Combinations
+
+```graphql
+query {
+    getLetterCombinations(digits: "23")
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "getLetterCombinations": [
+            "ad",
+            "ae",
+            "af",
+            "bd",
+            "be",
+            "bf",
+            "cd",
+            "ce",
+            "cf"
+        ]
+    }
+}
+```
+
+#### Longest Palindrome
+
+```graphql
+query {
+    findLongestPalindrome(input: "babad")
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "findLongestPalindrome": "bab"
+    }
+}
+```
+
+#### Merge K Sorted Lists
+
+```graphql
+query {
+    mergeKSortedLists(lists: [[1, 4, 5], [1, 3, 4], [2, 6]])
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "mergeKSortedLists": [1, 1, 2, 3, 4, 4, 5, 6]
+    }
+}
+```
+
+#### Count Negatives
+
+```graphql
+query {
+    countNegatives(
+        grid: [[4, 3, 2, -1], [3, 2, 1, -1], [1, 1, -1, -2], [-1, -1, -2, -3]]
+    )
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "countNegatives": 8
+    }
+}
+```
+
+#### Longest Unique Substring Length
+
+```graphql
+query {
+    findLongestUniqueSubstringLength(input: "abcabcbb")
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "findLongestUniqueSubstringLength": 3
+    }
+}
+```
+
+#### Rearrange Fruits
+
+```graphql
+query {
+    rearrangeFruits(basket1: [4, 2, 2, 2], basket2: [1, 4, 1, 2])
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "rearrangeFruits": 1
+    }
+}
+```
+
+### Using cURL
+
+You can also call the GraphQL API using cURL:
+
+```bash
+curl -X POST http://localhost:8080/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ calculateMedian(array1: [1, 3], array2: [2]) }"}'
+```
 
 ---
 
