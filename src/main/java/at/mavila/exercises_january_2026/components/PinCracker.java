@@ -6,6 +6,8 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * A brute-force PIN cracker that recovers numeric PINs from their MD5 hashes.
  *
@@ -89,6 +91,7 @@ import org.springframework.stereotype.Component;
  * @see MessageDigest
  */
 @Component
+@Slf4j
 public class PinCracker {
 
     private static final MessageDigest MD5;
@@ -229,7 +232,7 @@ public class PinCracker {
     private ProgressListener createProgressListener() {
         return (candidate, triedSoFar) -> {
             if (triedSoFar % 100000 == 0) {
-                System.out.println("Tried so far: " + triedSoFar + " (latest: " + candidate + ")");
+                log.info("Tried so far: {} (latest: {})", triedSoFar, candidate);
             }
             return true; // continue searching
         };
