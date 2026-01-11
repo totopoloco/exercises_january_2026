@@ -1,10 +1,12 @@
 package at.mavila.exercises_january_2026.components;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.Arrays;
+import java.util.function.IntBinaryOperator;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Given an array of integers, find the one that appears an odd number of times.
@@ -15,7 +17,10 @@ import org.springframework.stereotype.Component;
  * @since 11.01.2026
  */
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class OddFinder {
+
+    private final IntBinaryOperator oddFinderOperator;
 
     /**
      * Finds the integer that appears an odd number of times in the given array.
@@ -25,30 +30,8 @@ public class OddFinder {
      *         appears 1 time (which is odd)
      */
     public int findIt(final int[] a) {
-
-        if (Objects.isNull(a)) {
-            throw new IllegalArgumentException("Input array cannot be null");
-        }
-
-        // Convert the array to a map of counts
-        // Then find the entry with an odd count
-        final List<Integer> aList = new ArrayList<>();
-
-        for (int n = 0; n < a.length; n++) {
-            aList.add(a[n]);
-        }
-
-        // Transform to a map of counts where the key is the number and the value is the
-        // count
-        for (Integer number : aList) {
-            long count = aList.stream().filter(n -> n.equals(number)).count();
-            if (count % 2 != 0) {
-                return number;
-            }
-        }
-
-        return 0;
-
+        // Let's use the Stream API to reduce the array to the odd occurring element
+        return Arrays.stream(a).reduce(0, this.oddFinderOperator);
     }
 
 }
