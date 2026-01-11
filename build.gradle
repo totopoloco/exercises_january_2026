@@ -19,8 +19,10 @@ java {
 }
 
 // Force Java 21 bytecode output for Pitest compatibility
+// Add -parameters flag to preserve method parameter names for Spring GraphQL
 tasks.withType(JavaCompile).configureEach {
     options.release = 21
+    options.compilerArgs.add('-parameters')
 }
 
 configurations {

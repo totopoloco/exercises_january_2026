@@ -12,7 +12,8 @@ A collection of algorithm exercises implemented in Java with Spring Boot.
 6. [Longest Palindromic Substring](#6-longest-palindromic-substring)
 7. [Longest Substring Without Repeating Characters](#7-longest-substring-without-repeating-characters)
 8. [Rearranging Fruits](#8-rearranging-fruits)
-9. [GraphQL API](#9-graphql-api)
+9. [PIN Cracker](#9-pin-cracker)
+10. [GraphQL API](#10-graphql-api)
 
 ---
 
@@ -1006,7 +1007,136 @@ Via-Minimum Swap (cost = 2 × globalMin):
 
 ---
 
-## 9. GraphQL API
+## 9. PIN Cracker
+
+**File:** `PinCracker.java`
+
+### Problem
+
+Given an MD5 hash of a numeric PIN, recover the original PIN by brute-force search.
+
+### Algorithm: Exhaustive Search
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              INPUT: hash (MD5 hex string), maxLen           │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│            Normalize hash to lowercase                      │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│           For each length L from 1 to maxLen:               │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │  For each candidate from "0...0" to "9...9" (L digits)│  │
+│  │    1. Compute MD5(candidate)                          │  │
+│  │    2. If MD5 matches target hash → return candidate   │  │
+│  └───────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│     OUTPUT: recovered PIN string, or null if not found      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Mathematical Background
+
+#### Search Space Size
+
+For a maximum PIN length **M**, the algorithm searches all numeric strings from length 1 to M. The total number of candidates is:
+
+$$
+\text{Total} = \sum_{k=1}^{M} 10^k = 10^1 + 10^2 + 10^3 + \ldots + 10^M
+$$
+
+This is a geometric series with first term $a = 10$, common ratio $r = 10$, and $M$ terms.
+
+Using the geometric series formula:
+
+$$
+\sum_{k=1}^{M} 10^k = 10 \cdot \frac{10^M - 1}{10 - 1} = \frac{10^{M+1} - 10}{9}
+$$
+
+#### Candidate Count by Maximum Length
+
+| Max Length (M) | Formula Result | Total Candidates |
+| -------------- | -------------- | ---------------- |
+| 1              | (10² - 10) / 9 | **10**           |
+| 2              | (10³ - 10) / 9 | **110**          |
+| 3              | (10⁴ - 10) / 9 | **1,110**        |
+| 4              | (10⁵ - 10) / 9 | **11,110**       |
+| 5              | (10⁶ - 10) / 9 | **111,110**      |
+| 6              | (10⁷ - 10) / 9 | **1,111,110**    |
+| 7              | (10⁸ - 10) / 9 | **11,111,110**   |
+| 8              | (10⁹ - 10) / 9 | **111,111,110**  |
+
+#### Derivation
+
+The formula can be derived as follows:
+
+1. **Per-length count:** For length $k$, candidates range from $\underbrace{00\ldots0}_{k}$ to $\underbrace{99\ldots9}_{k}$, giving exactly $10^k$ candidates.
+
+2. **Summation:** Total = $10^1 + 10^2 + \ldots + 10^M$
+
+3. **Geometric Series:** Let $S = 10 + 10^2 + \ldots + 10^M$
+
+    Multiply by 10: $10S = 10^2 + 10^3 + \ldots + 10^{M+1}$
+
+    Subtract: $10S - S = 10^{M+1} - 10$
+
+    Therefore: $S = \frac{10^{M+1} - 10}{9}$
+
+### Complexity
+
+-   **Time:** $O\left(\frac{10^{M+1} - 10}{9}\right) \approx O(10^M)$ — exponential in PIN length
+-   **Space:** $O(M)$ for storing the candidate string
+
+### Example
+
+```
+Input:  hash = "827ccb0eea8a706c4c34a16891f84e7b" (MD5 of "12345")
+        maxLen = 5
+
+Search: "0" → MD5 ≠ target
+        "1" → MD5 ≠ target
+        ...
+        "12345" → MD5 = "827ccb0eea8a706c4c34a16891f84e7b" ✓
+
+Output: "12345"
+```
+
+### Leading Zeros Example
+
+```
+Input:  hash = "86aa400b65433b608a9db30070ec60cd" (MD5 of "00078")
+        maxLen = 5
+
+Search: ...
+        "00078" → MD5 = "86aa400b65433b608a9db30070ec60cd" ✓
+
+Output: "00078"  (leading zeros preserved)
+```
+
+### Progress Listener
+
+The cracker supports a callback interface for monitoring progress:
+
+```java
+pinCracker.crack(hash, 6, (candidate, triedSoFar) -> {
+    if (triedSoFar % 100000 == 0) {
+        System.out.println("Progress: " + triedSoFar + " candidates tried");
+    }
+    return true; // return false to abort search
+});
+```
+
+---
+
+## 10. GraphQL API
 
 All algorithms are exposed via a GraphQL API, allowing you to interact with them through HTTP requests or the built-in GraphiQL interface.
 
