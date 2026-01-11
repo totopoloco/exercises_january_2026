@@ -1174,6 +1174,9 @@ type Query {
 
     # Calculates min cost to rearrange fruits (-1 if impossible)
     rearrangeFruits(basket1: [Int!]!, basket2: [Int!]!): Long!
+
+    # Cracks a numeric PIN from its MD5 hash (maxLen defaults to 5)
+    crackPin(hash: String!, maxLen: Int): String
 }
 ```
 
@@ -1331,6 +1334,42 @@ query {
 {
     "data": {
         "rearrangeFruits": 1
+    }
+}
+```
+
+#### Crack PIN
+
+```graphql
+query {
+    crackPin(hash: "827ccb0eea8a706c4c34a16891f84e7b")
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "crackPin": "12345"
+    }
+}
+```
+
+#### Crack PIN with Leading Zeros
+
+```graphql
+query {
+    crackPin(hash: "86aa400b65433b608a9db30070ec60cd", maxLen: 5)
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "crackPin": "00078"
     }
 }
 ```

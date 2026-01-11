@@ -45,6 +45,13 @@ type Query {
     Returns -1 if impossible.
     """
     rearrangeFruits(basket1: [Int!]!, basket2: [Int!]!): Long!
+
+    """
+    Cracks a numeric PIN from its MD5 hash by brute-force search.
+    Searches all numeric PINs from length 1 to maxLen (default 5).
+    Returns the recovered PIN string (with leading zeros preserved), or null if not found.
+    """
+    crackPin(hash: String!, maxLen: Int): String
 }
 
 """

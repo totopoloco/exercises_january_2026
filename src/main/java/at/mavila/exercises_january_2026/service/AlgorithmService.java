@@ -1,6 +1,7 @@
 package at.mavila.exercises_january_2026.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import at.mavila.exercises_january_2026.components.LinkedListMerger;
 import at.mavila.exercises_january_2026.components.ListNode;
 import at.mavila.exercises_january_2026.components.LongestPalindromeSubstringExtractor;
 import at.mavila.exercises_january_2026.components.LongestSubstring;
+import at.mavila.exercises_january_2026.components.PinCracker;
 import at.mavila.exercises_january_2026.components.RearrangingFruits;
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +32,7 @@ public class AlgorithmService {
     private final LinkedListMerger linkedListMerger;
     private final LongestPalindromeSubstringExtractor longestPalindromeSubstringExtractor;
     private final LongestSubstring longestSubstring;
+    private final PinCracker pinCracker;
     private final RearrangingFruits rearrangingFruits;
 
     /**
@@ -114,6 +117,22 @@ public class AlgorithmService {
      */
     public long rearrangeFruits(int[] basket1, int[] basket2) {
         return rearrangingFruits.rearrange(basket1, basket2);
+    }
+
+    /**
+     * Cracks a numeric PIN from its MD5 hash by brute-force search.
+     *
+     * @param hash   the MD5 hash (hex string) of the target PIN
+     * @param maxLen the maximum PIN length to search (default 5 if null)
+     * @return the recovered PIN string, or null if not found
+     */
+    public String crackPin(String hash, Integer maxLen) {
+
+        if (Objects.isNull(maxLen)) {
+            return this.pinCracker.crack(hash, 5);
+        }
+
+        return pinCracker.crack(hash, maxLen.intValue());
     }
 
 }

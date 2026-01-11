@@ -77,6 +77,11 @@ public class AlgorithmController {
         basket2.stream().mapToInt(Integer::intValue).toArray());
   }
 
+  @QueryMapping
+  public String crackPin(@Argument String hash, @Argument Integer maxLen) {
+    return algorithmService.crackPin(hash, maxLen);
+  }
+
   /**
    * Helper method to create a linked list from a list of integers.
    */
