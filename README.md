@@ -13,7 +13,8 @@ A collection of algorithm exercises implemented in Java with Spring Boot.
 7. [Longest Substring Without Repeating Characters](#7-longest-substring-without-repeating-characters)
 8. [Rearranging Fruits](#8-rearranging-fruits)
 9. [PIN Cracker](#9-pin-cracker)
-10. [GraphQL API](#10-graphql-api)
+10. [Minimum Percentage](#10-minimum-percentage)
+11. [GraphQL API](#11-graphql-api)
 
 ---
 
@@ -1136,7 +1137,131 @@ pinCracker.crack(hash, 6, (candidate, triedSoFar) -> {
 
 ---
 
-## 10. GraphQL API
+## 10. Minimum Percentage
+
+**File:** `MinimumPercentage.java`
+
+### Problem
+
+Given an array of n percentages (representing completion rates, scores, etc.), calculate the **minimum percentage** that must be achieved by ALL items simultaneously for the overall goal to be met.
+
+This is useful in scenarios like:
+
+-   Determining the minimum score needed across multiple subjects to pass
+-   Finding the required completion rate for parallel tasks
+-   Calculating threshold values for multi-criteria systems
+
+### Algorithm
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                INPUT: percentages[] (n values)              │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│              1. Calculate sum of all percentages            │
+│                     Σp = p₁ + p₂ + ... + pₙ                 │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│              2. Calculate threshold                         │
+│                 threshold = 100 × (n - 1)                   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│              3. Calculate excess                            │
+│                 excess = Σp - threshold                     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│              4. Return result                               │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │  excess < 0 ? return 0 : return excess              │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    OUTPUT: minimum percentage               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Mathematical Background
+
+#### The Formula
+
+$$
+\text{Result} = \max\left(0, \sum_{i=1}^{n} p_i - 100 \cdot (n-1)\right)
+$$
+
+Where:
+
+-   $p_i$ = each percentage value in the input
+-   $n$ = number of elements
+-   The result is clamped to 0 if negative
+
+#### Intuition
+
+The formula calculates how much "excess" percentage exists beyond the baseline. If you have n items and each could contribute up to 100%, then:
+
+-   The maximum total is 100n
+-   If n-1 items each contribute exactly 100%, that's 100(n-1)
+-   The minimum required for the nth item is: Total - 100(n-1)
+
+#### Step-by-Step Example
+
+```
+Input: [65, 80, 80, 90]
+
+Step 1: Calculate sum
+        Σp = 65 + 80 + 80 + 90 = 315
+
+Step 2: Calculate threshold
+        n = 4
+        threshold = 100 × (4 - 1) = 300
+
+Step 3: Calculate excess
+        excess = 315 - 300 = 15
+
+Step 4: Return result
+        15 ≥ 0, so return 15
+
+Output: 15
+```
+
+#### More Examples
+
+| Input            | Sum (Σp) | n   | Threshold | Excess | Result  |
+| ---------------- | -------- | --- | --------- | ------ | ------- |
+| [76]             | 76       | 1   | 0         | 76     | **76**  |
+| [50, 50]         | 100      | 2   | 100       | 0      | **0**   |
+| [30, 40]         | 70       | 2   | 100       | -30    | **0**   |
+| [100, 100, 100]  | 300      | 3   | 200       | 100    | **100** |
+| [80, 80, 80, 80] | 320      | 4   | 300       | 20     | **20**  |
+
+### Complexity
+
+-   **Time:** O(n) — single pass to sum all elements
+-   **Space:** O(1) — only stores sum and intermediate values
+
+### Edge Cases
+
+| Case                 | Input           | Result | Explanation                       |
+| -------------------- | --------------- | ------ | --------------------------------- |
+| Single element       | [76]            | 76     | threshold=0, result=76-0=76       |
+| All zeros            | [0, 0, 0]       | 0      | Sum below threshold, clamped to 0 |
+| All 100%             | [100, 100, 100] | 100    | 300-200=100                       |
+| Below threshold      | [30, 40]        | 0      | 70-100=-30 → clamped to 0         |
+| Exactly at threshold | [50, 50]        | 0      | 100-100=0                         |
+| Values > 100%        | [150, 120]      | 170    | 270-100=170                       |
+
+---
+
+## 11. GraphQL API
 
 All algorithms are exposed via a GraphQL API, allowing you to interact with them through HTTP requests or the built-in GraphiQL interface.
 
