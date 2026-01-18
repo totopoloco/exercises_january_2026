@@ -33,38 +33,38 @@ Given two integer arrays, merge them and calculate the median of the combined so
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    INPUT: array1, array2                     │
+│                    INPUT: array1, array2                    │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              1. Validate inputs (non-null)                   │
+│              1. Validate inputs (non-null)                  │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│         2. Convert arrays to Lists and merge                 │
-│            list1.addAll(list2)                               │
+│         2. Convert arrays to Lists and merge                │
+│            list1.addAll(list2)                              │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              3. Sort the merged list                         │
+│              3. Sort the merged list                        │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              4. Calculate median                             │
+│              4. Calculate median                            │
 │  ┌─────────────────────────────────────────────────────┐    │
-│  │  Is size odd?                                        │    │
-│  │  YES: median = list[size/2]                          │    │
-│  │  NO:  median = (list[size/2-1] + list[size/2]) / 2   │    │
+│  │  Is size odd?                                        │   │
+│  │  YES: median = list[size/2]                          │   │
+│  │  NO:  median = (list[size/2-1] + list[size/2]) / 2   │   │
 │  └─────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    OUTPUT: median value                      │
+│                    OUTPUT: median value                     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -96,26 +96,26 @@ Given an array of heights representing vertical lines, find two lines that toget
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    INPUT: height[]                           │
+│                    INPUT: height[]                          │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│      Initialize: left = 0, right = length-1, maxArea = 0     │
+│      Initialize: left = 0, right = length-1, maxArea = 0    │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
          ┌────────────────────┴────────────────────┐
-         │            WHILE left < right            │
+         │            WHILE left < right           │
          └────────────────────┬────────────────────┘
                               │
     ┌─────────────────────────┴─────────────────────────┐
-    │  Calculate area = min(height[left], height[right]) │
-    │                   × (right - left)                 │
+    │  Calculate area = min(height[left], height[right])│
+    │                   × (right - left)                │
     └─────────────────────────┬─────────────────────────┘
                               │
     ┌─────────────────────────┴─────────────────────────┐
-    │         Update maxArea = max(maxArea, area)        │
+    │         Update maxArea = max(maxArea, area)       │
     └─────────────────────────┬─────────────────────────┘
                               │
                               ▼
@@ -176,17 +176,17 @@ Given a 2D grid, count the number of negative numbers.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    INPUT: grid[][]                           │
+│                    INPUT: grid[][]                          │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│               Initialize: negatives = []                     │
+│               Initialize: negatives = []                    │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              FOR each row m in grid                          │
+│              FOR each row m in grid                         │
 │              ┌─────────────────────────────────────────┐    │
 │              │    FOR each element n in row            │    │
 │              │    ┌───────────────────────────────┐    │    │
@@ -198,7 +198,7 @@ Given a 2D grid, count the number of negative numbers.
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                OUTPUT: negatives.size()                      │
+│                OUTPUT: negatives.size()                     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -236,29 +236,29 @@ Given a string containing digits 2-9, return all possible letter combinations th
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    INPUT: digits "23"                        │
+│                    INPUT: digits "23"                       │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│        Map digits to letters: 2→"abc", 3→"def"               │
+│        Map digits to letters: 2→"abc", 3→"def"              │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│   Stream.reduce with initial value [""]                      │
-│                                                              │
-│   Accumulator function (flatMap expansion):                  │
+│   Stream.reduce with initial value [""]                     │
+│                                                             │
+│   Accumulator function (flatMap expansion):                 │
 │   ┌─────────────────────────────────────────────────────┐   │
-│   │  For each combination in current list:               │   │
-│   │    For each letter in current digit's mapping:       │   │
-│   │      Create: combination + letter                    │   │
+│   │  For each combination in current list:              │   │
+│   │    For each letter in current digit's mapping:      │   │
+│   │      Create: combination + letter                   │   │
 │   └─────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│     OUTPUT: ["ad","ae","af","bd","be","bf","cd","ce","cf"]   │
+│     OUTPUT: ["ad","ae","af","bd","be","bf","cd","ce","cf"]  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -300,17 +300,17 @@ Merge k sorted linked lists into one sorted linked list.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                INPUT: ListNode[] lists                       │
+│                INPUT: ListNode[] lists                      │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│           Initialize: merged = null                          │
+│           Initialize: merged = null                         │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              FOR each list in lists[]                        │
+│              FOR each list in lists[]                       │
 │              ┌─────────────────────────────────────────┐    │
 │              │  IF list is not null                    │    │
 │              │    merged = mergeTwoLists(merged, list) │    │
@@ -319,7 +319,7 @@ Merge k sorted linked lists into one sorted linked list.
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    OUTPUT: merged                            │
+│                    OUTPUT: merged                           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -327,18 +327,18 @@ Merge k sorted linked lists into one sorted linked list.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│             INPUT: source1, source2                          │
+│             INPUT: source1, source2                         │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│    Determine head = node with smaller value                  │
-│    Initialize tail = head                                    │
+│    Determine head = node with smaller value                 │
+│    Initialize tail = head                                   │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
          ┌────────────────────┴────────────────────┐
-         │     WHILE both lists have nodes          │
+         │     WHILE both lists have nodes         │
          └────────────────────┬────────────────────┘
                               │
     ┌─────────────────────────┴─────────────────────────┐
@@ -352,13 +352,13 @@ Merge k sorted linked lists into one sorted linked list.
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│     Append remaining nodes from non-empty list               │
-│     tail.next = (source1 != null) ? source1 : source2        │
+│     Append remaining nodes from non-empty list              │
+│     tail.next = (source1 != null) ? source1 : source2       │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    OUTPUT: head                              │
+│                    OUTPUT: head                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -767,20 +767,20 @@ Given a string, find the length of the longest substring without repeating chara
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    INPUT: string s                           │
+│                    INPUT: string s                          │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│   Initialize:                                                │
+│   Initialize:                                               │
 │     lastSeen[256] = {-1, -1, ...}  // last index of char    │
-│     left = 0                       // window start           │
-│     maxLen = 0                     // result                 │
+│     left = 0                       // window start          │
+│     maxLen = 0                     // result                │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
          ┌────────────────────┴────────────────────┐
-         │       FOR right = 0 to s.length-1        │
+         │       FOR right = 0 to s.length-1       │
          └────────────────────┬────────────────────┘
                               │
     ┌─────────────────────────┴─────────────────────────┐
@@ -800,7 +800,7 @@ Given a string, find the length of the longest substring without repeating chara
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    OUTPUT: maxLen                            │
+│                    OUTPUT: maxLen                           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -887,7 +887,7 @@ Given two baskets of fruits (represented as arrays of costs), rearrange fruits b
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                INPUT: basket1[], basket2[]                   │
+│                INPUT: basket1[], basket2[]                  │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -899,50 +899,50 @@ Given two baskets of fruits (represented as arrays of costs), rearrange fruits b
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│   STEP 2: Feasibility check                                  │
-│   FOR each unique fruit v:                                   │
-│     total = freq1[v] + freq2[v]                              │
-│     IF total is ODD → RETURN -1 (impossible)                 │
+│   STEP 2: Feasibility check                                 │
+│   FOR each unique fruit v:                                  │
+│     total = freq1[v] + freq2[v]                             │
+│     IF total is ODD → RETURN -1 (impossible)                │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│   STEP 3: Find globalMin (cheapest fruit across both)        │
+│   STEP 3: Find globalMin (cheapest fruit across both)       │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│   STEP 4: Build excess lists                                 │
-│   FOR each unique fruit v:                                   │
-│     target = (freq1[v] + freq2[v]) / 2                       │
-│     IF freq1[v] > target:                                    │
-│       Add (freq1[v] - target) copies of v to excess1         │
-│     IF freq2[v] > target:                                    │
-│       Add (freq2[v] - target) copies of v to excess2         │
+│   STEP 4: Build excess lists                                │
+│   FOR each unique fruit v:                                  │
+│     target = (freq1[v] + freq2[v]) / 2                      │
+│     IF freq1[v] > target:                                   │
+│       Add (freq1[v] - target) copies of v to excess1        │
+│     IF freq2[v] > target:                                   │
+│       Add (freq2[v] - target) copies of v to excess2        │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│   STEP 5: Sort and pair optimally                            │
-│   SORT excess1 ascending                                     │
-│   SORT excess2 ascending                                     │
-│                                                              │
-│   Pair: smallest from excess1 with largest from excess2      │
-│         (i starts at 0, j starts at end)                     │
+│   STEP 5: Sort and pair optimally                           │
+│   SORT excess1 ascending                                    │
+│   SORT excess2 ascending                                    │
+│                                                             │
+│   Pair: smallest from excess1 with largest from excess2     │
+│         (i starts at 0, j starts at end)                    │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│   STEP 6: Calculate minimum cost for each pair               │
-│   FOR each pair (a from excess1, b from excess2):            │
-│     directCost = min(a, b)                                   │
-│     viaMinCost = 2 × globalMin                               │
-│     totalCost += min(directCost, viaMinCost)                 │
+│   STEP 6: Calculate minimum cost for each pair              │
+│   FOR each pair (a from excess1, b from excess2):           │
+│     directCost = min(a, b)                                  │
+│     viaMinCost = 2 × globalMin                              │
+│     totalCost += min(directCost, viaMinCost)                │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    OUTPUT: totalCost                         │
+│                    OUTPUT: totalCost                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -1297,49 +1297,49 @@ Roman numerals use **subtraction notation** for certain combinations where a sma
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    INPUT: roman string                       │
+│                    INPUT: roman string                      │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│       Validate: Is input null or blank?                      │
-│       YES → throw IllegalArgumentException                   │
+│       Validate: Is input null or blank?                     │
+│       YES → throw IllegalArgumentException                  │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│       Validate Roman numeral format:                         │
-│       • Only valid characters (I, V, X, L, C, D, M)          │
-│       • Valid subtraction pairs (IV, IX, XL, XC, CD, CM)     │
-│       • No invalid repetitions (V, L, D cannot repeat)       │
-│       • Max 3 consecutive same symbols (I, X, C, M)          │
-│       INVALID → throw InvalidRomanNumeralException           │
+│       Validate Roman numeral format:                        │
+│       • Only valid characters (I, V, X, L, C, D, M)         │
+│       • Valid subtraction pairs (IV, IX, XL, XC, CD, CM)    │
+│       • No invalid repetitions (V, L, D cannot repeat)      │
+│       • Max 3 consecutive same symbols (I, X, C, M)         │
+│       INVALID → throw InvalidRomanNumeralException          │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│       Initialize: result = 0, i = 0                          │
+│       Initialize: result = 0, i = 0                         │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│       FOR each character at index i in roman string          │
-│       ┌─────────────────────────────────────────────────┐   │
-│       │  currentValue = map.get(roman[i])               │   │
-│       │  IF currentValue is null → skip (invalid char)  │   │
-│       │                                                  │   │
-│       │  nextValue = map.get(roman[i+1]) if exists      │   │
-│       │                                                  │   │
-│       │  IF nextValue exists AND currentValue < nextValue│   │
-│       │      result -= currentValue  (subtraction case) │   │
-│       │  ELSE                                            │   │
-│       │      result += currentValue  (addition case)    │   │
-│       └─────────────────────────────────────────────────┘   │
+│       FOR each character at index i in roman string         │
+│       ┌───────────────────────────────────────────────────┐ │
+│       │  currentValue = map.get(roman[i])                 │ │
+│       │  IF currentValue is null → skip (invalid char)    │ │
+│       │                                                   │ │
+│       │  nextValue = map.get(roman[i+1]) if exists        │ │
+│       │                                                   │ │
+│       │  IF nextValue exists AND currentValue < nextValue │ │
+│       │      result -= currentValue  (subtraction case)   │ │
+│       │  ELSE                                             │ │
+│       │      result += currentValue  (addition case)      │ │
+│       └───────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    OUTPUT: result                            │
+│                    OUTPUT: result                           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -1435,35 +1435,35 @@ Iterate through Roman numeral values from largest to smallest. For each value, r
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    INPUT: number (integer)                   │
+│                    INPUT: number (integer)                  │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│       Validate: Is number between 1 and 3999?                │
-│       NO → throw IllegalArgumentException                    │
+│       Validate: Is number between 1 and 3999?               │
+│       NO → throw IllegalArgumentException                   │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│       Initialize: result = "", remaining = number            │
+│       Initialize: result = "", remaining = number           │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│       FOR each (symbol, value) in descending order:          │
+│       FOR each (symbol, value) in descending order:         │
 │       M(1000), CM(900), D(500), CD(400), C(100), XC(90),    │
 │       L(50), XL(40), X(10), IX(9), V(5), IV(4), I(1)        │
 │       ┌─────────────────────────────────────────────────┐   │
-│       │  WHILE remaining >= value:                       │   │
-│       │      result += symbol                            │   │
-│       │      remaining -= value                          │   │
+│       │  WHILE remaining >= value:                      │   │
+│       │      result += symbol                           │   │
+│       │      remaining -= value                         │   │
 │       └─────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    OUTPUT: result                            │
+│                    OUTPUT: result                           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -1565,27 +1565,27 @@ The Roman numeral processor enforces strict validation rules to ensure only prop
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│              ROMAN NUMERAL VALIDATION RULES                  │
+│              ROMAN NUMERAL VALIDATION RULES                 │
 ├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  1. VALID CHARACTERS ONLY                                    │
+│                                                             │
+│  1. VALID CHARACTERS ONLY                                   │
 │     ├── Must be uppercase: I, V, X, L, C, D, M              │
-│     └── Lowercase letters are INVALID                        │
-│                                                              │
-│  2. VALID SUBTRACTION PAIRS                                  │
+│     └── Lowercase letters are INVALID                       │
+│                                                             │
+│  2. VALID SUBTRACTION PAIRS                                 │
 │     ├── I can precede: V (IV=4), X (IX=9)                   │
 │     ├── X can precede: L (XL=40), C (XC=90)                 │
 │     ├── C can precede: D (CD=400), M (CM=900)               │
 │     └── V, L, D CANNOT be used for subtraction              │
-│                                                              │
-│  3. REPETITION LIMITS                                        │
+│                                                             │
+│  3. REPETITION LIMITS                                       │
 │     ├── V, L, D: Cannot repeat (max 1)                      │
 │     └── I, X, C, M: Maximum 3 consecutive                   │
-│                                                              │
-│  4. NO DOUBLE SUBTRACTION                                    │
+│                                                             │
+│  4. NO DOUBLE SUBTRACTION                                   │
 │     └── Cannot have multiple chars before subtraction       │
 │         (e.g., IIV, XXC are INVALID)                        │
-│                                                              │
+│                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
