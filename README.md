@@ -1407,6 +1407,138 @@ This works because subtraction notation in Roman numerals always involves exactl
 
 ---
 
+## 11b. Integer to Roman Numeral
+
+**File:** `RomanNumberProcessor.java`
+
+### Problem
+
+Convert an integer (1-3999) to its Roman numeral representation.
+
+### Algorithm: Greedy Approach
+
+Iterate through Roman numeral values from largest to smallest. For each value, repeatedly subtract it from the number and append the corresponding symbol until the number is less than that value.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    INPUT: number (integer)                   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       Validate: Is number between 1 and 3999?                │
+│       NO → throw IllegalArgumentException                    │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       Initialize: result = "", remaining = number            │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       FOR each (symbol, value) in descending order:          │
+│       M(1000), CM(900), D(500), CD(400), C(100), XC(90),    │
+│       L(50), XL(40), X(10), IX(9), V(5), IV(4), I(1)        │
+│       ┌─────────────────────────────────────────────────┐   │
+│       │  WHILE remaining >= value:                       │   │
+│       │      result += symbol                            │   │
+│       │      remaining -= value                          │   │
+│       └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    OUTPUT: result                            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Step-by-Step Example
+
+**Converting 94 to Roman numerals:**
+
+```
+Start: num = 94, result = ""
+
+┌────────┬───────┬─────────────┬────────────────┬────────────┐
+│ Symbol │ Value │ num >= val? │     Action     │   Result   │
+├────────┼───────┼─────────────┼────────────────┼────────────┤
+│   M    │ 1000  │  94 < 1000  │     skip       │     ""     │
+│   CM   │  900  │  94 < 900   │     skip       │     ""     │
+│   D    │  500  │  94 < 500   │     skip       │     ""     │
+│   CD   │  400  │  94 < 400   │     skip       │     ""     │
+│   C    │  100  │  94 < 100   │     skip       │     ""     │
+│   XC   │   90  │  94 >= 90 ✓ │ append, 94-90  │    "XC"    │
+│   L    │   50  │   4 < 50    │     skip       │    "XC"    │
+│   XL   │   40  │   4 < 40    │     skip       │    "XC"    │
+│   X    │   10  │   4 < 10    │     skip       │    "XC"    │
+│   IX   │    9  │   4 < 9     │     skip       │    "XC"    │
+│   V    │    5  │   4 < 5     │     skip       │    "XC"    │
+│   IV   │    4  │   4 >= 4 ✓  │ append, 4-4    │   "XCIV"   │
+└────────┴───────┴─────────────┴────────────────┴────────────┘
+
+num = 0, conversion complete
+Output: "XCIV"
+```
+
+**Converting 58 to Roman numerals:**
+
+```
+Start: num = 58, result = ""
+
+L(50):  58 >= 50 → append "L", num = 8
+V(5):    8 >= 5  → append "V", num = 3
+I(1):    3 >= 1  → append "I", num = 2
+I(1):    2 >= 1  → append "I", num = 1
+I(1):    1 >= 1  → append "I", num = 0
+
+Output: "LVIII"
+```
+
+### Examples
+
+| Input | Output    | Explanation                          |
+| ----- | --------- | ------------------------------------ |
+| 3     | III       | 1 + 1 + 1                            |
+| 4     | IV        | 5 - 1 (subtraction notation)         |
+| 9     | IX        | 10 - 1 (subtraction notation)        |
+| 58    | LVIII     | 50 + 5 + 1 + 1 + 1                   |
+| 94    | XCIV      | (100-10) + (5-1)                     |
+| 1994  | MCMXCIV   | 1000 + (1000-100) + (100-10) + (5-1) |
+| 2026  | MMXXVI    | 1000 + 1000 + 10 + 10 + 5 + 1        |
+| 3999  | MMMCMXCIX | Maximum standard Roman numeral       |
+
+### Why the Limit of 3999?
+
+Standard Roman numerals have a maximum of **3999** because:
+
+1. **M (1000)** is the largest symbol
+2. The rule "no symbol repeats more than 3 times" limits us to **MMM = 3000**
+3. The maximum is therefore: MMM + CM + XC + IX = 3000 + 900 + 90 + 9 = **3999**
+
+Historically, Romans used additional notations for larger numbers:
+
+- **Vinculum (overline):** V̄ = 5,000, X̅ = 10,000
+- **Apostrophus:** Special curved symbols for 5,000, 10,000, etc.
+
+### Edge Cases
+
+| Case         | Input | Output    | Notes                    |
+| ------------ | ----- | --------- | ------------------------ |
+| Minimum      | 1     | I         | Smallest valid input     |
+| Maximum      | 3999  | MMMCMXCIX | Largest standard numeral |
+| Zero         | 0     | Error     | IllegalArgumentException |
+| Negative     | -1    | Error     | IllegalArgumentException |
+| Too large    | 4000  | Error     | IllegalArgumentException |
+| Current year | 2026  | MMXXVI    | 1000+1000+10+10+5+1      |
+
+### Complexity
+
+- **Time:** O(1) — fixed number of symbols (13), bounded iterations
+- **Space:** O(1) — output length is bounded (max ~15 characters)
+
+---
+
 ## 12. GraphQL API
 
 All algorithms are exposed via a GraphQL API, allowing you to interact with them through HTTP requests or the built-in GraphiQL interface.
@@ -1451,6 +1583,9 @@ type Query {
 
     # Converts Roman numeral to integer (e.g., "MCMXCIV" → 1994)
     romanToInt(roman: String!): Int!
+
+    # Converts integer to Roman numeral (e.g., 1994 → "MCMXCIV")
+    intToRoman(number: Int!): String!
 }
 ```
 
@@ -1680,6 +1815,42 @@ query {
 {
     "data": {
         "romanToInt": 2026
+    }
+}
+```
+
+#### Integer to Roman Numeral
+
+```graphql
+query {
+    intToRoman(number: 1994)
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "intToRoman": "MCMXCIV"
+    }
+}
+```
+
+#### Integer to Roman - Current Year
+
+```graphql
+query {
+    intToRoman(number: 2026)
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "intToRoman": "MMXXVI"
     }
 }
 ```

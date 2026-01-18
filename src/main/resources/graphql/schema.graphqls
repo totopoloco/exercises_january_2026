@@ -60,6 +60,14 @@ type Query {
     Invalid characters are silently ignored. Case-sensitive (only uppercase).
     """
     romanToInt(roman: String!): Int!
+
+    """
+    Converts an integer to its Roman numeral representation.
+    Uses a greedy algorithm with standard Roman numeral symbols.
+    Examples: 3 → "III", 4 → "IV", 1994 → "MCMXCIV"
+    Valid range: 1 to 3999 inclusive.
+    """
+    intToRoman(number: Int!): String!
 }
 
 """

@@ -3,7 +3,9 @@ package at.mavila.exercises_january_2026.components;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -58,6 +60,40 @@ public class RomanNumberProcessor {
             'D', 500,
             'M', 1000);
 
+    private static final Map<String, Integer> SUBTRACTION_CASES = Map.of(
+            "IV", 4,
+            "IX", 9,
+            "XL", 40,
+            "XC", 90,
+            "CD", 400,
+            "CM", 900);
+
+    /**
+     * Combined map ordered by value descending, used for integer to Roman
+     * conversion.
+     */
+    private static final Map<String, Integer> COMBINED_MAP_DESC;
+
+    static {
+        // Create a temporary map with all entries
+        Map<String, Integer> tempMap = new LinkedHashMap<>();
+
+        // Add single character mappings
+        ROMAN_TO_INT_MAP.forEach((key, value) -> tempMap.put(String.valueOf(key), value));
+
+        // Add subtraction cases
+        tempMap.putAll(SUBTRACTION_CASES);
+
+        // Sort by value descending for intToRoman conversion
+        COMBINED_MAP_DESC = tempMap.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new));
+    }
+
     /**
      * Converts a Roman numeral string to its integer value.
      *
@@ -99,13 +135,71 @@ public class RomanNumberProcessor {
 
             if (nonNull(nextValue) && (currentValue < nextValue)) {
                 result -= currentValue;
-            } else {
-                result += currentValue;
+                continue;
             }
+
+            result += currentValue;
         }
 
         return result;
 
+    }
+
+    /**
+     * Converts an integer to its Roman numeral representation.
+     *
+     * <p>
+     * Uses a greedy algorithm that iterates through Roman numeral values
+     * from largest to smallest, subtracting and appending symbols as needed.
+     *
+     * <p>
+     * Examples:
+     * <ul>
+     * <li>3 → "III"</li>
+     * <li>58 → "LVIII"</li>
+     * <li>1994 → "MCMXCIV"</li>
+     * <li>94 → "XCIV"</li>
+     * </ul>
+     *
+     * <p>
+     * <b>Complexity:</b>
+     * <ul>
+     * <li>Time: O(1) - fixed number of symbols (13)</li>
+     * <li>Space: O(1) - maximum Roman numeral length is bounded</li>
+     * </ul>
+     *
+     * @param number the integer to convert (must be between 1 and 3999 inclusive)
+     * @return the Roman numeral string representation
+     * @throws IllegalArgumentException if number is less than 1 or greater than
+     *                                  3999
+     */
+    public String intToRoman(final int number) {
+
+        if (number < 1 || number > 3999) {
+            throw new IllegalArgumentException("Number must be between 1 and 3999, got: " + number);
+        }
+
+        int remaining = number;
+        final StringBuilder result = new StringBuilder();
+
+        // Iterate through symbols from largest to smallest value
+        for (Map.Entry<String, Integer> entry : COMBINED_MAP_DESC.entrySet()) {
+            final String symbol = entry.getKey();
+            final int value = entry.getValue();
+
+            // While we can still use this symbol
+            while (remaining >= value) {
+                result.append(symbol);
+                remaining -= value;
+            }
+
+            // Early exit if nothing left to convert
+            if (remaining == 0) {
+                break;
+            }
+        }
+
+        return result.toString();
     }
 
 }

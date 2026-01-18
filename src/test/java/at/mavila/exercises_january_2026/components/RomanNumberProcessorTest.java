@@ -95,12 +95,12 @@ class RomanNumberProcessorTest {
 
     @ParameterizedTest(name = "Large number {0} should equal {1}")
     @CsvSource({
-            "MMMCMXCIX, 3999",   // Maximum standard Roman numeral
+            "MMMCMXCIX, 3999", // Maximum standard Roman numeral
             "MMMDCCCLXXXVIII, 3888",
             "MMMCCCXXXIII, 3333",
             "MMCMXCIX, 2999",
             "MDCLXVI, 1666",
-            "MMXXVI, 2026"       // Current year
+            "MMXXVI, 2026" // Current year
     })
     void testLargeNumbers(String roman, int expected) {
         assertThat(this.romanNumberProcessor.romanToInt(roman)).isEqualTo(expected);
@@ -253,6 +253,31 @@ class RomanNumberProcessorTest {
     })
     void testNumbersOneToTen(String roman, int expected) {
         assertThat(this.romanNumberProcessor.romanToInt(roman)).isEqualTo(expected);
+    }
+
+    //////// ==================== intToRoman Tests ====================//////
+    @Test
+    void testIntToRoman1() {
+        String result = this.romanNumberProcessor.intToRoman(58);
+        assertThat(result).isEqualTo("LVIII");
+    }
+
+    @Test
+    void testIntToRoman2() {
+        String result = this.romanNumberProcessor.intToRoman(94);
+        assertThat(result).isEqualTo("XCIV");
+    }
+
+    @Test
+    void testIntToRoman3() {
+        String result = this.romanNumberProcessor.intToRoman(1994);
+        assertThat(result).isEqualTo("MCMXCIV");
+    }
+
+    @Test
+    void testIntToRoman4() {
+        String result = this.romanNumberProcessor.intToRoman(4);
+        assertThat(result).isEqualTo("IV");
     }
 
 }
