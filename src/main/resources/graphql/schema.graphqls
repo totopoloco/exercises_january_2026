@@ -57,7 +57,8 @@ type Query {
     Converts a Roman numeral string to its integer value.
     Supports standard Roman numerals (I, V, X, L, C, D, M) and subtraction notation.
     Examples: "III" → 3, "IV" → 4, "MCMXCIV" → 1994
-    Invalid characters are silently ignored. Case-sensitive (only uppercase).
+    Throws an error for invalid input (null/blank, invalid characters, invalid repetition, or invalid subtraction).
+    Valid range: 1 to 3999. Case-sensitive (only uppercase).
     """
     romanToInt(roman: String!): Int!
 

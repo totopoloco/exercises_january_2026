@@ -100,7 +100,7 @@ class RomanNumberProcessorTest {
             "MMMCCCXXXIII, 3333",
             "MMCMXCIX, 2999",
             "MDCLXVI, 1666",
-            "MMXXVI, 2026" // Current year
+            "MMXXVI, 2026" // Recent year example
     })
     void testLargeNumbers(String roman, int expected) {
         assertThat(this.romanNumberProcessor.romanToInt(roman)).isEqualTo(expected);
@@ -368,6 +368,64 @@ class RomanNumberProcessorTest {
     void testIntToRoman4() {
         String result = this.romanNumberProcessor.intToRoman(4);
         assertThat(result).isEqualTo("IV");
+    }
+
+    // ==================== intToRoman Boundary Tests ====================
+
+    @Test
+    void testIntToRomanMinimumValid() {
+        // 1 is the smallest valid input
+        String result = this.romanNumberProcessor.intToRoman(1);
+        assertThat(result).isEqualTo("I");
+    }
+
+    @Test
+    void testIntToRomanMaximumValid() {
+        // 3999 is the largest valid input
+        String result = this.romanNumberProcessor.intToRoman(3999);
+        assertThat(result).isEqualTo("MMMCMXCIX");
+    }
+
+    // ==================== intToRoman Invalid Input Tests ====================
+
+    @Test
+    void testIntToRomanZeroThrowsException() {
+        // Zero is not representable in Roman numerals
+        assertThatThrownBy(() -> this.romanNumberProcessor.intToRoman(0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must be between 1 and 3999");
+    }
+
+    @Test
+    void testIntToRomanNegativeThrowsException() {
+        // Negative numbers are not valid
+        assertThatThrownBy(() -> this.romanNumberProcessor.intToRoman(-1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must be between 1 and 3999");
+    }
+
+    @Test
+    void testIntToRomanTooLargeThrowsException() {
+        // 4000 exceeds the maximum valid Roman numeral
+        assertThatThrownBy(() -> this.romanNumberProcessor.intToRoman(4000))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must be between 1 and 3999");
+    }
+
+    @Test
+    void testIntToRomanLargeNegativeThrowsException() {
+        // Large negative numbers are not valid
+        assertThatThrownBy(() -> this.romanNumberProcessor.intToRoman(-1000))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must be between 1 and 3999");
+    }
+
+    @Test
+    void testIntToRomanVeryLargeThrowsException() {
+        // Very large numbers are not valid
+        assertThatThrownBy(() -> this.romanNumberProcessor.intToRoman(10000))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must be between 1 and 3999");
     }
 
 }

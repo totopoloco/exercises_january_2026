@@ -1326,14 +1326,14 @@ Roman numerals use **subtraction notation** for certain combinations where a sma
 │       FOR each character at index i in roman string         │
 │       ┌───────────────────────────────────────────────────┐ │
 │       │  currentValue = map.get(roman[i])                 │ │
-│       │  IF currentValue is null → skip (invalid char)    │ │
-│       │                                                   │ │
 │       │  nextValue = map.get(roman[i+1]) if exists        │ │
 │       │                                                   │ │
-│       │  IF nextValue exists AND currentValue < nextValue │ │
-│       │      result -= currentValue  (subtraction case)   │ │
-│       │  ELSE                                             │ │
+│       │  IF isAdditionCase(currentValue, nextValue)       │ │
 │       │      result += currentValue  (addition case)      │ │
+│       │  ELSE                                             │ │
+│       │      result -= currentValue  (subtraction case)   │ │
+│       │                                                   │ │
+│       │  isAdditionCase: no next OR current >= next       │ │
 │       └───────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
                               │
@@ -1387,15 +1387,15 @@ This works because subtraction notation in Roman numerals always involves exactl
 
 ### Examples
 
-| Input     | Output | Explanation                                  |
-| --------- | ------ | -------------------------------------------- |
-| III       | 3      | 1 + 1 + 1                                    |
-| IV        | 4      | 5 - 1                                        |
-| IX        | 9      | 10 - 1                                       |
-| LVIII     | 58     | 50 + 5 + 1 + 1 + 1                           |
-| MCMXCIV   | 1994   | 1000 + (1000-100) + (100-10) + (5-1)         |
-| MMMCMXCIX | 3999   | Maximum standard Roman numeral               |
-| MMXXVI    | 2026   | 1000 + 1000 + 10 + 10 + 5 + 1 (current year) |
+| Input     | Output | Explanation                          |
+| --------- | ------ | ------------------------------------ |
+| III       | 3      | 1 + 1 + 1                            |
+| IV        | 4      | 5 - 1                                |
+| IX        | 9      | 10 - 1                               |
+| LVIII     | 58     | 50 + 5 + 1 + 1 + 1                   |
+| MCMXCIV   | 1994   | 1000 + (1000-100) + (100-10) + (5-1) |
+| MMMCMXCIX | 3999   | Maximum standard Roman numeral       |
+| MMXXVI    | 2026   | 1000 + 1000 + 10 + 10 + 5 + 1        |
 
 ### Edge Cases
 
@@ -1537,14 +1537,14 @@ Historically, Romans used additional notations for larger numbers:
 
 ### Edge Cases
 
-| Case         | Input | Output    | Notes                    |
-| ------------ | ----- | --------- | ------------------------ |
-| Minimum      | 1     | I         | Smallest valid input     |
-| Maximum      | 3999  | MMMCMXCIX | Largest standard numeral |
-| Zero         | 0     | Error     | IllegalArgumentException |
-| Negative     | -1    | Error     | IllegalArgumentException |
-| Too large    | 4000  | Error     | IllegalArgumentException |
-| Current year | 2026  | MMXXVI    | 1000+1000+10+10+5+1      |
+| Case        | Input | Output    | Notes                    |
+| ----------- | ----- | --------- | ------------------------ |
+| Minimum     | 1     | I         | Smallest valid input     |
+| Maximum     | 3999  | MMMCMXCIX | Largest standard numeral |
+| Zero        | 0     | Error     | IllegalArgumentException |
+| Negative    | -1    | Error     | IllegalArgumentException |
+| Too large   | 4000  | Error     | IllegalArgumentException |
+| Recent year | 2026  | MMXXVI    | 1000+1000+10+10+5+1      |
 
 ### Complexity
 
@@ -1930,7 +1930,7 @@ query {
 }
 ```
 
-#### Roman Numeral - Current Year
+#### Roman Numeral - Recent Year
 
 ```graphql
 query {
@@ -1966,7 +1966,7 @@ query {
 }
 ```
 
-#### Integer to Roman - Current Year
+#### Integer to Roman - Recent Year
 
 ```graphql
 query {
@@ -1981,6 +1981,61 @@ query {
     "data": {
         "intToRoman": "MMXXVI"
     }
+}
+```
+
+### Error Handling
+
+The GraphQL API provides structured error responses for invalid inputs:
+
+#### Invalid Roman Numeral (validation error)
+
+```bash
+curl -X POST http://localhost:8080/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ romanToInt(roman: \"IIII\") }"}'
+```
+
+**Response:**
+
+```json
+{
+    "errors": [
+        {
+            "message": "Invalid Roman numeral: Character 'I' cannot repeat more than 3 times consecutively",
+            "extensions": {
+                "errorCode": "INVALID_ROMAN_NUMERAL",
+                "invalidInput": "IIII",
+                "violationReason": "Character 'I' cannot repeat more than 3 times consecutively",
+                "classification": "BAD_REQUEST"
+            }
+        }
+    ]
+}
+```
+
+#### Invalid Argument (null/blank input or out-of-range)
+
+```bash
+curl -X POST http://localhost:8080/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ intToRoman(number: 5000) }"}'
+```
+
+**Response:**
+
+```json
+{
+    "errors": [
+        {
+            "message": "Invalid input: Number must be between 1 and 3999",
+            "extensions": {
+                "errorCode": "INVALID_ARGUMENT",
+                "reason": "Number must be between 1 and 3999",
+                "classification": "BAD_REQUEST"
+            }
+        }
+    ]
 }
 ```
 

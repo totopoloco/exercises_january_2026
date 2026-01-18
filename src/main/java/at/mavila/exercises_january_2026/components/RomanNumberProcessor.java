@@ -1,7 +1,6 @@
 package at.mavila.exercises_january_2026.components;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,8 +31,9 @@ import org.springframework.stereotype.Component;
  *
  * <p>
  * <b>Algorithm:</b> Single-pass iteration with look-ahead comparison.
- * For each character, if its value is less than the next character's value,
- * subtract it; otherwise, add it.
+ * For each character, if there is no next character or the current value is
+ * greater than or equal to the next value, add it; otherwise, subtract it
+ * (subtraction case).
  *
  * <p>
  * <b>Complexity:</b>
@@ -156,26 +156,29 @@ public class RomanNumberProcessor {
         int result = 0;
 
         for (int i = 0; i < roman.length(); i++) {
-            Integer currentValue = ROMAN_TO_INT_MAP.get(roman.charAt(i));
-            // Skip invalid characters (already validated, but keeping for safety)
-            if (isNull(currentValue)) {
-                continue;
-            }
+            int currentValue = ROMAN_TO_INT_MAP.get(roman.charAt(i));
 
             // Look ahead to check if this is a subtraction case (e.g., IV, IX, XL, XC, CD,
             // CM)
             Integer nextValue = ((i + 1) < roman.length()) ? ROMAN_TO_INT_MAP.get(roman.charAt(i + 1)) : null;
 
-            if (nonNull(nextValue) && (currentValue < nextValue)) {
-                result -= currentValue;
+            // If no next value or we are in an addition case
+            if (isAdditionCase(currentValue, nextValue)) {
+                result += currentValue;
                 continue;
             }
 
-            result += currentValue;
+            // Otherwise, it's a subtraction case
+            result -= currentValue;
+
         }
 
         return result;
 
+    }
+
+    private boolean isAdditionCase(final int currentValue, final Integer nextValue) {
+        return isNull(nextValue) || (currentValue >= nextValue);
     }
 
     /**

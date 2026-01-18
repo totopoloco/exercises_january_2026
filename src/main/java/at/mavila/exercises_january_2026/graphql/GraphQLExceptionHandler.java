@@ -1,5 +1,7 @@
 package at.mavila.exercises_january_2026.graphql;
 
+import java.util.Map;
+
 import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Component;
@@ -27,9 +29,14 @@ import graphql.schema.DataFetchingEnvironment;
  * <ul>
  * <li>{@link InvalidRomanNumeralException} - Returns BAD_REQUEST with
  * errorCode "INVALID_ROMAN_NUMERAL", invalidInput, and violationReason</li>
+ * <li>{@link IllegalArgumentException} - Returns BAD_REQUEST with
+ * errorCode "INVALID_ARGUMENT" for null/blank input or out-of-range
+ * numbers</li>
  * </ul>
  *
- * <h2>Example Error Response</h2>
+ * <h2>Example Error Responses</h2>
+ *
+ * <h3>InvalidRomanNumeralException</h3>
  *
  * <pre>{@code
  * {
@@ -39,6 +46,21 @@ import graphql.schema.DataFetchingEnvironment;
  *       "errorCode": "INVALID_ROMAN_NUMERAL",
  *       "invalidInput": "IIII",
  *       "violationReason": "Character 'I' cannot repeat more than 3 times consecutively",
+ *       "classification": "BAD_REQUEST"
+ *     }
+ *   }]
+ * }
+ * }</pre>
+ *
+ * <h3>IllegalArgumentException</h3>
+ *
+ * <pre>{@code
+ * {
+ *   "errors": [{
+ *     "message": "Invalid input: Number must be between 1 and 3999",
+ *     "extensions": {
+ *       "errorCode": "INVALID_ARGUMENT",
+ *       "reason": "Number must be between 1 and 3999",
  *       "classification": "BAD_REQUEST"
  *     }
  *   }]
@@ -68,17 +90,38 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
     @Override
     protected GraphQLError resolveToSingleError(Throwable ex, DataFetchingEnvironment env) {
         if (ex instanceof InvalidRomanNumeralException invalidRomanEx) {
-            return GraphqlErrorBuilder.newError(env)
-                    .message("Invalid Roman numeral: %s", invalidRomanEx.getViolationReason())
-                    .errorType(ErrorType.BAD_REQUEST)
-                    .extensions(java.util.Map.of(
+            return buildBadRequestError(env, "Invalid Roman numeral: %s".formatted(invalidRomanEx.getViolationReason()),
+                    Map.of(
+                            "errorCode", "INVALID_ROMAN_NUMERAL",
                             "invalidInput", invalidRomanEx.getInvalidInput(),
-                            "violationReason", invalidRomanEx.getViolationReason(),
-                            "errorCode", "INVALID_ROMAN_NUMERAL"))
-                    .build();
+                            "violationReason", invalidRomanEx.getViolationReason()));
+        }
+
+        if (ex instanceof IllegalArgumentException illegalArgEx) {
+            return buildBadRequestError(env, "Invalid input: %s".formatted(illegalArgEx.getMessage()),
+                    Map.of(
+                            "errorCode", "INVALID_ARGUMENT",
+                            "reason", illegalArgEx.getMessage()));
         }
 
         // Let other exceptions be handled by the default resolver
         return null;
+    }
+
+    /**
+     * Builds a GraphQL error with BAD_REQUEST type and the given extensions.
+     *
+     * @param env        the data fetching environment
+     * @param message    the error message
+     * @param extensions the extension fields to include in the error
+     * @return the constructed GraphQL error
+     */
+    private GraphQLError buildBadRequestError(final DataFetchingEnvironment env, final String message,
+            final Map<String, Object> extensions) {
+        return GraphqlErrorBuilder.newError(env)
+                .message(message)
+                .errorType(ErrorType.BAD_REQUEST)
+                .extensions(extensions)
+                .build();
     }
 }
