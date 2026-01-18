@@ -14,7 +14,8 @@ A collection of algorithm exercises implemented in Java with Spring Boot.
 8. [Rearranging Fruits](#8-rearranging-fruits)
 9. [PIN Cracker](#9-pin-cracker)
 10. [Minimum Percentage](#10-minimum-percentage)
-11. [GraphQL API](#11-graphql-api)
+11. [Roman Numeral to Integer](#11-roman-numeral-to-integer)
+12. [GraphQL API](#12-graphql-api)
 
 ---
 
@@ -67,8 +68,8 @@ Given two integer arrays, merge them and calculate the median of the combined so
 
 ### Complexity
 
--   **Time:** O((n+m) log(n+m)) due to sorting
--   **Space:** O(n+m) for the merged list
+- **Time:** O((n+m) log(n+m)) due to sorting
+- **Space:** O(n+m) for the merged list
 
 ### Example
 
@@ -156,8 +157,8 @@ The area is limited by the shorter line. Moving the taller line can only **decre
 
 ### Complexity
 
--   **Time:** O(n) - single pass with two pointers
--   **Space:** O(1) - constant extra space
+- **Time:** O(n) - single pass with two pointers
+- **Space:** O(1) - constant extra space
 
 ---
 
@@ -201,8 +202,8 @@ Given a 2D grid, count the number of negative numbers.
 
 ### Complexity
 
--   **Time:** O(m × n) where m = rows, n = columns
--   **Space:** O(k) where k = number of negatives
+- **Time:** O(m × n) where m = rows, n = columns
+- **Space:** O(k) where k = number of negatives
 
 ---
 
@@ -280,8 +281,8 @@ After processing '3' (def):
 
 ### Complexity
 
--   **Time:** O(4^n × n) where n = number of digits (worst case for 7 and 9 which have 4 letters)
--   **Space:** O(4^n × n) for storing all combinations
+- **Time:** O(4^n × n) where n = number of digits (worst case for 7 and 9 which have 4 letters)
+- **Space:** O(4^n × n) for storing all combinations
 
 ---
 
@@ -375,8 +376,8 @@ Step 2: Merge result with List3
 
 ### Complexity
 
--   **Time:** O(N × k) where N = total nodes, k = number of lists
--   **Space:** O(1) - we reuse existing nodes
+- **Time:** O(N × k) where N = total nodes, k = number of lists
+- **Space:** O(1) - we reuse existing nodes
 
 ---
 
@@ -558,8 +559,8 @@ Since `right` only moves forward and never backward, the total work is linear.
 
 ### Complexity
 
--   **Time:** O(n) - each position is visited at most twice
--   **Space:** O(n) - for the preprocessed string and pradii[] array
+- **Time:** O(n) - each position is visited at most twice
+- **Space:** O(n) - for the preprocessed string and pradii[] array
 
 ### Execution Example: "babad"
 
@@ -867,8 +868,8 @@ RESULT: 3 (substring "abc")
 
 ### Complexity
 
--   **Time:** O(n) - single pass through the string
--   **Space:** O(1) or O(256) - fixed-size map for ASCII characters
+- **Time:** O(n) - single pass through the string
+- **Space:** O(1) or O(256) - fixed-size map for ASCII characters
 
 ---
 
@@ -1003,8 +1004,8 @@ Via-Minimum Swap (cost = 2 × globalMin):
 
 ### Complexity
 
--   **Time:** O(n log n) due to sorting
--   **Space:** O(n) for frequency maps and excess lists
+- **Time:** O(n log n) due to sorting
+- **Space:** O(n) for frequency maps and excess lists
 
 ---
 
@@ -1093,8 +1094,8 @@ The formula can be derived as follows:
 
 ### Complexity
 
--   **Time:** $O\left(\frac{10^{M+1} - 10}{9}\right) \approx O(10^M)$ — exponential in PIN length
--   **Space:** $O(M)$ for storing the candidate string
+- **Time:** $O\left(\frac{10^{M+1} - 10}{9}\right) \approx O(10^M)$ — exponential in PIN length
+- **Space:** $O(M)$ for storing the candidate string
 
 ### Example
 
@@ -1147,9 +1148,9 @@ Given an array of n percentages (representing completion rates, scores, etc.), c
 
 This is useful in scenarios like:
 
--   Determining the minimum score needed across multiple subjects to pass
--   Finding the required completion rate for parallel tasks
--   Calculating threshold values for multi-criteria systems
+- Determining the minimum score needed across multiple subjects to pass
+- Finding the required completion rate for parallel tasks
+- Calculating threshold values for multi-criteria systems
 
 ### Algorithm
 
@@ -1200,17 +1201,17 @@ $$
 
 Where:
 
--   $p_i$ = each percentage value in the input
--   $n$ = number of elements
--   The result is clamped to 0 if negative
+- $p_i$ = each percentage value in the input
+- $n$ = number of elements
+- The result is clamped to 0 if negative
 
 #### Intuition
 
 The formula calculates how much "excess" percentage exists beyond the baseline. If you have n items and each could contribute up to 100%, then:
 
--   The maximum total is 100n
--   If n-1 items each contribute exactly 100%, that's 100(n-1)
--   The minimum required for the nth item is: Total - 100(n-1)
+- The maximum total is 100n
+- If n-1 items each contribute exactly 100%, that's 100(n-1)
+- The minimum required for the nth item is: Total - 100(n-1)
 
 #### Step-by-Step Example
 
@@ -1245,8 +1246,8 @@ Output: 15
 
 ### Complexity
 
--   **Time:** O(n) — single pass to sum all elements
--   **Space:** O(1) — only stores sum and intermediate values
+- **Time:** O(n) — single pass to sum all elements
+- **Space:** O(1) — only stores sum and intermediate values
 
 ### Edge Cases
 
@@ -1261,7 +1262,152 @@ Output: 15
 
 ---
 
-## 11. GraphQL API
+## 11. Roman Numeral to Integer
+
+**File:** `RomanNumberProcessor.java`
+
+### Problem
+
+Convert a Roman numeral string to its integer value. Roman numerals are represented by seven different symbols with the following values:
+
+| Symbol | Value |
+| ------ | ----- |
+| I      | 1     |
+| V      | 5     |
+| X      | 10    |
+| L      | 50    |
+| C      | 100   |
+| D      | 500   |
+| M      | 1000  |
+
+Roman numerals use **subtraction notation** for certain combinations where a smaller numeral appears before a larger one:
+
+| Pattern | Value | Meaning    |
+| ------- | ----- | ---------- |
+| IV      | 4     | 5 - 1      |
+| IX      | 9     | 10 - 1     |
+| XL      | 40    | 50 - 10    |
+| XC      | 90    | 100 - 10   |
+| CD      | 400   | 500 - 100  |
+| CM      | 900   | 1000 - 100 |
+
+### Algorithm: Single-Pass with Look-Ahead
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    INPUT: roman string                       │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       Validate: Is input null or blank?                      │
+│       YES → throw IllegalArgumentException                   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       Initialize: result = 0, i = 0                          │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       FOR each character at index i in roman string          │
+│       ┌─────────────────────────────────────────────────┐   │
+│       │  currentValue = map.get(roman[i])               │   │
+│       │  IF currentValue is null → skip (invalid char)  │   │
+│       │                                                  │   │
+│       │  nextValue = map.get(roman[i+1]) if exists      │   │
+│       │                                                  │   │
+│       │  IF nextValue exists AND currentValue < nextValue│   │
+│       │      result -= currentValue  (subtraction case) │   │
+│       │  ELSE                                            │   │
+│       │      result += currentValue  (addition case)    │   │
+│       └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    OUTPUT: result                            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Step-by-Step Example
+
+```
+Input: "MCMXCIV"
+
+Processing each character:
+┌───────┬───────────────┬───────────┬───────────┬─────────────────────┬────────┐
+│ Index │   Character   │  Current  │   Next    │       Action        │ Result │
+├───────┼───────────────┼───────────┼───────────┼─────────────────────┼────────┤
+│   0   │      M        │   1000    │   100 (C) │ 1000 > 100 → ADD    │  1000  │
+│   1   │      C        │    100    │  1000 (M) │ 100 < 1000 → SUB    │   900  │
+│   2   │      M        │   1000    │    10 (X) │ 1000 > 10 → ADD     │  1900  │
+│   3   │      X        │     10    │   100 (C) │ 10 < 100 → SUB      │  1890  │
+│   4   │      C        │    100    │     1 (I) │ 100 > 1 → ADD       │  1990  │
+│   5   │      I        │      1    │     5 (V) │ 1 < 5 → SUB         │  1989  │
+│   6   │      V        │      5    │   (none)  │ No next → ADD       │  1994  │
+└───────┴───────────────┴───────────┴───────────┴─────────────────────┴────────┘
+
+Output: 1994
+```
+
+### Visual Representation
+
+```
+        MCMXCIV = 1994
+
+        M    CM    XC    IV
+        │     │     │     │
+        │     │     │     └─→ 5-1 = 4
+        │     │     └───────→ 100-10 = 90
+        │     └─────────────→ 1000-100 = 900
+        └───────────────────→ 1000
+
+        1000 + 900 + 90 + 4 = 1994
+```
+
+### Key Insight
+
+The algorithm uses a simple rule: **if the current value is less than the next value, subtract it; otherwise, add it.**
+
+This works because subtraction notation in Roman numerals always involves exactly one smaller numeral immediately before a larger one.
+
+### Examples
+
+| Input     | Output | Explanation                                  |
+| --------- | ------ | -------------------------------------------- |
+| III       | 3      | 1 + 1 + 1                                    |
+| IV        | 4      | 5 - 1                                        |
+| IX        | 9      | 10 - 1                                       |
+| LVIII     | 58     | 50 + 5 + 1 + 1 + 1                           |
+| MCMXCIV   | 1994   | 1000 + (1000-100) + (100-10) + (5-1)         |
+| MMMCMXCIX | 3999   | Maximum standard Roman numeral               |
+| MMXXVI    | 2026   | 1000 + 1000 + 10 + 10 + 5 + 1 (current year) |
+
+### Edge Cases
+
+| Case                    | Input     | Output | Notes                                 |
+| ----------------------- | --------- | ------ | ------------------------------------- |
+| Single character        | I         | 1      | Minimum valid input                   |
+| Maximum standard        | MMMCMXCIX | 3999   | Largest representable with M, C, X, I |
+| All same digits         | III       | 3      | Simple addition                       |
+| All subtraction pairs   | MCMXCIV   | 1994   | Multiple subtraction patterns         |
+| Null input              | null      | Error  | IllegalArgumentException              |
+| Empty string            | ""        | Error  | IllegalArgumentException              |
+| Blank string            | " "       | Error  | IllegalArgumentException              |
+| Invalid characters only | "ABC"     | 0      | No valid Roman numerals found         |
+| Lowercase letters       | "iii"     | 0      | Case-sensitive, lowercase ignored     |
+| Mixed valid/invalid     | "X1V2I3"  | 16     | Only X, V, I processed → 10 + 5 + 1   |
+
+### Complexity
+
+- **Time:** O(n) where n is the length of the input string — single pass
+- **Space:** O(1) — constant extra space (only integer variables)
+
+---
+
+## 12. GraphQL API
 
 All algorithms are exposed via a GraphQL API, allowing you to interact with them through HTTP requests or the built-in GraphiQL interface.
 
@@ -1302,6 +1448,9 @@ type Query {
 
     # Cracks a numeric PIN from its MD5 hash (maxLen defaults to 5)
     crackPin(hash: String!, maxLen: Int): String
+
+    # Converts Roman numeral to integer (e.g., "MCMXCIV" → 1994)
+    romanToInt(roman: String!): Int!
 }
 ```
 
@@ -1499,6 +1648,42 @@ query {
 }
 ```
 
+#### Roman Numeral to Integer
+
+```graphql
+query {
+    romanToInt(roman: "MCMXCIV")
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "romanToInt": 1994
+    }
+}
+```
+
+#### Roman Numeral - Current Year
+
+```graphql
+query {
+    romanToInt(roman: "MMXXVI")
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "romanToInt": 2026
+    }
+}
+```
+
 ### Using cURL
 
 You can also call the GraphQL API using cURL:
@@ -1515,8 +1700,8 @@ curl -X POST http://localhost:8080/graphql \
 
 ### Prerequisites
 
--   Java 17+
--   Gradle
+- Java 17+
+- Gradle
 
 ### Build
 

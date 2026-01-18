@@ -15,6 +15,7 @@ import at.mavila.exercises_january_2026.components.LongestPalindromeSubstringExt
 import at.mavila.exercises_january_2026.components.LongestSubstring;
 import at.mavila.exercises_january_2026.components.PinCracker;
 import at.mavila.exercises_january_2026.components.RearrangingFruits;
+import at.mavila.exercises_january_2026.components.RomanNumberProcessor;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -34,6 +35,7 @@ public class AlgorithmService {
     private final LongestSubstring longestSubstring;
     private final PinCracker pinCracker;
     private final RearrangingFruits rearrangingFruits;
+    private final RomanNumberProcessor romanNumberProcessor;
 
     /**
      * Merges two integer arrays and calculates the median of the combined sorted
@@ -133,6 +135,17 @@ public class AlgorithmService {
         }
 
         return pinCracker.crack(hash, maxLen.intValue());
+    }
+
+    /**
+     * Converts a Roman numeral string to its integer value.
+     *
+     * @param roman the Roman numeral string (e.g., "MCMXCIV")
+     * @return the integer value (e.g., 1994)
+     * @throws IllegalArgumentException if the input is null or blank
+     */
+    public int romanToInt(String roman) {
+        return romanNumberProcessor.romanToInt(roman);
     }
 
 }
