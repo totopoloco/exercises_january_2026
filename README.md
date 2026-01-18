@@ -14,7 +14,10 @@ A collection of algorithm exercises implemented in Java with Spring Boot.
 8. [Rearranging Fruits](#8-rearranging-fruits)
 9. [PIN Cracker](#9-pin-cracker)
 10. [Minimum Percentage](#10-minimum-percentage)
-11. [GraphQL API](#11-graphql-api)
+11. [Roman Numeral to Integer](#11-roman-numeral-to-integer)
+    - [11b. Integer to Roman Numeral](#11b-integer-to-roman-numeral)
+    - [11c. Roman Numeral Validation](#11c-roman-numeral-validation)
+12. [GraphQL API](#12-graphql-api)
 
 ---
 
@@ -67,8 +70,8 @@ Given two integer arrays, merge them and calculate the median of the combined so
 
 ### Complexity
 
--   **Time:** O((n+m) log(n+m)) due to sorting
--   **Space:** O(n+m) for the merged list
+- **Time:** O((n+m) log(n+m)) due to sorting
+- **Space:** O(n+m) for the merged list
 
 ### Example
 
@@ -156,8 +159,8 @@ The area is limited by the shorter line. Moving the taller line can only **decre
 
 ### Complexity
 
--   **Time:** O(n) - single pass with two pointers
--   **Space:** O(1) - constant extra space
+- **Time:** O(n) - single pass with two pointers
+- **Space:** O(1) - constant extra space
 
 ---
 
@@ -201,8 +204,8 @@ Given a 2D grid, count the number of negative numbers.
 
 ### Complexity
 
--   **Time:** O(m × n) where m = rows, n = columns
--   **Space:** O(k) where k = number of negatives
+- **Time:** O(m × n) where m = rows, n = columns
+- **Space:** O(k) where k = number of negatives
 
 ---
 
@@ -280,8 +283,8 @@ After processing '3' (def):
 
 ### Complexity
 
--   **Time:** O(4^n × n) where n = number of digits (worst case for 7 and 9 which have 4 letters)
--   **Space:** O(4^n × n) for storing all combinations
+- **Time:** O(4^n × n) where n = number of digits (worst case for 7 and 9 which have 4 letters)
+- **Space:** O(4^n × n) for storing all combinations
 
 ---
 
@@ -375,8 +378,8 @@ Step 2: Merge result with List3
 
 ### Complexity
 
--   **Time:** O(N × k) where N = total nodes, k = number of lists
--   **Space:** O(1) - we reuse existing nodes
+- **Time:** O(N × k) where N = total nodes, k = number of lists
+- **Space:** O(1) - we reuse existing nodes
 
 ---
 
@@ -558,8 +561,8 @@ Since `right` only moves forward and never backward, the total work is linear.
 
 ### Complexity
 
--   **Time:** O(n) - each position is visited at most twice
--   **Space:** O(n) - for the preprocessed string and pradii[] array
+- **Time:** O(n) - each position is visited at most twice
+- **Space:** O(n) - for the preprocessed string and pradii[] array
 
 ### Execution Example: "babad"
 
@@ -867,8 +870,8 @@ RESULT: 3 (substring "abc")
 
 ### Complexity
 
--   **Time:** O(n) - single pass through the string
--   **Space:** O(1) or O(256) - fixed-size map for ASCII characters
+- **Time:** O(n) - single pass through the string
+- **Space:** O(1) or O(256) - fixed-size map for ASCII characters
 
 ---
 
@@ -1003,8 +1006,8 @@ Via-Minimum Swap (cost = 2 × globalMin):
 
 ### Complexity
 
--   **Time:** O(n log n) due to sorting
--   **Space:** O(n) for frequency maps and excess lists
+- **Time:** O(n log n) due to sorting
+- **Space:** O(n) for frequency maps and excess lists
 
 ---
 
@@ -1093,8 +1096,8 @@ The formula can be derived as follows:
 
 ### Complexity
 
--   **Time:** $O\left(\frac{10^{M+1} - 10}{9}\right) \approx O(10^M)$ — exponential in PIN length
--   **Space:** $O(M)$ for storing the candidate string
+- **Time:** $O\left(\frac{10^{M+1} - 10}{9}\right) \approx O(10^M)$ — exponential in PIN length
+- **Space:** $O(M)$ for storing the candidate string
 
 ### Example
 
@@ -1147,9 +1150,9 @@ Given an array of n percentages (representing completion rates, scores, etc.), c
 
 This is useful in scenarios like:
 
--   Determining the minimum score needed across multiple subjects to pass
--   Finding the required completion rate for parallel tasks
--   Calculating threshold values for multi-criteria systems
+- Determining the minimum score needed across multiple subjects to pass
+- Finding the required completion rate for parallel tasks
+- Calculating threshold values for multi-criteria systems
 
 ### Algorithm
 
@@ -1200,17 +1203,17 @@ $$
 
 Where:
 
--   $p_i$ = each percentage value in the input
--   $n$ = number of elements
--   The result is clamped to 0 if negative
+- $p_i$ = each percentage value in the input
+- $n$ = number of elements
+- The result is clamped to 0 if negative
 
 #### Intuition
 
 The formula calculates how much "excess" percentage exists beyond the baseline. If you have n items and each could contribute up to 100%, then:
 
--   The maximum total is 100n
--   If n-1 items each contribute exactly 100%, that's 100(n-1)
--   The minimum required for the nth item is: Total - 100(n-1)
+- The maximum total is 100n
+- If n-1 items each contribute exactly 100%, that's 100(n-1)
+- The minimum required for the nth item is: Total - 100(n-1)
 
 #### Step-by-Step Example
 
@@ -1245,8 +1248,8 @@ Output: 15
 
 ### Complexity
 
--   **Time:** O(n) — single pass to sum all elements
--   **Space:** O(1) — only stores sum and intermediate values
+- **Time:** O(n) — single pass to sum all elements
+- **Space:** O(1) — only stores sum and intermediate values
 
 ### Edge Cases
 
@@ -1261,7 +1264,411 @@ Output: 15
 
 ---
 
-## 11. GraphQL API
+## 11. Roman Numeral to Integer
+
+**File:** `RomanNumberProcessor.java`
+
+### Problem
+
+Convert a Roman numeral string to its integer value. Roman numerals are represented by seven different symbols with the following values:
+
+| Symbol | Value |
+| ------ | ----- |
+| I      | 1     |
+| V      | 5     |
+| X      | 10    |
+| L      | 50    |
+| C      | 100   |
+| D      | 500   |
+| M      | 1000  |
+
+Roman numerals use **subtraction notation** for certain combinations where a smaller numeral appears before a larger one:
+
+| Pattern | Value | Meaning    |
+| ------- | ----- | ---------- |
+| IV      | 4     | 5 - 1      |
+| IX      | 9     | 10 - 1     |
+| XL      | 40    | 50 - 10    |
+| XC      | 90    | 100 - 10   |
+| CD      | 400   | 500 - 100  |
+| CM      | 900   | 1000 - 100 |
+
+### Algorithm: Single-Pass with Look-Ahead
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    INPUT: roman string                       │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       Validate: Is input null or blank?                      │
+│       YES → throw IllegalArgumentException                   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       Validate Roman numeral format:                         │
+│       • Only valid characters (I, V, X, L, C, D, M)          │
+│       • Valid subtraction pairs (IV, IX, XL, XC, CD, CM)     │
+│       • No invalid repetitions (V, L, D cannot repeat)       │
+│       • Max 3 consecutive same symbols (I, X, C, M)          │
+│       INVALID → throw InvalidRomanNumeralException           │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       Initialize: result = 0, i = 0                          │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       FOR each character at index i in roman string          │
+│       ┌─────────────────────────────────────────────────┐   │
+│       │  currentValue = map.get(roman[i])               │   │
+│       │  IF currentValue is null → skip (invalid char)  │   │
+│       │                                                  │   │
+│       │  nextValue = map.get(roman[i+1]) if exists      │   │
+│       │                                                  │   │
+│       │  IF nextValue exists AND currentValue < nextValue│   │
+│       │      result -= currentValue  (subtraction case) │   │
+│       │  ELSE                                            │   │
+│       │      result += currentValue  (addition case)    │   │
+│       └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    OUTPUT: result                            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Step-by-Step Example
+
+```
+Input: "MCMXCIV"
+
+Processing each character:
+┌───────┬───────────────┬───────────┬───────────┬─────────────────────┬────────┐
+│ Index │   Character   │  Current  │   Next    │       Action        │ Result │
+├───────┼───────────────┼───────────┼───────────┼─────────────────────┼────────┤
+│   0   │      M        │   1000    │   100 (C) │ 1000 > 100 → ADD    │  1000  │
+│   1   │      C        │    100    │  1000 (M) │ 100 < 1000 → SUB    │   900  │
+│   2   │      M        │   1000    │    10 (X) │ 1000 > 10 → ADD     │  1900  │
+│   3   │      X        │     10    │   100 (C) │ 10 < 100 → SUB      │  1890  │
+│   4   │      C        │    100    │     1 (I) │ 100 > 1 → ADD       │  1990  │
+│   5   │      I        │      1    │     5 (V) │ 1 < 5 → SUB         │  1989  │
+│   6   │      V        │      5    │   (none)  │ No next → ADD       │  1994  │
+└───────┴───────────────┴───────────┴───────────┴─────────────────────┴────────┘
+
+Output: 1994
+```
+
+### Visual Representation
+
+```
+        MCMXCIV = 1994
+
+        M    CM    XC    IV
+        │     │     │     │
+        │     │     │     └─→ 5-1 = 4
+        │     │     └───────→ 100-10 = 90
+        │     └─────────────→ 1000-100 = 900
+        └───────────────────→ 1000
+
+        1000 + 900 + 90 + 4 = 1994
+```
+
+### Key Insight
+
+The algorithm uses a simple rule: **if the current value is less than the next value, subtract it; otherwise, add it.**
+
+This works because subtraction notation in Roman numerals always involves exactly one smaller numeral immediately before a larger one.
+
+### Examples
+
+| Input     | Output | Explanation                                  |
+| --------- | ------ | -------------------------------------------- |
+| III       | 3      | 1 + 1 + 1                                    |
+| IV        | 4      | 5 - 1                                        |
+| IX        | 9      | 10 - 1                                       |
+| LVIII     | 58     | 50 + 5 + 1 + 1 + 1                           |
+| MCMXCIV   | 1994   | 1000 + (1000-100) + (100-10) + (5-1)         |
+| MMMCMXCIX | 3999   | Maximum standard Roman numeral               |
+| MMXXVI    | 2026   | 1000 + 1000 + 10 + 10 + 5 + 1 (current year) |
+
+### Edge Cases
+
+| Case                  | Input     | Output | Notes                                         |
+| --------------------- | --------- | ------ | --------------------------------------------- |
+| Single character      | I         | 1      | Minimum valid input                           |
+| Maximum standard      | MMMCMXCIX | 3999   | Largest representable with M, C, X, I         |
+| All same digits       | III       | 3      | Simple addition                               |
+| All subtraction pairs | MCMXCIV   | 1994   | Multiple subtraction patterns                 |
+| Null input            | null      | Error  | IllegalArgumentException                      |
+| Empty string          | ""        | Error  | IllegalArgumentException                      |
+| Blank string          | " "       | Error  | IllegalArgumentException                      |
+| Invalid characters    | "ABC"     | Error  | InvalidRomanNumeralException                  |
+| Lowercase letters     | "iii"     | Error  | InvalidRomanNumeralException (case-sensitive) |
+| Invalid subtraction   | "IC"      | Error  | InvalidRomanNumeralException (I→C invalid)    |
+| Too many repetitions  | "IIII"    | Error  | InvalidRomanNumeralException (max 3)          |
+| Invalid repetition    | "VV"      | Error  | InvalidRomanNumeralException (V can't repeat) |
+
+### Complexity
+
+- **Time:** O(n) where n is the length of the input string — single pass
+- **Space:** O(1) — constant extra space (only integer variables)
+
+---
+
+## 11b. Integer to Roman Numeral
+
+**File:** `RomanNumberProcessor.java`
+
+### Problem
+
+Convert an integer (1-3999) to its Roman numeral representation.
+
+### Algorithm: Greedy Approach
+
+Iterate through Roman numeral values from largest to smallest. For each value, repeatedly subtract it from the number and append the corresponding symbol until the number is less than that value.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    INPUT: number (integer)                   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       Validate: Is number between 1 and 3999?                │
+│       NO → throw IllegalArgumentException                    │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       Initialize: result = "", remaining = number            │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│       FOR each (symbol, value) in descending order:          │
+│       M(1000), CM(900), D(500), CD(400), C(100), XC(90),    │
+│       L(50), XL(40), X(10), IX(9), V(5), IV(4), I(1)        │
+│       ┌─────────────────────────────────────────────────┐   │
+│       │  WHILE remaining >= value:                       │   │
+│       │      result += symbol                            │   │
+│       │      remaining -= value                          │   │
+│       └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    OUTPUT: result                            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Step-by-Step Example
+
+**Converting 94 to Roman numerals:**
+
+```
+Start: num = 94, result = ""
+
+┌────────┬───────┬─────────────┬────────────────┬────────────┐
+│ Symbol │ Value │ num >= val? │     Action     │   Result   │
+├────────┼───────┼─────────────┼────────────────┼────────────┤
+│   M    │ 1000  │  94 < 1000  │     skip       │     ""     │
+│   CM   │  900  │  94 < 900   │     skip       │     ""     │
+│   D    │  500  │  94 < 500   │     skip       │     ""     │
+│   CD   │  400  │  94 < 400   │     skip       │     ""     │
+│   C    │  100  │  94 < 100   │     skip       │     ""     │
+│   XC   │   90  │  94 >= 90 ✓ │ append, 94-90  │    "XC"    │
+│   L    │   50  │   4 < 50    │     skip       │    "XC"    │
+│   XL   │   40  │   4 < 40    │     skip       │    "XC"    │
+│   X    │   10  │   4 < 10    │     skip       │    "XC"    │
+│   IX   │    9  │   4 < 9     │     skip       │    "XC"    │
+│   V    │    5  │   4 < 5     │     skip       │    "XC"    │
+│   IV   │    4  │   4 >= 4 ✓  │ append, 4-4    │   "XCIV"   │
+└────────┴───────┴─────────────┴────────────────┴────────────┘
+
+num = 0, conversion complete
+Output: "XCIV"
+```
+
+**Converting 58 to Roman numerals:**
+
+```
+Start: num = 58, result = ""
+
+L(50):  58 >= 50 → append "L", num = 8
+V(5):    8 >= 5  → append "V", num = 3
+I(1):    3 >= 1  → append "I", num = 2
+I(1):    2 >= 1  → append "I", num = 1
+I(1):    1 >= 1  → append "I", num = 0
+
+Output: "LVIII"
+```
+
+### Examples
+
+| Input | Output    | Explanation                          |
+| ----- | --------- | ------------------------------------ |
+| 3     | III       | 1 + 1 + 1                            |
+| 4     | IV        | 5 - 1 (subtraction notation)         |
+| 9     | IX        | 10 - 1 (subtraction notation)        |
+| 58    | LVIII     | 50 + 5 + 1 + 1 + 1                   |
+| 94    | XCIV      | (100-10) + (5-1)                     |
+| 1994  | MCMXCIV   | 1000 + (1000-100) + (100-10) + (5-1) |
+| 2026  | MMXXVI    | 1000 + 1000 + 10 + 10 + 5 + 1        |
+| 3999  | MMMCMXCIX | Maximum standard Roman numeral       |
+
+### Why the Limit of 3999?
+
+Standard Roman numerals have a maximum of **3999** because:
+
+1. **M (1000)** is the largest symbol
+2. The rule "no symbol repeats more than 3 times" limits us to **MMM = 3000**
+3. The maximum is therefore: MMM + CM + XC + IX = 3000 + 900 + 90 + 9 = **3999**
+
+Historically, Romans used additional notations for larger numbers:
+
+- **Vinculum (overline):** V̄ = 5,000, X̅ = 10,000
+- **Apostrophus:** Special curved symbols for 5,000, 10,000, etc.
+
+### Edge Cases
+
+| Case         | Input | Output    | Notes                    |
+| ------------ | ----- | --------- | ------------------------ |
+| Minimum      | 1     | I         | Smallest valid input     |
+| Maximum      | 3999  | MMMCMXCIX | Largest standard numeral |
+| Zero         | 0     | Error     | IllegalArgumentException |
+| Negative     | -1    | Error     | IllegalArgumentException |
+| Too large    | 4000  | Error     | IllegalArgumentException |
+| Current year | 2026  | MMXXVI    | 1000+1000+10+10+5+1      |
+
+### Complexity
+
+- **Time:** O(1) — fixed number of symbols (13), bounded iterations
+- **Space:** O(1) — output length is bounded (max ~15 characters)
+
+---
+
+## 11c. Roman Numeral Validation
+
+**File:** `RomanNumberProcessor.java`, `InvalidRomanNumeralException.java`
+
+### Overview
+
+The Roman numeral processor enforces strict validation rules to ensure only properly formed Roman numerals are accepted. Invalid inputs throw an `InvalidRomanNumeralException` with detailed information about the violation.
+
+### Validation Rules
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              ROMAN NUMERAL VALIDATION RULES                  │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. VALID CHARACTERS ONLY                                    │
+│     ├── Must be uppercase: I, V, X, L, C, D, M              │
+│     └── Lowercase letters are INVALID                        │
+│                                                              │
+│  2. VALID SUBTRACTION PAIRS                                  │
+│     ├── I can precede: V (IV=4), X (IX=9)                   │
+│     ├── X can precede: L (XL=40), C (XC=90)                 │
+│     ├── C can precede: D (CD=400), M (CM=900)               │
+│     └── V, L, D CANNOT be used for subtraction              │
+│                                                              │
+│  3. REPETITION LIMITS                                        │
+│     ├── V, L, D: Cannot repeat (max 1)                      │
+│     └── I, X, C, M: Maximum 3 consecutive                   │
+│                                                              │
+│  4. NO DOUBLE SUBTRACTION                                    │
+│     └── Cannot have multiple chars before subtraction       │
+│         (e.g., IIV, XXC are INVALID)                        │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### InvalidRomanNumeralException
+
+A custom `RuntimeException` that provides detailed error information:
+
+```java
+public class InvalidRomanNumeralException extends RuntimeException {
+    private final String invalidInput;      // The input that failed validation
+    private final String violationReason;   // Why it's invalid
+}
+```
+
+### Examples of Invalid Roman Numerals
+
+| Input  | Violation                                       | Error Message                                          |
+| ------ | ----------------------------------------------- | ------------------------------------------------------ |
+| `IIII` | Too many repetitions                            | Character 'I' cannot repeat more than 3 times          |
+| `VV`   | V cannot repeat                                 | Character 'V' cannot repeat                            |
+| `LL`   | L cannot repeat                                 | Character 'L' cannot repeat                            |
+| `DD`   | D cannot repeat                                 | Character 'D' cannot repeat                            |
+| `IC`   | Invalid subtraction (I can only precede V or X) | Invalid subtraction pair 'IC' - 'I' cannot precede 'C' |
+| `IM`   | Invalid subtraction (I can only precede V or X) | Invalid subtraction pair 'IM' - 'I' cannot precede 'M' |
+| `XD`   | Invalid subtraction (X can only precede L or C) | Invalid subtraction pair 'XD' - 'X' cannot precede 'D' |
+| `VX`   | V cannot be used for subtraction                | Invalid subtraction pair 'VX' - 'V' cannot precede 'X' |
+| `IIV`  | Double subtraction (II before V)                | Cannot have multiple 'I' before subtraction            |
+| `XXC`  | Double subtraction (XX before C)                | Cannot have multiple 'X' before subtraction            |
+| `ABC`  | Invalid character                               | Invalid character 'A' at position 0                    |
+| `iii`  | Lowercase not allowed                           | Invalid character 'i' at position 0                    |
+| `X1V`  | Invalid character                               | Invalid character '1' at position 1                    |
+
+### GraphQL Error Response
+
+When an invalid Roman numeral is passed via the GraphQL API, a structured error is returned:
+
+```json
+{
+    "errors": [
+        {
+            "message": "Invalid Roman numeral: Character 'I' cannot repeat more than 3 times consecutively",
+            "locations": [{ "line": 1, "column": 3 }],
+            "path": ["romanToInt"],
+            "extensions": {
+                "errorCode": "INVALID_ROMAN_NUMERAL",
+                "invalidInput": "IIII",
+                "violationReason": "Character 'I' cannot repeat more than 3 times consecutively",
+                "classification": "BAD_REQUEST"
+            }
+        }
+    ]
+}
+```
+
+### Example API Calls with Invalid Input
+
+**Invalid Repetition:**
+
+```bash
+curl -X POST http://localhost:8080/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ romanToInt(roman: \"IIII\") }"}'
+```
+
+**Invalid Subtraction:**
+
+```bash
+curl -X POST http://localhost:8080/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ romanToInt(roman: \"IC\") }"}'
+```
+
+**Invalid Character:**
+
+```bash
+curl -X POST http://localhost:8080/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ romanToInt(roman: \"XYZ\") }"}'
+```
+
+---
+
+## 12. GraphQL API
 
 All algorithms are exposed via a GraphQL API, allowing you to interact with them through HTTP requests or the built-in GraphiQL interface.
 
@@ -1302,6 +1709,12 @@ type Query {
 
     # Cracks a numeric PIN from its MD5 hash (maxLen defaults to 5)
     crackPin(hash: String!, maxLen: Int): String
+
+    # Converts Roman numeral to integer (e.g., "MCMXCIV" → 1994)
+    romanToInt(roman: String!): Int!
+
+    # Converts integer to Roman numeral (e.g., 1994 → "MCMXCIV")
+    intToRoman(number: Int!): String!
 }
 ```
 
@@ -1499,6 +1912,78 @@ query {
 }
 ```
 
+#### Roman Numeral to Integer
+
+```graphql
+query {
+    romanToInt(roman: "MCMXCIV")
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "romanToInt": 1994
+    }
+}
+```
+
+#### Roman Numeral - Current Year
+
+```graphql
+query {
+    romanToInt(roman: "MMXXVI")
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "romanToInt": 2026
+    }
+}
+```
+
+#### Integer to Roman Numeral
+
+```graphql
+query {
+    intToRoman(number: 1994)
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "intToRoman": "MCMXCIV"
+    }
+}
+```
+
+#### Integer to Roman - Current Year
+
+```graphql
+query {
+    intToRoman(number: 2026)
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "intToRoman": "MMXXVI"
+    }
+}
+```
+
 ### Using cURL
 
 You can also call the GraphQL API using cURL:
@@ -1515,8 +2000,8 @@ curl -X POST http://localhost:8080/graphql \
 
 ### Prerequisites
 
--   Java 17+
--   Gradle
+- Java 17+
+- Gradle
 
 ### Build
 

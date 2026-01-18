@@ -82,6 +82,16 @@ public class AlgorithmController {
     return algorithmService.crackPin(hash, maxLen);
   }
 
+  @QueryMapping
+  public int romanToInt(@Argument String roman) {
+    return algorithmService.romanToInt(roman);
+  }
+
+  @QueryMapping
+  public String intToRoman(@Argument int number) {
+    return algorithmService.intToRoman(number);
+  }
+
   /**
    * Helper method to create a linked list from a list of integers.
    */

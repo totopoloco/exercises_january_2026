@@ -52,6 +52,22 @@ type Query {
     Returns the recovered PIN string (with leading zeros preserved), or null if not found.
     """
     crackPin(hash: String!, maxLen: Int): String
+
+    """
+    Converts a Roman numeral string to its integer value.
+    Supports standard Roman numerals (I, V, X, L, C, D, M) and subtraction notation.
+    Examples: "III" → 3, "IV" → 4, "MCMXCIV" → 1994
+    Invalid characters are silently ignored. Case-sensitive (only uppercase).
+    """
+    romanToInt(roman: String!): Int!
+
+    """
+    Converts an integer to its Roman numeral representation.
+    Uses a greedy algorithm with standard Roman numeral symbols.
+    Examples: 3 → "III", 4 → "IV", 1994 → "MCMXCIV"
+    Valid range: 1 to 3999 inclusive.
+    """
+    intToRoman(number: Int!): String!
 }
 
 """
