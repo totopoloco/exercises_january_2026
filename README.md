@@ -15,6 +15,8 @@ A collection of algorithm exercises implemented in Java with Spring Boot.
 9. [PIN Cracker](#9-pin-cracker)
 10. [Minimum Percentage](#10-minimum-percentage)
 11. [Roman Numeral to Integer](#11-roman-numeral-to-integer)
+    - [11b. Integer to Roman Numeral](#11b-integer-to-roman-numeral)
+    - [11c. Roman Numeral Validation](#11c-roman-numeral-validation)
 12. [GraphQL API](#12-graphql-api)
 
 ---
@@ -1306,6 +1308,16 @@ Roman numerals use **subtraction notation** for certain combinations where a sma
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
+│       Validate Roman numeral format:                         │
+│       • Only valid characters (I, V, X, L, C, D, M)          │
+│       • Valid subtraction pairs (IV, IX, XL, XC, CD, CM)     │
+│       • No invalid repetitions (V, L, D cannot repeat)       │
+│       • Max 3 consecutive same symbols (I, X, C, M)          │
+│       INVALID → throw InvalidRomanNumeralException           │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
 │       Initialize: result = 0, i = 0                          │
 └─────────────────────────────────────────────────────────────┘
                               │
@@ -1387,18 +1399,20 @@ This works because subtraction notation in Roman numerals always involves exactl
 
 ### Edge Cases
 
-| Case                    | Input     | Output | Notes                                 |
-| ----------------------- | --------- | ------ | ------------------------------------- |
-| Single character        | I         | 1      | Minimum valid input                   |
-| Maximum standard        | MMMCMXCIX | 3999   | Largest representable with M, C, X, I |
-| All same digits         | III       | 3      | Simple addition                       |
-| All subtraction pairs   | MCMXCIV   | 1994   | Multiple subtraction patterns         |
-| Null input              | null      | Error  | IllegalArgumentException              |
-| Empty string            | ""        | Error  | IllegalArgumentException              |
-| Blank string            | " "       | Error  | IllegalArgumentException              |
-| Invalid characters only | "ABC"     | 0      | No valid Roman numerals found         |
-| Lowercase letters       | "iii"     | 0      | Case-sensitive, lowercase ignored     |
-| Mixed valid/invalid     | "X1V2I3"  | 16     | Only X, V, I processed → 10 + 5 + 1   |
+| Case                  | Input     | Output | Notes                                         |
+| --------------------- | --------- | ------ | --------------------------------------------- |
+| Single character      | I         | 1      | Minimum valid input                           |
+| Maximum standard      | MMMCMXCIX | 3999   | Largest representable with M, C, X, I         |
+| All same digits       | III       | 3      | Simple addition                               |
+| All subtraction pairs | MCMXCIV   | 1994   | Multiple subtraction patterns                 |
+| Null input            | null      | Error  | IllegalArgumentException                      |
+| Empty string          | ""        | Error  | IllegalArgumentException                      |
+| Blank string          | " "       | Error  | IllegalArgumentException                      |
+| Invalid characters    | "ABC"     | Error  | InvalidRomanNumeralException                  |
+| Lowercase letters     | "iii"     | Error  | InvalidRomanNumeralException (case-sensitive) |
+| Invalid subtraction   | "IC"      | Error  | InvalidRomanNumeralException (I→C invalid)    |
+| Too many repetitions  | "IIII"    | Error  | InvalidRomanNumeralException (max 3)          |
+| Invalid repetition    | "VV"      | Error  | InvalidRomanNumeralException (V can't repeat) |
 
 ### Complexity
 
@@ -1536,6 +1550,121 @@ Historically, Romans used additional notations for larger numbers:
 
 - **Time:** O(1) — fixed number of symbols (13), bounded iterations
 - **Space:** O(1) — output length is bounded (max ~15 characters)
+
+---
+
+## 11c. Roman Numeral Validation
+
+**File:** `RomanNumberProcessor.java`, `InvalidRomanNumeralException.java`
+
+### Overview
+
+The Roman numeral processor enforces strict validation rules to ensure only properly formed Roman numerals are accepted. Invalid inputs throw an `InvalidRomanNumeralException` with detailed information about the violation.
+
+### Validation Rules
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              ROMAN NUMERAL VALIDATION RULES                  │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. VALID CHARACTERS ONLY                                    │
+│     ├── Must be uppercase: I, V, X, L, C, D, M              │
+│     └── Lowercase letters are INVALID                        │
+│                                                              │
+│  2. VALID SUBTRACTION PAIRS                                  │
+│     ├── I can precede: V (IV=4), X (IX=9)                   │
+│     ├── X can precede: L (XL=40), C (XC=90)                 │
+│     ├── C can precede: D (CD=400), M (CM=900)               │
+│     └── V, L, D CANNOT be used for subtraction              │
+│                                                              │
+│  3. REPETITION LIMITS                                        │
+│     ├── V, L, D: Cannot repeat (max 1)                      │
+│     └── I, X, C, M: Maximum 3 consecutive                   │
+│                                                              │
+│  4. NO DOUBLE SUBTRACTION                                    │
+│     └── Cannot have multiple chars before subtraction       │
+│         (e.g., IIV, XXC are INVALID)                        │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### InvalidRomanNumeralException
+
+A custom `RuntimeException` that provides detailed error information:
+
+```java
+public class InvalidRomanNumeralException extends RuntimeException {
+    private final String invalidInput;      // The input that failed validation
+    private final String violationReason;   // Why it's invalid
+}
+```
+
+### Examples of Invalid Roman Numerals
+
+| Input  | Violation                                       | Error Message                                          |
+| ------ | ----------------------------------------------- | ------------------------------------------------------ |
+| `IIII` | Too many repetitions                            | Character 'I' cannot repeat more than 3 times          |
+| `VV`   | V cannot repeat                                 | Character 'V' cannot repeat                            |
+| `LL`   | L cannot repeat                                 | Character 'L' cannot repeat                            |
+| `DD`   | D cannot repeat                                 | Character 'D' cannot repeat                            |
+| `IC`   | Invalid subtraction (I can only precede V or X) | Invalid subtraction pair 'IC' - 'I' cannot precede 'C' |
+| `IM`   | Invalid subtraction (I can only precede V or X) | Invalid subtraction pair 'IM' - 'I' cannot precede 'M' |
+| `XD`   | Invalid subtraction (X can only precede L or C) | Invalid subtraction pair 'XD' - 'X' cannot precede 'D' |
+| `VX`   | V cannot be used for subtraction                | Invalid subtraction pair 'VX' - 'V' cannot precede 'X' |
+| `IIV`  | Double subtraction (II before V)                | Cannot have multiple 'I' before subtraction            |
+| `XXC`  | Double subtraction (XX before C)                | Cannot have multiple 'X' before subtraction            |
+| `ABC`  | Invalid character                               | Invalid character 'A' at position 0                    |
+| `iii`  | Lowercase not allowed                           | Invalid character 'i' at position 0                    |
+| `X1V`  | Invalid character                               | Invalid character '1' at position 1                    |
+
+### GraphQL Error Response
+
+When an invalid Roman numeral is passed via the GraphQL API, a structured error is returned:
+
+```json
+{
+    "errors": [
+        {
+            "message": "Invalid Roman numeral: Character 'I' cannot repeat more than 3 times consecutively",
+            "locations": [{ "line": 1, "column": 3 }],
+            "path": ["romanToInt"],
+            "extensions": {
+                "errorCode": "INVALID_ROMAN_NUMERAL",
+                "invalidInput": "IIII",
+                "violationReason": "Character 'I' cannot repeat more than 3 times consecutively",
+                "classification": "BAD_REQUEST"
+            }
+        }
+    ]
+}
+```
+
+### Example API Calls with Invalid Input
+
+**Invalid Repetition:**
+
+```bash
+curl -X POST http://localhost:8080/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ romanToInt(roman: \"IIII\") }"}'
+```
+
+**Invalid Subtraction:**
+
+```bash
+curl -X POST http://localhost:8080/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ romanToInt(roman: \"IC\") }"}'
+```
+
+**Invalid Character:**
+
+```bash
+curl -X POST http://localhost:8080/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ romanToInt(roman: \"XYZ\") }"}'
+```
 
 ---
 
