@@ -3,13 +3,11 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspace",
-
   // Features to add to the container
   "features": {
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-
   // Configure tool-specific properties
   "customizations": {
     "vscode": {
@@ -26,7 +24,6 @@
         "vscjava.vscode-java-test",
         "vscjava.vscode-java-dependency",
         "vscjava.vscode-maven",
-        "GabrielBB.vscode-lombok",
         "EditorConfig.EditorConfig",
         "esbenp.prettier-vscode",
         "eamodio.gitlens",
@@ -34,7 +31,9 @@
         "streetsidesoftware.code-spell-checker",
         "formulahendry.code-runner",
         "k--kato.intellij-idea-keybindings",
-        "madhavd1.javadoc-tools"
+        "madhavd1.javadoc-tools",
+        "vscjava.vscode-lombok",
+        "sureshnettur.jsonutil"
       ],
       // VS Code settings
       "settings": {
@@ -50,10 +49,12 @@
       }
     }
   },
-
   // Use 'forwardPorts' to make a list of ports inside the container available locally
-  "forwardPorts": [8080, 5005, 8081],
-
+  "forwardPorts": [
+    8080,
+    5005,
+    8081
+  ],
   // Port labels for better identification
   "portsAttributes": {
     "8080": {
@@ -69,11 +70,9 @@
       "onAutoForward": "silent"
     }
   },
-
   // Lifecycle scripts
   // "postCreateCommand": "chmod +x ./gradlew && ./gradlew --version",
   // "postStartCommand": "./gradlew dependencies --refresh-dependencies",
-
   // Set user
   "remoteUser": "vscode"
 }
