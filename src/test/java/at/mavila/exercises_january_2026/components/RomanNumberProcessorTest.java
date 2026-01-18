@@ -144,49 +144,139 @@ class RomanNumberProcessorTest {
     // ==================== Invalid Characters Tests ====================
 
     @Test
-    void testInvalidCharactersAreIgnored() {
-        // Current implementation ignores invalid characters
-        // "XYZQ" - only X is valid = 10 (Y, Z, Q are invalid)
-        int result = this.romanNumberProcessor.romanToInt("XYZQ");
-        assertThat(result).isEqualTo(10);
+    void testInvalidCharactersThrowException() {
+        // "XYZQ" contains invalid characters Y, Z, Q - should throw exception
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("XYZQ"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("Invalid character");
     }
 
     @Test
-    void testMixedValidAndInvalidCharacters() {
-        // "X1V2I3" should be treated as "XVI" = 16
-        int result = this.romanNumberProcessor.romanToInt("X1V2I3");
-        assertThat(result).isEqualTo(16);
+    void testMixedValidAndInvalidCharactersThrowException() {
+        // "X1V2I3" contains invalid characters - should throw exception
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("X1V2I3"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("Invalid character");
     }
 
     @Test
-    void testOnlyInvalidCharactersReturnsZero() {
-        // All invalid characters result in 0 (no valid Roman numerals in string)
-        int result = this.romanNumberProcessor.romanToInt("ABEFGHJKNOPQRSTUWYZ");
-        assertThat(result).isZero();
+    void testOnlyInvalidCharactersThrowException() {
+        // All invalid characters - should throw exception
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("ABEFGHJKNOPQRSTUWYZ"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("Invalid character");
     }
 
     @Test
-    void testSpecialCharactersAreIgnored() {
-        // "X!@#V" should be treated as "XV" = 15
-        int result = this.romanNumberProcessor.romanToInt("X!@#V");
-        assertThat(result).isEqualTo(15);
+    void testSpecialCharactersThrowException() {
+        // "X!@#V" contains special characters - should throw exception
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("X!@#V"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("Invalid character");
     }
 
     // ==================== Case Sensitivity Tests ====================
 
     @Test
-    void testLowercaseCharactersAreIgnored() {
-        // Current implementation is case-sensitive, lowercase letters are ignored
-        // "iii" should return 0 (all ignored)
-        int result = this.romanNumberProcessor.romanToInt("iii");
-        assertThat(result).isZero();
+    void testLowercaseCharactersThrowException() {
+        // "iii" - lowercase letters are not valid Roman numerals
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("iii"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("Invalid character");
     }
 
     @Test
-    void testMixedCaseOnlyUppercaseProcessed() {
-        // "XiVi" should be treated as "XV" = 15 (lowercase ignored)
-        int result = this.romanNumberProcessor.romanToInt("XiVi");
-        assertThat(result).isEqualTo(15);
+    void testMixedCaseThrowsException() {
+        // "XiVi" contains lowercase - should throw exception
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("XiVi"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("Invalid character");
+    }
+
+    // ==================== Invalid Subtraction Pair Tests ====================
+
+    @Test
+    void testInvalidSubtractionPairIMThrowsException() {
+        // "IM" - I can only precede V or X
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("IM"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("Invalid subtraction pair 'IM'");
+    }
+
+    @Test
+    void testInvalidSubtractionPairICThrowsException() {
+        // "IC" - I can only precede V or X
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("IC"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("Invalid subtraction pair 'IC'");
+    }
+
+    @Test
+    void testInvalidSubtractionPairXDThrowsException() {
+        // "XD" - X can only precede L or C
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("XD"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("Invalid subtraction pair 'XD'");
+    }
+
+    @Test
+    void testInvalidSubtractionPairVXThrowsException() {
+        // "VX" - V cannot be used for subtraction
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("VX"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("Invalid subtraction pair 'VX'");
+    }
+
+    // ==================== Invalid Repetition Tests ====================
+
+    @Test
+    void testFourConsecutiveIThrowsException() {
+        // "IIII" - I cannot repeat more than 3 times
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("IIII"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("cannot repeat more than 3 times");
+    }
+
+    @Test
+    void testRepeatingVThrowsException() {
+        // "VV" - V cannot repeat
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("VV"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("'V' cannot repeat");
+    }
+
+    @Test
+    void testRepeatingLThrowsException() {
+        // "LL" - L cannot repeat
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("LL"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("'L' cannot repeat");
+    }
+
+    @Test
+    void testRepeatingDThrowsException() {
+        // "DD" - D cannot repeat
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("DD"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("'D' cannot repeat");
+    }
+
+    // ==================== Double Subtraction Tests ====================
+
+    @Test
+    void testDoubleSubtractionIIVThrowsException() {
+        // "IIV" - cannot have II before subtraction
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("IIV"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("multiple 'I' before subtraction");
+    }
+
+    @Test
+    void testDoubleSubtractionXXCThrowsException() {
+        // "XXC" - cannot have XX before subtraction
+        assertThatThrownBy(() -> this.romanNumberProcessor.romanToInt("XXC"))
+                .isInstanceOf(InvalidRomanNumeralException.class)
+                .hasMessageContaining("multiple 'X' before subtraction");
     }
 
     // ==================== Boundary and Edge Cases ====================

@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -69,6 +70,28 @@ public class RomanNumberProcessor {
             "CM", 900);
 
     /**
+     * Valid subtraction pairs: maps a character to the set of characters it can
+     * precede in subtraction.
+     * I can only precede V and X; X can only precede L and C; C can only precede D
+     * and M.
+     */
+    private static final Map<Character, Set<Character>> VALID_SUBTRACTION_PAIRS = Map.of(
+            'I', Set.of('V', 'X'),
+            'X', Set.of('L', 'C'),
+            'C', Set.of('D', 'M'));
+
+    /**
+     * Characters that cannot repeat (V, L, D).
+     */
+    private static final Set<Character> NON_REPEATABLE = Set.of('V', 'L', 'D');
+
+    /**
+     * Maximum consecutive repetitions allowed for repeatable characters (I, X, C,
+     * M).
+     */
+    private static final int MAX_REPETITIONS = 3;
+
+    /**
      * Combined map ordered by value descending, used for integer to Roman
      * conversion.
      */
@@ -107,12 +130,19 @@ public class RomanNumberProcessor {
      * </ul>
      *
      * <p>
-     * Invalid characters (non-Roman numerals) are silently ignored.
-     * Lowercase letters are not recognized and will be ignored.
+     * This method validates the input against standard Roman numeral rules:
+     * <ul>
+     * <li>Only valid subtraction pairs: I before V/X, X before L/C, C before
+     * D/M</li>
+     * <li>V, L, D cannot repeat</li>
+     * <li>I, X, C, M cannot repeat more than 3 times consecutively</li>
+     * </ul>
      *
      * @param roman the Roman numeral string to convert (must not be null or blank)
      * @return the integer value of the Roman numeral
-     * @throws IllegalArgumentException if the input is null or blank
+     * @throws IllegalArgumentException     if the input is null or blank
+     * @throws InvalidRomanNumeralException if the input violates Roman numeral
+     *                                      rules
      */
     public int romanToInt(final String roman) {
 
@@ -120,11 +150,14 @@ public class RomanNumberProcessor {
             throw new IllegalArgumentException("Input Roman numeral string is null or empty");
         }
 
+        // Validate the Roman numeral before conversion
+        validateRomanNumeral(roman);
+
         int result = 0;
 
         for (int i = 0; i < roman.length(); i++) {
             Integer currentValue = ROMAN_TO_INT_MAP.get(roman.charAt(i));
-            // Ignore invalid characters
+            // Skip invalid characters (already validated, but keeping for safety)
             if (isNull(currentValue)) {
                 continue;
             }
@@ -143,6 +176,77 @@ public class RomanNumberProcessor {
 
         return result;
 
+    }
+
+    /**
+     * Validates a Roman numeral string against standard rules.
+     *
+     * @param roman the Roman numeral string to validate
+     * @throws InvalidRomanNumeralException if validation fails
+     */
+    private void validateRomanNumeral(final String roman) {
+        int consecutiveCount = 1;
+        Character previousChar = null;
+        Character charBeforePrevious = null;
+
+        for (int i = 0; i < roman.length(); i++) {
+            char currentChar = roman.charAt(i);
+            Integer currentValue = ROMAN_TO_INT_MAP.get(currentChar);
+
+            // Check for invalid characters
+            if (isNull(currentValue)) {
+                throw new InvalidRomanNumeralException(roman,
+                        String.format("Invalid character '%c' at position %d", currentChar, i));
+            }
+
+            // Check for consecutive repetitions
+            if (previousChar != null && currentChar == previousChar) {
+                consecutiveCount++;
+
+                // V, L, D cannot repeat at all
+                if (NON_REPEATABLE.contains(currentChar)) {
+                    throw new InvalidRomanNumeralException(roman,
+                            String.format("Character '%c' cannot repeat", currentChar));
+                }
+
+                // I, X, C, M cannot repeat more than 3 times
+                if (consecutiveCount > MAX_REPETITIONS) {
+                    throw new InvalidRomanNumeralException(roman,
+                            String.format("Character '%c' cannot repeat more than %d times consecutively",
+                                    currentChar, MAX_REPETITIONS));
+                }
+            } else {
+                consecutiveCount = 1;
+            }
+
+            // Check for valid subtraction pairs
+            if (previousChar != null) {
+                Integer previousValue = ROMAN_TO_INT_MAP.get(previousChar);
+
+                if (previousValue < currentValue) {
+                    // This is a subtraction case - validate it
+                    Set<Character> allowedFollowers = VALID_SUBTRACTION_PAIRS.get(previousChar);
+
+                    if (isNull(allowedFollowers) || !allowedFollowers.contains(currentChar)) {
+                        throw new InvalidRomanNumeralException(roman,
+                                String.format("Invalid subtraction pair '%c%c' - '%c' cannot precede '%c'",
+                                        previousChar, currentChar, previousChar, currentChar));
+                    }
+
+                    // Check for multiple subtraction (e.g., IIV, XXC) - the char before the
+                    // subtraction
+                    // must not be the same as the subtracting char
+                    if (charBeforePrevious != null && charBeforePrevious.equals(previousChar)) {
+                        throw new InvalidRomanNumeralException(roman,
+                                String.format("Invalid pattern '%c%c%c' - multiple '%c' before subtraction",
+                                        charBeforePrevious, previousChar, currentChar, previousChar));
+                    }
+                }
+            }
+
+            charBeforePrevious = previousChar;
+            previousChar = currentChar;
+        }
     }
 
     /**
