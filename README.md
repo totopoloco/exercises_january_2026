@@ -56,9 +56,9 @@ Given two integer arrays, merge them and calculate the median of the combined so
 ┌─────────────────────────────────────────────────────────────┐
 │              4. Calculate median                            │
 │  ┌─────────────────────────────────────────────────────┐    │
-│  │  Is size odd?                                        │   │
-│  │  YES: median = list[size/2]                          │   │
-│  │  NO:  median = (list[size/2-1] + list[size/2]) / 2   │   │
+│  │  Is size odd?                                       │    │
+│  │  YES: median = list[size/2]                         │    │
+│  │  NO:  median = (list[size/2-1] + list[size/2]) / 2  │    │
 │  └─────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────┘
                               │
