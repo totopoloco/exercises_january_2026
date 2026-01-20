@@ -46,28 +46,31 @@ public class MinimumPercentageCalculator {
    */
   public int calculate(final int[] numbers) {
 
-    if (Objects.isNull(numbers)) {
-      throw new IllegalArgumentException("Input array must not be null");
-    }
-    int n = numbers.length;
-
+    validateInput(numbers);
     BigDecimal sum = BigDecimal.ZERO;
 
-    for (int i = 0; i < n; i++) {
-      int currentNumber = numbers[i];
+    for (int currentNumber : numbers) {
       BigDecimal currentNumberInBigDecimal = BigDecimal.valueOf(currentNumber);
       sum = sum.add(currentNumberInBigDecimal);
     }
 
+    return calculateExcess(sum, numbers.length);
+  }
+
+  private static int calculateExcess(BigDecimal sum, int length) {
     // Calculate the excess
-    BigDecimal excess = sum.subtract(BigDecimal.valueOf(100).multiply(BigDecimal.valueOf(n - 1)));
+    return evaluateExcess(sum.subtract(BigDecimal.valueOf(100).multiply(BigDecimal.valueOf(length - 1))));
+  }
 
+  private static int evaluateExcess(BigDecimal excess) {
     // if excess is negative return 0
-    if (excess.compareTo(BigDecimal.ZERO) < 0) {
-      return 0;
-    }
+    return (excess.compareTo(BigDecimal.ZERO) < 0) ? 0 : excess.intValue();
+  }
 
-    return excess.intValue();
+  private static void validateInput(int[] numbers) {
+    if (Objects.isNull(numbers)) {
+      throw new IllegalArgumentException("Input array must not be null");
+    }
   }
 
 }
