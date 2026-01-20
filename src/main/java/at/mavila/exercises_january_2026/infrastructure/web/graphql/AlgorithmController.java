@@ -13,21 +13,21 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * GraphQL Controller that exposes all algorithm operations as queries.
- * 
+ *
  * <p>
  * This controller acts as a GraphQL adapter, translating GraphQL queries
  * into application service calls and converting domain models to
  * GraphQL-compatible
  * representations.
  * </p>
- * 
+ *
  * <h2>Responsibilities</h2>
  * <ul>
  * <li>Handle GraphQL query resolution</li>
  * <li>Convert GraphQL input types to domain types</li>
  * <li>Convert domain results to GraphQL output types</li>
  * </ul>
- * 
+ *
  * @author mavila
  * @since January 2026
  */

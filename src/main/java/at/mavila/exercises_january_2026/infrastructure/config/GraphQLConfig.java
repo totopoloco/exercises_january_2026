@@ -8,17 +8,17 @@ import graphql.scalars.ExtendedScalars;
 
 /**
  * Infrastructure configuration for GraphQL.
- * 
+ *
  * <p>
  * This configuration class registers custom scalars and other GraphQL-related
  * beans for the GraphQL infrastructure.
  * </p>
- * 
+ *
  * <h2>Custom Scalars</h2>
  * <ul>
  * <li>Long - Support for 64-bit integers</li>
  * </ul>
- * 
+ *
  * @author mavila
  * @since January 2026
  */

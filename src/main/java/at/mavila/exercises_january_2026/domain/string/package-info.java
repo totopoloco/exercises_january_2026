@@ -1,11 +1,11 @@
 /**
  * Domain package for string-related operations.
- * 
+ *
  * <p>
  * This package contains domain services for various string manipulation
  * and analysis operations.
  * </p>
- * 
+ *
  * <h2>Components</h2>
  * <ul>
  * <li>{@link at.mavila.exercises_january_2026.domain.string.LongestSubstringFinder}
@@ -17,7 +17,7 @@
  * -
  * Extracts longest palindromic substring</li>
  * </ul>
- * 
+ *
  * @since January 2026
  */
 package at.mavila.exercises_january_2026.domain.string;

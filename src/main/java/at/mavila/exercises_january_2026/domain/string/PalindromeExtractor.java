@@ -8,12 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Domain service for extracting the longest palindromic substring.
- * 
+ *
  * <p>
  * This component implements <strong>Manacher's Algorithm</strong> to find
  * the longest palindromic substring in linear time.
  * </p>
- * 
+ *
  * <h2>Algorithm Overview</h2>
  * <ol>
  * <li>Preprocess string by inserting separators (handles odd/even lengths
@@ -22,13 +22,13 @@ import lombok.extern.slf4j.Slf4j;
  * <li>Use mirror property to skip redundant comparisons</li>
  * <li>Expand around each center as needed</li>
  * </ol>
- * 
+ *
  * <h2>Complexity</h2>
  * <ul>
  * <li><b>Time:</b> O(n) - each character processed at most twice</li>
  * <li><b>Space:</b> O(n) for the preprocessed string and radii array</li>
  * </ul>
- * 
+ *
  * @author mavila
  * @since January 2026
  */

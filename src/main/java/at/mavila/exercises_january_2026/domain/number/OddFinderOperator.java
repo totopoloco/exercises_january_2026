@@ -6,12 +6,12 @@ import org.springframework.stereotype.Component;
 
 /**
  * Domain operator for XOR-based odd number detection.
- * 
+ *
  * <p>
  * This operator implements XOR operation used to find the element
  * that appears an odd number of times in an array.
  * </p>
- * 
+ *
  * <h2>Mathematical Principle</h2>
  * <p>
  * XOR has these properties:
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
  * Therefore, XORing all elements cancels out pairs, leaving only the odd
  * occurrence.
  * </p>
- * 
+ *
  * @author mavila
  * @since January 2026
  */

@@ -7,30 +7,30 @@ import org.springframework.stereotype.Component;
 
 /**
  * Domain service for calculating minimum percentage values.
- * 
+ *
  * <p>
  * This component calculates the minimum additional percentage needed
  * to reach at least 100% total using the formula: Σ p − 100·(n‑1)
  * </p>
- * 
+ *
  * <h2>Formula</h2>
  * <p>
  * Given an array of percentages, the minimum percentage is calculated as:
  * </p>
- * 
+ *
  * <pre>
  * result = sum(percentages) - 100 * (n - 1)
  * </pre>
  * <p>
  * where n is the number of percentages.
  * </p>
- * 
+ *
  * <h2>Complexity</h2>
  * <ul>
  * <li><b>Time:</b> O(n) - single pass through the array</li>
  * <li><b>Space:</b> O(1) - constant extra space</li>
  * </ul>
- * 
+ *
  * @author mavila
  * @since January 2026
  */

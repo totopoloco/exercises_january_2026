@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Application Service that orchestrates domain operations.
- * 
+ *
  * <p>
  * This service acts as a facade for the infrastructure layer (GraphQL, REST,
  * etc.)
@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
  * handles
  * use case orchestration.
  * </p>
- * 
+ *
  * <h2>Responsibilities</h2>
  * <ul>
  * <li>Coordinate multiple domain services for complex use cases</li>
@@ -36,13 +36,13 @@ import lombok.RequiredArgsConstructor;
  * <li>Convert between external and domain representations</li>
  * <li>Enforce application-level business rules</li>
  * </ul>
- * 
+ *
  * <h2>Design Notes</h2>
  * <p>
  * This layer sits between the domain and infrastructure layers, ensuring
  * the domain layer remains isolated from external concerns.
  * </p>
- * 
+ *
  * @author mavila
  * @since January 2026
  */

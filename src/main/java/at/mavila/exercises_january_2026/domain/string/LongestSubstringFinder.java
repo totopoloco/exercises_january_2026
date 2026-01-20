@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component;
 /**
  * Domain service for finding the longest substring without repeating
  * characters.
- * 
+ *
  * <p>
  * This component implements the <strong>Sliding Window</strong> algorithm to
  * efficiently find the longest contiguous sequence of characters in a string
  * where
  * no character appears more than once.
  * </p>
- * 
+ *
  * <h2>Algorithm</h2>
  * <p>
  * Uses two pointers (left and right) to maintain a "window" of unique
@@ -28,13 +28,13 @@ import org.springframework.stereotype.Component;
  * occurrence</li>
  * <li>Track the maximum window length seen</li>
  * </ol>
- * 
+ *
  * <h2>Complexity</h2>
  * <ul>
  * <li><b>Time:</b> O(n) where n is the string length</li>
  * <li><b>Space:</b> O(1) or O(256) for ASCII character map</li>
  * </ul>
- * 
+ *
  * @author mavila
  * @since January 2026
  */

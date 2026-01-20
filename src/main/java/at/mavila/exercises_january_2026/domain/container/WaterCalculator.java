@@ -4,25 +4,25 @@ import org.springframework.stereotype.Component;
 
 /**
  * Domain service for calculating maximum water container area.
- * 
+ *
  * <p>
  * Given an array of heights representing vertical lines, this service
  * finds two lines that together with the x-axis form a container that
  * holds the most water.
  * </p>
- * 
+ *
  * <h2>Algorithm: Two-Pointer Technique</h2>
  * <p>
  * Start from both ends and move inward, always moving the pointer
  * with the smaller height because the area is limited by the shorter line.
  * </p>
- * 
+ *
  * <h2>Complexity</h2>
  * <ul>
  * <li><b>Time:</b> O(n) - single pass through the array</li>
  * <li><b>Space:</b> O(1) - constant extra space</li>
  * </ul>
- * 
+ *
  * @author mavila
  * @since January 2026
  */
