@@ -1,6 +1,56 @@
 # Exercises January 2026
 
-A collection of algorithm exercises implemented in Java with Spring Boot.
+A collection of algorithm exercises implemented in Java with Spring Boot, following **Domain-Driven Design (DDD)** architecture.
+
+## Architecture
+
+This project follows Domain-Driven Design principles with a clear separation of concerns:
+
+```
+src/main/java/at/mavila/exercises_january_2026/
+├── domain/                          # Domain Layer - Core Business Logic
+│   ├── array/                       # Array operations
+│   │   └── MedianCalculator         # Merge arrays and calculate median
+│   ├── container/                   # Container optimization
+│   │   └── WaterCalculator          # Maximum water container problem
+│   ├── string/                      # String processing
+│   │   ├── LongestSubstringFinder   # Longest substring without repeats
+│   │   ├── MaskService              # String masking
+│   │   └── PalindromeExtractor      # Longest palindromic substring
+│   ├── number/                      # Number operations
+│   │   ├── MinimumPercentageCalculator
+│   │   ├── OddFinder                # Find odd-occurring element
+│   │   ├── OddFinderOperator        # XOR operator for odd finder
+│   │   └── roman/                   # Roman numeral subdomain
+│   │       ├── RomanNumberProcessor # Roman ↔ Integer conversion
+│   │       └── InvalidRomanNumeralException
+│   ├── security/                    # Security operations
+│   │   ├── PinCracker               # MD5 PIN cracking
+│   │   └── MessageDigestInstanceException
+│   ├── collection/                  # Collection operations
+│   │   ├── ListNode                 # Linked list node model
+│   │   ├── LinkedListMerger         # Merge k sorted lists
+│   │   ├── CountNegativesSortedMix  # Count negatives in matrix
+│   │   └── RearrangingFruits        # Basket optimization
+│   └── phonetic/                    # Phone-related operations
+│       └── LetterCombinations       # Phone digit combinations
+├── application/                     # Application Layer - Use Cases
+│   └── AlgorithmService             # Orchestrates domain services
+└── infrastructure/                  # Infrastructure Layer - External Concerns
+    ├── config/
+    │   └── GraphQLConfig            # GraphQL configuration
+    └── web/graphql/
+        ├── AlgorithmController      # GraphQL query resolver
+        └── GraphQLExceptionHandler  # Error handling
+```
+
+### Layer Responsibilities
+
+| Layer              | Responsibility                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------------------ |
+| **Domain**         | Core business logic, algorithms, domain models, and exceptions. No dependencies on outer layers. |
+| **Application**    | Use case orchestration, coordinates domain services, handles transaction boundaries.             |
+| **Infrastructure** | External concerns: web adapters (GraphQL), configuration, persistence, messaging.                |
 
 ## Table of Contents
 
@@ -23,7 +73,7 @@ A collection of algorithm exercises implemented in Java with Spring Boot.
 
 ## 1. Array Median Calculator
 
-**File:** `ArrayMediaCalculator.java`
+**Location:** `domain/array/MedianCalculator.java`
 
 ### Problem
 
@@ -86,7 +136,7 @@ median = 2 (odd size, middle element)
 
 ## 2. Container With Most Water
 
-**File:** `ContainerWater.java`
+**Location:** `domain/container/WaterCalculator.java`
 
 ### Problem
 
@@ -166,7 +216,7 @@ The area is limited by the shorter line. Moving the taller line can only **decre
 
 ## 3. Count Negatives in Sorted Matrix
 
-**File:** `CountNegativesSortedMix.java`
+**Location:** `domain/collection/CountNegativesSortedMix.java`
 
 ### Problem
 
