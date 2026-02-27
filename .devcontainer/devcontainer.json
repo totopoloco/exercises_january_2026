@@ -33,7 +33,10 @@
         "k--kato.intellij-idea-keybindings",
         "madhavd1.javadoc-tools",
         "vscjava.vscode-lombok",
-        "sureshnettur.jsonutil"
+        "sureshnettur.jsonutil",
+        "yashar-zolmajdi.graphql-complexity-vscode",
+        "ookiecoder.function-complexity-heatmap",
+        "mkswebs.algorithm-complexity-analyzer"
       ],
       // VS Code settings
       "settings": {
