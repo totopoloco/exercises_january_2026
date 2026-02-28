@@ -35,8 +35,7 @@
         "vscjava.vscode-lombok",
         "sureshnettur.jsonutil",
         "yashar-zolmajdi.graphql-complexity-vscode",
-        "ookiecoder.function-complexity-heatmap",
-        "mkswebs.algorithm-complexity-analyzer"
+        "codescene.codescene-vscode"
       ],
       // VS Code settings
       "settings": {

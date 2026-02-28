@@ -1,7 +1,8 @@
 package at.mavila.exercises_january_2026.domain.string;
 
-import java.util.Objects;
-import java.util.regex.Matcher;
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Component;
@@ -40,22 +41,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class MaskService {
 
-  private static final ThreadLocal<Pattern> PATTERN = ThreadLocal.withInitial(() -> Pattern.compile(".(?=.{4})"));
+    private static final ThreadLocal<Pattern> PATTERN = ThreadLocal.withInitial(() -> Pattern.compile(".(?=.{4})"));
 
-  /**
-   * Masks all but the last 4 characters of the input string.
-   *
-   * @param str the string to mask
-   * @return the masked string with '#' replacing characters, or empty string if
-   *         null
-   */
-  public String maskify(final String str) {
-    if (Objects.isNull(str)) {
-      return "";
+    /**
+     * Masks all but the last 4 characters of the input string.
+     *
+     * @param str the string to mask
+     * @return the masked string with '#' replacing characters, or empty string if
+     *         null
+     */
+    public String maskify(final String str) {
+        return isNull(str) ? EMPTY : applyMaskPattern(str);
     }
-    final Pattern pattern = PATTERN.get();
-    final Matcher matcher = pattern.matcher(str);
-    return matcher.replaceAll("#");
-  }
+
+    private String applyMaskPattern(final String str) {
+        return PATTERN.get().matcher(str).replaceAll("#");
+    }
 
 }
