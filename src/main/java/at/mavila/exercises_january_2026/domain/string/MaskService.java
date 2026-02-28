@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PreDestroy;
+
 /**
  * Domain service for masking sensitive string data.
  *
@@ -35,13 +37,21 @@ import org.springframework.stereotype.Component;
  * <li><b>Space:</b> O(n) for the result string</li>
  * </ul>
  *
+ * <h2>Resource Management</h2>
+ * <p>
+ * This service uses a {@link ThreadLocal} to store a compiled regex pattern
+ * for thread-safe operation. The pattern is automatically cleaned up via
+ * {@link jakarta.annotation.PreDestroy} when the Spring context shuts down
+ * to prevent memory leaks.
+ * </p>
+ *
  * @author mavila
  * @since January 2026
  */
 @Component
 public class MaskService {
 
-    private static final ThreadLocal<Pattern> PATTERN = ThreadLocal.withInitial(() -> Pattern.compile(".(?=.{4})"));
+    private static final ThreadLocal<Pattern> MASK_PATTERN = ThreadLocal.withInitial(() -> Pattern.compile(".(?=.{4})"));
 
     /**
      * Masks all but the last 4 characters of the input string.
@@ -55,7 +65,21 @@ public class MaskService {
     }
 
     private String applyMaskPattern(final String str) {
-        return PATTERN.get().matcher(str).replaceAll("#");
+        return MASK_PATTERN.get().matcher(str).replaceAll("#");
+    }
+
+    /**
+     * Cleans up the ThreadLocal resource when the component is destroyed.
+     *
+     * <p>
+     * This method is automatically invoked by Spring's lifecycle management
+     * when the application context is shutting down. It removes the compiled
+     * regex pattern from the ThreadLocal to prevent potential memory leaks.
+     * </p>
+     */
+    @PreDestroy
+    void cleanup() {
+        MASK_PATTERN.remove();
     }
 
 }

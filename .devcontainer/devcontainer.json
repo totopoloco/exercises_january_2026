@@ -35,7 +35,8 @@
         "vscjava.vscode-lombok",
         "sureshnettur.jsonutil",
         "yashar-zolmajdi.graphql-complexity-vscode",
-        "codescene.codescene-vscode"
+        "codescene.codescene-vscode",
+        "sonarsource.sonarlint-vscode"
       ],
       // VS Code settings
       "settings": {
