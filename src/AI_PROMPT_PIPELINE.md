@@ -41,7 +41,7 @@ A spec **must** include:
 src/specs/<category>/<PascalCaseName>.md
 ```
 
-`<category>` must match one of the existing domain subdomains (`array`, `collection`, `container`, `number`, `phonetic`, `security`, `string`) or define a new one.
+`<category>` must match one of the existing domain subdomains (`array`, `calculus`, `collection`, `container`, `number`, `phonetic`, `security`, `string`) or define a new one.
 
 ---
 
@@ -89,8 +89,9 @@ If the algorithm requires a dedicated data structure, create a plain model class
 
 If a domain-specific error condition exists beyond `IllegalArgumentException`:
 
-- Create a custom exception in the same subdomain package.
-- Naming: `Descriptive` + `Exception` (e.g., `InvalidRomanNumeralException`).
+- Create a custom exception in a dedicated `exception` sub-package within the subdomain (e.g., `domain.calculus.exception`, `domain.number.roman`).
+- This keeps exception classes cleanly separated from service and model classes.
+- Naming: `Descriptive` + `Exception` (e.g., `InvalidRomanNumeralException`, `ZeroDerivativeException`).
 
 ### 3.4 `package-info.java`
 
