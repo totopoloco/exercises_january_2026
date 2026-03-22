@@ -48,12 +48,14 @@ $$f'(x) = a_1 + 2a_2 x + 3a_3 x^2 + \cdots + n \cdot a_n x^{n-1}$$
 5. **NaN/Infinity initial guess**: Throw `IllegalArgumentException` with message `"Initial guess must be a finite number"`.
 6. **Invalid epsilon**: If provided and is ≤ 0, `NaN`, or `Infinity`, throw `IllegalArgumentException` with message `"Epsilon must be a positive finite number, got: <epsilon>"`.
 7. **Invalid maxIterations**: If provided and is ≤ 0, throw `IllegalArgumentException` with message `"Max iterations must be a positive integer, got: <maxIterations>"`.
-8. **Derivative is zero**: If $f'(x_k) = 0$ at any iteration, throw `ArithmeticException` with message `"Derivative is zero at x = <x_k>. Newton-Raphson cannot continue."`. This means the method hit a stationary point.
-9. **Convergence criterion**: Stop iterating when $|x_{k+1} - x_k| < \epsilon$.
-10. **Non-convergence**: If the method does not converge within `maxIterations`, throw `ArithmeticException` with message `"Newton-Raphson did not converge within <maxIterations> iterations"`.
-11. **Linear polynomial**: For $f(x) = a_0 + a_1 x$, the method should converge in exactly one iteration to $x = -a_0 / a_1$.
-12. **Multiple roots**: The method finds whichever root the initial guess converges to. No guarantee on which root is returned.
-13. **Polynomial evaluation**: Use **Horner's method** for efficient and numerically stable evaluation of $f(x)$ and $f'(x)$.
+8. **Derivative is zero — guard before every division**: The only division in the algorithm is $f(x_k) / f'(x_k)$. **Before every such division**, the implementation must check that $f'(x_k) \neq 0$. If $f'(x_k) = 0$, throw `ArithmeticException` with message `"Derivative is zero at x = <x_k>. Newton-Raphson cannot continue."`. This applies equally whether it is the first iteration or any subsequent iteration.
+9. **Near-zero derivative — overflow guard**: If $f'(x_k)$ is non-zero but so close to zero that the division $f(x_k) / f'(x_k)$ produces `Infinity`, `−Infinity`, or `NaN`, throw `ArithmeticException` with message `"Division by near-zero derivative produced non-finite result at x = <x_k>"`. This must be checked **after** performing the division and **before** using the result.
+10. **Non-finite intermediate value**: If at any point the updated $x_{k+1}$ becomes `NaN` or `Infinity` (e.g., due to floating-point overflow), throw `ArithmeticException` with message `"Newton-Raphson produced non-finite value at iteration <k>"`. This acts as a safety net for numerical instability.
+11. **Convergence criterion**: Stop iterating when $|x_{k+1} - x_k| < \epsilon$.
+12. **Non-convergence**: If the method does not converge within `maxIterations`, throw `ArithmeticException` with message `"Newton-Raphson did not converge within <maxIterations> iterations"`.
+13. **Linear polynomial**: For $f(x) = a_0 + a_1 x$, the method should converge in exactly one iteration to $x = -a_0 / a_1$.
+14. **Multiple roots**: The method finds whichever root the initial guess converges to. No guarantee on which root is returned.
+15. **Polynomial evaluation**: Use **Horner's method** for efficient and numerically stable evaluation of $f(x)$ and $f'(x)$.
 
 ---
 
@@ -156,6 +158,43 @@ Input:  coefficients = [-16.0, 0.0, 0.0, 0.0, 1.0], initialGuess = 3.0
 Output: 2.0
 
 Explanation: x⁴ - 16 = 0 → x = ±2, ±2i. Starting from x₀ = 3.0, converges to x = 2.
+```
+
+### Example 11 — Derivative becomes zero mid-iteration
+
+```
+Input:  coefficients = [0.0, 0.0, 0.0, 1.0], initialGuess = -1.0
+        f(x) = x³
+Output: (the method converges toward 0, but if an intermediate x_k
+         lands exactly at 0 while f(x_k) is also 0, it converges;
+         if f'(x_k) = 0 while f(x_k) ≠ 0, throws ArithmeticException)
+
+Explanation: f'(x) = 3x². Iteration from x₀ = -1 yields x₁ = -2/3, x₂ = -4/9, ...
+             The derivative approaches zero as x → 0. For a triple root the method
+             still converges, but the guard must be evaluated at every step.
+```
+
+### Example 12 — Near-zero derivative causing overflow
+
+```
+Input:  coefficients = [-1.0, 1.0E-300, 1.0], initialGuess = -5.0E-301
+        f(x) = -1 + 1e-300·x + x²
+Output: ArithmeticException("Division by near-zero derivative produced non-finite result at x = ...")
+
+Explanation: At x ≈ -5e-301, f'(x) = 1e-300 + 2x ≈ 0 (extremely small).
+             f(x) ≈ -1, so f(x)/f'(x) overflows to Infinity.
+             The guard after the division detects the non-finite quotient and throws.
+```
+
+### Example 13 — Non-finite intermediate value
+
+```
+Input:  coefficients = [-1.0E308, 0.0, 1.0], initialGuess = 1.0E308
+        f(x) = -1e308 + x²
+Output: ArithmeticException("Newton-Raphson produced non-finite value at iteration ...")
+
+Explanation: With an extremely large initial guess, x² overflows to Infinity
+             during polynomial evaluation, producing a non-finite x_{k+1}.
 ```
 
 ---
