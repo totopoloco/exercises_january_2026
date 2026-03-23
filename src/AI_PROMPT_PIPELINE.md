@@ -282,11 +282,57 @@ String.format("Invalid character '%c' at position %d", ch, pos)
 - Boolean methods: prefix with `is`, `has`, `can`, `should` (e.g., `isAdditionCase`, `hasConverged`).
 - Constants: `UPPER_SNAKE_CASE`.
 
-### Method design
+### Function argument limits
 
-- Keep methods short and single-purpose; extract private helpers for distinct logical steps (validation, evaluation, iteration).
+- **Public methods must have at most 3 parameters.** If a method requires more, group related parameters into a `record` or dedicated parameter object.
+- This rule is enforced by static analysis (CodeScene) which flags `Excess Number of Function Arguments` for methods exceeding the threshold.
+- **Private helper methods** called only internally may accept up to 4 parameters when decomposing a public method, but should still prefer parameter objects when the parameter list is growing.
+- When introducing a parameter object, name it descriptively (e.g., `RootFinderParams`, `PolynomialInput`) and place it in the same package as the service that uses it.
+
+```java
+// ✅ Good — parameter object keeps the public API clean
+public record RootFinderParams(
+    List<BigDecimal> coefficients,
+    BigDecimal initialGuess,
+    BigDecimal epsilon,
+    int maxIterations,
+    int scale
+) {}
+
+public BigDecimal findRoot(final RootFinderParams params) { ... }
+
+// ❌ Bad — too many positional arguments
+public BigDecimal findRoot(List<BigDecimal> coefficients, BigDecimal initialGuess,
+    BigDecimal epsilon, int maxIterations, int scale) { ... }
+```
+
+### Method design & complexity
+
+- **Target a cyclomatic complexity (CC) ≤ 10** per method. CodeScene flags `Complex Method` when CC exceeds this threshold.
+- Keep methods short and single-purpose; extract **private helpers** for distinct logical steps (validation, evaluation, iteration, convergence checking).
+- Validation logic with many `if` guards must be **decomposed** — group related validations into focused helper methods (e.g., `validateCoefficients(...)`, `validateNumericParams(...)`) rather than placing all checks in a single method.
 - Prefer returning early (`guard clauses`) over deep nesting.
-- When a method needs many parameters (> 3), consider grouping related parameters into a record or dedicated parameter object.
+- Each private helper should have a clear, single responsibility and a descriptive name.
+
+```java
+// ✅ Good — decomposed validation reduces complexity
+private void validateCoefficients(final List<BigDecimal> coefficients) {
+    if (Objects.isNull(coefficients) || coefficients.isEmpty()) { throw ...; }
+    if (coefficients.size() < MIN_SIZE) { throw ...; }
+    // ...
+}
+
+private void validateNumericParams(final BigDecimal epsilon, final int maxIterations, final int scale) {
+    if (epsilon.compareTo(BigDecimal.ZERO) <= 0) { throw ...; }
+    // ...
+}
+
+// ❌ Bad — monolithic validation method with CC > 10
+private void validateInputs(List<BigDecimal> coefficients, BigDecimal initialGuess,
+    BigDecimal epsilon, int maxIterations, int scale) {
+    // 8+ branching checks all in one method
+}
+```
 
 ### Miscellaneous conventions
 
