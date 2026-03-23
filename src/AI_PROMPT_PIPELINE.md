@@ -210,6 +210,94 @@ Use this checklist for every spec implementation:
 
 ---
 
+## Coding Style
+
+All generated code **must** follow these conventions to remain consistent with the existing codebase.
+
+### Null handling
+
+- **Never** use bare `== null` or `!= null` comparisons.
+- Use `Objects.isNull(...)` for null checks and `Objects.nonNull(...)` for non-null checks.
+- Import from `java.util.Objects` — either qualified (`Objects.isNull(x)`) or static (`import static java.util.Objects.isNull;`).
+- For ternary defaulting, prefer `Objects.isNull(value) ? default : value`.
+
+```java
+// ✅ Good
+if (Objects.isNull(input)) { ... }
+if (Objects.nonNull(listener)) { ... }
+
+// ❌ Bad
+if (input == null) { ... }
+if (listener != null) { ... }
+```
+
+### Iteration & collections
+
+- **Prefer the Stream API** (`stream()`, `map()`, `filter()`, `reduce()`, `forEach()`, `IntStream`, etc.) over imperative `for` / `while` loops wherever readability is not degraded.
+- Use **enhanced for-each** (`for (var item : collection)`) when a stream would be awkward (e.g., index-dependent mutation, early `break`/`return`, algorithms that carry mutable state across iterations such as Horner's method).
+- **Never** use C-style indexed `for (int i = 0; ...)` when an enhanced for-each or stream is sufficient.
+- When iterating to build a collection, prefer `Collectors.toList()` / `toUnmodifiableList()` over manual `List.add()` in a loop.
+
+```java
+// ✅ Good — stream to transform
+List<Integer> result = items.stream()
+    .filter(Objects::nonNull)
+    .map(Item::value)
+    .toList();
+
+// ✅ Good — enhanced for-each when state is carried
+for (BigDecimal coefficient : coefficients) {
+    if (Objects.isNull(coefficient)) { throw ...; }
+}
+
+// ❌ Bad — indexed loop for simple iteration
+for (int i = 0; i < list.size(); i++) { ... }
+```
+
+### Immutability & `final`
+
+- Mark **all method parameters** `final`.
+- Mark **local variables** `final` when they are not reassigned.
+- Prefer `List.of(...)`, `Map.of(...)`, `Set.of(...)` for immutable collection literals.
+- Use `private static final` for class-level constants.
+
+### String formatting
+
+- Prefer `String.format(...)` for messages that contain format specifiers.
+- `"...".formatted(...)` (instance method) is also acceptable and is the project's newer convention.
+- Never use string concatenation (`+`) for building error messages with dynamic values.
+
+```java
+// ✅ Good
+String.format("Invalid character '%c' at position %d", ch, pos)
+"Scale must be a positive integer, got: %d".formatted(scale)
+
+// ❌ Bad
+"Scale must be a positive integer, got: " + scale
+```
+
+### Variable & method naming
+
+- Use descriptive, intention-revealing names — avoid single-letter variables except for standard loop counters (`i`, `j`, `k`) in index-based algorithms.
+- Boolean methods: prefix with `is`, `has`, `can`, `should` (e.g., `isAdditionCase`, `hasConverged`).
+- Constants: `UPPER_SNAKE_CASE`.
+
+### Method design
+
+- Keep methods short and single-purpose; extract private helpers for distinct logical steps (validation, evaluation, iteration).
+- Prefer returning early (`guard clauses`) over deep nesting.
+- When a method needs many parameters (> 3), consider grouping related parameters into a record or dedicated parameter object.
+
+### Miscellaneous conventions
+
+- Use **text blocks** (`"""..."""`) for multi-line strings (GraphQL queries in tests, etc.).
+- Prefer `record` types for simple immutable value carriers (e.g., pairs, tuples).
+- Use `var` for local variables only when the type is obvious from the right-hand side.
+- Always specify `RoundingMode` when calling `BigDecimal.divide()`.
+- Use underscore separators for large numeric literals (e.g., `100_000`, `1_000_000_000`).
+
+---
+
 ## Example: Adding a "FibonacciCalculator" exercise
 
 ```
