@@ -178,7 +178,39 @@ Add test cases in `AlgorithmControllerTest`:
 
 ---
 
-## Step 7 — Validate
+## Step 7 — Update Documentation
+
+Every spec implementation **must** include documentation updates across code and project-level files.
+
+### 7.1 Javadoc — Every Class and Public Method
+
+All **new and modified** Java classes and public methods across **every layer** (domain, application, infrastructure, exceptions, models) must have comprehensive Javadoc:
+
+- **Class-level Javadoc**: Describe the class's purpose, its role in the architecture, and the algorithm or responsibility it encapsulates. Include `@since` with the current date.
+- **Public method Javadoc**: Every public method must document:
+    - A description of what the method does.
+    - `@param` for each parameter with type constraints and semantics.
+    - `@return` describing the return value.
+    - `@throws` for each exception that can be thrown, with the condition that triggers it.
+    - Algorithm description and time/space complexity where applicable.
+- **Exception classes**: Document the error condition they represent, when they are thrown, and describe any contextual fields.
+- **Records and models**: Document the purpose of the data structure and each component/field.
+- **`package-info.java`**: Must contain Javadoc describing the package's purpose, key components, and design principles.
+
+> **Rule**: No public class or public method may be left without Javadoc. This applies to domain services, application services, controllers, exception handlers, exception classes, records, and models alike.
+
+### 7.2 README.md
+
+Update the project's `README.md` (in the repository root) to reflect the newly added exercise:
+
+- Add an entry for the new algorithm/exercise in the appropriate section or table listing available exercises.
+- Include a brief description of what the exercise solves.
+- Reference the GraphQL query name so users know how to invoke it.
+- If a new domain subdomain was created, mention it in the project structure or architecture overview.
+
+---
+
+## Step 8 — Validate
 
 Run the full pipeline to verify correctness:
 
@@ -186,6 +218,7 @@ Run the full pipeline to verify correctness:
 2. **Tests**: `./gradlew test` — all tests green.
 3. **Mutation testing** (optional): `./gradlew pitest` — verify mutation coverage.
 4. **Review**: Ensure Javadoc, naming, and package placement match project conventions.
+5. **Documentation review**: Verify that every new/modified class and public method has Javadoc and that `README.md` is up to date.
 
 ---
 
@@ -205,6 +238,9 @@ Use this checklist for every spec implementation:
 - [ ] Domain test created (AssertJ, exhaustive)
 - [ ] Application test added (`@Nested` in `AlgorithmServiceTest`)
 - [ ] GraphQL integration test added
+- [ ] Javadoc on every new/modified class (all layers)
+- [ ] Javadoc on every new/modified public method (all layers)
+- [ ] `README.md` updated with the new exercise entry
 - [ ] `./gradlew build` passes
 - [ ] `./gradlew test` passes
 
@@ -355,4 +391,6 @@ Controller:     infrastructure/web/graphql/AlgorithmController.java (add @QueryM
 Domain test:    test/domain/number/FibonacciCalculatorTest.java  (@SpringBootTest, AssertJ)
 App test:       test/application/AlgorithmServiceTest.java       (add @Nested class)
 GraphQL test:   test/infrastructure/web/graphql/AlgorithmControllerTest.java (add query test)
+Javadoc:        All new/modified classes and public methods across all layers
+README:         README.md                                       (add exercise entry)
 ```
