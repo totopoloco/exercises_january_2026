@@ -13,18 +13,20 @@ import jakarta.validation.constraints.Size;
  * Immutable parameter object for Newton-Raphson polynomial root finding.
  *
  * <p>
- * This record centralizes all Newton-Raphson inputs and declares validation
- * constraints using Jakarta Bean Validation so domain-service logic can focus
- * strictly on algorithm orchestration.
+ * This record centralizes all Newton-Raphson inputs and declares validation constraints using Jakarta Bean Validation
+ * so domain-service logic can focus strictly on algorithm orchestration.
  * </p>
  *
- * @param coefficients  polynomial coefficients in ascending power order
- *                      {@code [a0, a1, ..., an]}
- * @param initialGuess  starting value for Newton-Raphson iteration
- * @param epsilon       convergence tolerance that must be strictly positive
- * @param maxIterations maximum iteration count that must be strictly positive
- * @param scale         decimal scale used for division rounding, must be
- *                      strictly positive
+ * @param coefficients
+ *                          polynomial coefficients in ascending power order {@code [a0, a1, ..., an]}
+ * @param initialGuess
+ *                          starting value for Newton-Raphson iteration
+ * @param epsilon
+ *                          convergence tolerance that must be strictly positive
+ * @param maxIterations
+ *                          maximum iteration count that must be strictly positive
+ * @param scale
+ *                          decimal scale used for division rounding, must be strictly positive
  * @since 2026-03-29
  */
 public record NewtonRaphsonParams(
