@@ -9,7 +9,11 @@
  * <h2>Components</h2>
  * <ul>
  * <li>{@link at.mavila.exercises_january_2026.domain.calculus.NewtonRaphsonRootFinder}
- * - Finds polynomial roots using Newton-Raphson iteration</li>
+ * - Orchestrates polynomial root finding using Newton-Raphson iteration</li>
+ * <li>{@link at.mavila.exercises_january_2026.domain.calculus.PolynomialEvaluator}
+ * - Evaluates polynomial and derivative values via Horner's method</li>
+ * <li>{@link at.mavila.exercises_january_2026.domain.calculus.ConvergenceChecker}
+ * - Evaluates residual and step-size convergence conditions</li>
  * </ul>
  *
  * <h2>Subpackages</h2>

@@ -112,27 +112,34 @@ public class AlgorithmController {
     return algorithmService.intToRoman(number);
   }
 
-  @QueryMapping
   /**
    * Resolves the {@code findPolynomialRoot} GraphQL query.
    *
    * <p>
-   * The controller accepts a single GraphQL input object, converts it into an
-   * application request, and delegates all business logic and default handling
-   * to {@link AlgorithmService}.
+   * This adapter forwards raw query arguments to the application service, which
+   * applies defaults and delegates Newton-Raphson execution to the domain layer.
    * </p>
    *
-   * @param input GraphQL input containing polynomial coefficients, an initial
-   *              guess, and optional Newton-Raphson settings
+   * @param coefficients  polynomial coefficients from lowest to highest order
+   * @param initialGuess  starting value for Newton-Raphson iteration
+   * @param epsilon       optional convergence tolerance
+   * @param maxIterations optional iteration cap
+   * @param scale         optional decimal scale used for division rounding
    * @return approximate polynomial root as a {@link BigDecimal}
    */
-  public BigDecimal findPolynomialRoot(@Argument final PolynomialRootInput input) {
+  @QueryMapping
+  public BigDecimal findPolynomialRoot(
+      @Argument final List<BigDecimal> coefficients,
+      @Argument final BigDecimal initialGuess,
+      @Argument final BigDecimal epsilon,
+      @Argument final Integer maxIterations,
+      @Argument final Integer scale) {
     return algorithmService.findPolynomialRoot(new PolynomialRootRequest(
-        input.coefficients(),
-        input.initialGuess(),
-        input.epsilon(),
-        input.maxIterations(),
-        input.scale()));
+        coefficients,
+        initialGuess,
+        epsilon,
+        maxIterations,
+        scale));
   }
 
   /**

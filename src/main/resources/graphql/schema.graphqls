@@ -77,26 +77,17 @@ type Query {
     All numeric values use BigDecimal for arbitrary-precision arithmetic.
     """
     findPolynomialRoot(
-        "Input object containing polynomial coefficients, the initial guess, and optional convergence settings."
-        input: PolynomialRootInput!
+        "Polynomial coefficients from lowest to highest order: [a₀, a₁, ..., aₙ]."
+        coefficients: [BigDecimal!]!
+        "The starting value for iteration."
+        initialGuess: BigDecimal!
+        "Optional convergence tolerance. Defaults to 1e-10."
+        epsilon: BigDecimal
+        "Optional maximum number of iterations. Defaults to 1000."
+        maxIterations: Int
+        "Optional number of decimal places for division rounding using HALF_UP. Defaults to 10."
+        scale: Int
     ): BigDecimal!
-}
-
-"""
-Input model for the Newton-Raphson polynomial root finder.
-The polynomial coefficients are ordered from lowest to highest power.
-"""
-input PolynomialRootInput {
-    "Polynomial coefficients from lowest to highest order: [a₀, a₁, ..., aₙ]."
-    coefficients: [BigDecimal!]!
-    "The starting value for iteration."
-    initialGuess: BigDecimal!
-    "Optional convergence tolerance. Defaults to 1e-10."
-    epsilon: BigDecimal
-    "Optional maximum number of iterations. Defaults to 1000."
-    maxIterations: Int
-    "Optional number of decimal places for division rounding using HALF_UP. Defaults to 10."
-    scale: Int
 }
 
 """

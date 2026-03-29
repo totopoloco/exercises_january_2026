@@ -3,10 +3,9 @@ package at.mavila.exercises_january_2026.domain.calculus;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 

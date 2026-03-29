@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.xml.validation.Validator;
-
 import org.springframework.stereotype.Component;
 
 import at.mavila.exercises_january_2026.domain.calculus.exception.ConvergenceFailedException;
@@ -18,6 +16,7 @@ import at.mavila.exercises_january_2026.domain.calculus.exception.InvalidScaleEx
 import at.mavila.exercises_january_2026.domain.calculus.exception.InvalidToleranceException;
 import at.mavila.exercises_january_2026.domain.calculus.exception.ZeroDerivativeException;
 import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -51,8 +50,11 @@ import lombok.RequiredArgsConstructor;
 public class NewtonRaphsonRootFinder {
 
     private static final BigDecimal ZERO = BigDecimal.ZERO;
+
     private final Validator validator;
     private final NewtonRaphsonConstraintViolationMapper violationMapper;
+    private final PolynomialEvaluator polynomialEvaluator;
+    private final ConvergenceChecker convergenceChecker;
 
     /**
      * Finds a polynomial root using Newton-Raphson iteration.
@@ -98,11 +100,12 @@ public class NewtonRaphsonRootFinder {
         BigDecimal currentX = params.initialGuess();
 
         for (int iteration = 1; iteration <= maxIterations; iteration++) {
-            final HornerPair hornerPair = evaluatePolynomialAndDerivative(coefficients, currentX);
-            final BigDecimal fx = hornerPair.polynomial();
-            final BigDecimal derivative = hornerPair.derivative();
+            final PolynomialEvaluator.EvaluationResult evaluation = polynomialEvaluator
+                    .evaluatePolynomialAndDerivative(coefficients, currentX);
+            final BigDecimal fx = evaluation.polynomial();
+            final BigDecimal derivative = evaluation.derivative();
 
-            if (fx.abs().compareTo(epsilon) < 0) {
+            if (convergenceChecker.hasConvergedByResidual(fx, epsilon)) {
                 return currentX.setScale(scale, RoundingMode.HALF_UP);
             }
 
@@ -114,11 +117,12 @@ public class NewtonRaphsonRootFinder {
             final BigDecimal delta = fx.divide(derivative, scale, RoundingMode.HALF_UP);
             final BigDecimal nextX = currentX.subtract(delta);
 
-            if (nextX.subtract(currentX).abs().compareTo(epsilon) < 0) {
+            if (convergenceChecker.hasConvergedByDelta(currentX, nextX, epsilon)) {
                 return nextX.setScale(scale, RoundingMode.HALF_UP);
             }
 
-            if (evaluatePolynomial(coefficients, nextX).abs().compareTo(epsilon) < 0) {
+            final BigDecimal nextFx = polynomialEvaluator.evaluatePolynomial(coefficients, nextX);
+            if (convergenceChecker.hasConvergedByResidual(nextFx, epsilon)) {
                 return nextX.setScale(scale, RoundingMode.HALF_UP);
             }
 
@@ -138,30 +142,5 @@ public class NewtonRaphsonRootFinder {
         if (!violations.isEmpty()) {
             throw violationMapper.toDomainException(violations);
         }
-    }
-
-    private HornerPair evaluatePolynomialAndDerivative(final List<BigDecimal> coefficients, final BigDecimal x) {
-        BigDecimal polynomial = coefficients.getLast();
-        BigDecimal derivative = ZERO;
-
-        for (int i = coefficients.size() - 2; i >= 0; i--) {
-            derivative = derivative.multiply(x).add(polynomial);
-            polynomial = polynomial.multiply(x).add(coefficients.get(i));
-        }
-
-        return new HornerPair(polynomial, derivative);
-    }
-
-    private BigDecimal evaluatePolynomial(final List<BigDecimal> coefficients, final BigDecimal x) {
-        BigDecimal value = coefficients.getLast();
-
-        for (int i = coefficients.size() - 2; i >= 0; i--) {
-            value = value.multiply(x).add(coefficients.get(i));
-        }
-
-        return value;
-    }
-
-    private record HornerPair(BigDecimal polynomial, BigDecimal derivative) {
     }
 }

@@ -25,7 +25,8 @@ out/
 .classpath
 .factorypath
 .project
-.settings
+.settings/*
+!.settings/org.eclipse.jdt.core.prefs
 .springBeans
 .sts4-cache
 bin/

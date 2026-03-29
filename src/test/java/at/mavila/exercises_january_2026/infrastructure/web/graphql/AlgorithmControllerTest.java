@@ -144,7 +144,7 @@ class AlgorithmControllerTest {
   void shouldFindPolynomialRoot() {
     graphQlTester.document("""
         query {
-            findPolynomialRoot(input: { coefficients: [-6.0, 3.0], initialGuess: 0.0 })
+            findPolynomialRoot(coefficients: [-6.0, 3.0], initialGuess: 0.0)
         }
         """)
         .execute()
@@ -158,7 +158,7 @@ class AlgorithmControllerTest {
   void shouldReturnErrorForInvalidPolynomial() {
     graphQlTester.document("""
         query {
-            findPolynomialRoot(input: { coefficients: [5.0], initialGuess: 1.0 })
+            findPolynomialRoot(coefficients: [5.0], initialGuess: 1.0)
         }
         """)
         .execute()

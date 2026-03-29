@@ -15,7 +15,9 @@ src/main/java/at/mavila/exercises_january_2026/
 │   │   └── WaterCalculator          # Maximum water container problem
 │   ├── calculus/                    # Calculus and numerical methods
 │   │   ├── NewtonRaphsonRootFinder  # Polynomial root finding
-│   │   ├── RootFinderParams         # Root finder parameter object
+│   │   ├── NewtonRaphsonParams      # Root finder parameter object
+│   │   ├── PolynomialEvaluator      # Horner evaluation for f(x) and f'(x)
+│   │   ├── ConvergenceChecker       # Residual and delta convergence checks
 │   │   └── exception/               # Calculus-specific domain exceptions
 │   ├── string/                      # String processing
 │   │   ├── LongestSubstringFinder   # Longest substring without repeats
@@ -1753,12 +1755,10 @@ Iteration stops when either $|f(x_k)| < \epsilon$ or $|x_{k+1} - x_k| < \epsilon
 ```graphql
 query {
     findPolynomialRoot(
-        input: {
-            coefficients: [-2.0, 0.0, 1.0]
-            initialGuess: 1.0
-            epsilon: 0.001
-            scale: 4
-        }
+        coefficients: [-2.0, 0.0, 1.0]
+        initialGuess: 1.0
+        epsilon: 0.001
+        scale: 4
     )
 }
 ```
@@ -1823,16 +1823,14 @@ type Query {
     # Converts integer to Roman numeral (e.g., 1994 → "MCMXCIV")
     intToRoman(number: Int!): String!
 
-    # Finds a polynomial root using Newton-Raphson and a single input object
-    findPolynomialRoot(input: PolynomialRootInput!): BigDecimal!
-}
-
-input PolynomialRootInput {
-    coefficients: [BigDecimal!]!
-    initialGuess: BigDecimal!
-    epsilon: BigDecimal
-    maxIterations: Int
-    scale: Int
+    # Finds a polynomial root using Newton-Raphson
+    findPolynomialRoot(
+        coefficients: [BigDecimal!]!
+        initialGuess: BigDecimal!
+        epsilon: BigDecimal
+        maxIterations: Int
+        scale: Int
+    ): BigDecimal!
 }
 ```
 
