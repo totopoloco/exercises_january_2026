@@ -59,6 +59,9 @@
   "editor.suggestSelection": "first",
   // Files Settings
   "files.autoSave": "onFocusChange",
+  "java.excludedPackages": [
+    "org.antlr.v4.runtime.misc"
+  ],
   "files.exclude": {
     "**/.git": true,
     "**/.gradle": true,

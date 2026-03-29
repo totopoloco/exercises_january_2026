@@ -110,6 +110,8 @@ Input validation must be **declarative** and **decoupled** from domain-service l
 
 Group public-method parameters into a `record` annotated with Jakarta Bean Validation constraints. The record lives in the same domain package as the service.
 
+> **Formatting rule**: Each constraint annotation must appear on its **own line**, directly above the parameter it applies to. Never place multiple annotations on the same line as each other or on the same line as the parameter declaration. This ensures readability and clean diffs.
+
 ```java
 import jakarta.validation.constraints.*;
 
@@ -427,6 +429,17 @@ private void validateInputs(List<BigDecimal> coefficients, BigDecimal initialGue
 - Use **Jakarta Bean Validation** annotations (`@NotNull`, `@NotEmpty`, `@Positive`, `@Size`, etc.) on parameter records or DTOs.
 - For domain-specific constraints that cannot be expressed with standard annotations, create **custom constraint annotations** with dedicated `ConstraintValidator` implementations.
 - Keep `Objects.isNull()` / `Objects.nonNull()` for **runtime branching logic** (e.g., optional parameter defaulting in the application layer), not for input validation in domain services.
+- **Annotation formatting**: Each constraint annotation must be on its **own line**, directly above the parameter it annotates. Never stack multiple annotations on the same line or inline them with the parameter declaration.
+
+```java
+// ✅ Good — one annotation per line
+@NotNull(message = "Value must not be null")
+@Positive(message = "Value must be positive")
+Integer value
+
+// ❌ Bad — annotations crammed onto one line
+@NotNull(message = "Value must not be null") @Positive(message = "Value must be positive") Integer value
+```
 
 ### Dependency injection & delegation
 

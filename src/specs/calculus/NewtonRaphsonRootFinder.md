@@ -60,6 +60,35 @@ All exceptions are `RuntimeException` subclasses in the `domain.calculus.excepti
 
 > **Validation approach**: Rules 1–8 are **input-validation rules**. They must be implemented as Jakarta Bean Validation constraints on a `NewtonRaphsonParams` parameter record — **not** as manual `if`-checks inside the service class. Use standard annotations (`@NotNull`, `@NotEmpty`, `@Positive`, `@Size`) where possible and **custom constraint annotations** for domain-specific rules (e.g., “leading coefficient ≠ 0”, “no null elements in list”). Rules 9–15 are **algorithmic runtime rules** that remain as programmatic guards inside the iteration logic.
 
+#### `NewtonRaphsonParams` record layout
+
+Each constraint annotation must appear on its **own line**, directly above the parameter it applies to:
+
+```java
+public record NewtonRaphsonParams(
+    @NotEmpty(message = "Coefficients must not be null or empty")
+    @Size(min = 2, message = "Polynomial must be at least linear (2 or more coefficients)")
+    @NoNullElements(message = "All coefficients must be non-null")
+    @LeadingCoefficientNonZero(message = "Leading coefficient must not be zero")
+    List<BigDecimal> coefficients,
+
+    @NotNull(message = "Initial guess must not be null")
+    BigDecimal initialGuess,
+
+    @NotNull(message = "Epsilon must be a positive number, got: null")
+    @DecimalMin(value = "0", inclusive = false, message = "Epsilon must be a positive number")
+    BigDecimal epsilon,
+
+    @NotNull(message = "Max iterations must be a positive integer, got: null")
+    @Positive(message = "Max iterations must be a positive integer")
+    Integer maxIterations,
+
+    @NotNull(message = "Scale must be a positive integer, got: null")
+    @Positive(message = "Scale must be a positive integer")
+    Integer scale
+) {}
+```
+
 1. **Null or empty coefficients**: Throw `InvalidPolynomialException` with message `"Coefficients must not be null or empty"`.
 2. **Single coefficient**: A constant polynomial (e.g., `[5]`) has no root. Throw `InvalidPolynomialException` with message `"Polynomial must be at least linear (2 or more coefficients)"`.
 3. **Leading coefficient is zero**: The last element in the list (highest-order term) must not be 0. Throw `InvalidPolynomialException` with message `"Leading coefficient must not be zero"`.
