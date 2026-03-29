@@ -28,11 +28,6 @@ class NewtonRaphsonRootFinderTest {
     @Autowired
     private NewtonRaphsonRootFinder newtonRaphsonRootFinder;
 
-    private NewtonRaphsonParams createParams(final List<BigDecimal> coefficients, final BigDecimal initialGuess) {
-        return new NewtonRaphsonParams(coefficients, initialGuess, DEFAULT_EPSILON, DEFAULT_MAX_ITERATIONS,
-                DEFAULT_SCALE);
-    }
-
     @Test
     void testFindRoot_LinearPolynomial_ConvergesInOneIteration() {
         // f(x) = -6 + 3x has the exact root x = 2.
@@ -82,15 +77,18 @@ class NewtonRaphsonRootFinderTest {
     @Test
     void testFindRoot_NullCoefficients_ThrowsException() {
         // A null coefficient list is never a valid polynomial input.
-        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(createParams(null, BigDecimal.ONE)))
+        final NewtonRaphsonParams params = createParams(null, BigDecimal.ONE);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params))
                 .isInstanceOf(InvalidPolynomialException.class).hasMessage("Coefficients must not be null or empty");
     }
 
     @Test
     void testFindRoot_ConstantPolynomial_ThrowsException() {
         // A constant polynomial has no root to iterate toward.
-        assertThatThrownBy(
-                () -> newtonRaphsonRootFinder.findRoot(createParams(List.of(new BigDecimal("5.0")), BigDecimal.ONE)))
+        final NewtonRaphsonParams params = createParams(List.of(new BigDecimal("5.0")), BigDecimal.ONE);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params))
                 .isInstanceOf(InvalidPolynomialException.class)
                 .hasMessage("Polynomial must be at least linear (2 or more coefficients)");
     }
@@ -98,49 +96,58 @@ class NewtonRaphsonRootFinderTest {
     @Test
     void testFindRoot_LeadingCoefficientZero_ThrowsException() {
         // The highest-order coefficient must be non-zero.
-        assertThatThrownBy(() -> newtonRaphsonRootFinder
-                .findRoot(createParams(List.of(new BigDecimal("1.0"), BigDecimal.ZERO), BigDecimal.ONE)))
+        final NewtonRaphsonParams params = createParams(List.of(new BigDecimal("1.0"), BigDecimal.ZERO),
+                BigDecimal.ONE);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params))
                 .isInstanceOf(InvalidPolynomialException.class).hasMessage("Leading coefficient must not be zero");
     }
 
     @Test
     void testFindRoot_NullCoefficientElement_ThrowsException() {
         // Every coefficient position must contain a concrete BigDecimal value.
-        assertThatThrownBy(() -> newtonRaphsonRootFinder
-                .findRoot(createParams(java.util.Arrays.asList(BigDecimal.ONE, null), BigDecimal.ONE)))
+        final NewtonRaphsonParams params = createParams(java.util.Arrays.asList(BigDecimal.ONE, null), BigDecimal.ONE);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params))
                 .isInstanceOf(InvalidPolynomialException.class).hasMessage("All coefficients must be non-null");
     }
 
     @Test
     void testFindRoot_NullInitialGuess_ThrowsException() {
         // Newton-Raphson requires an explicit starting value.
-        assertThatThrownBy(() -> newtonRaphsonRootFinder
-                .findRoot(createParams(List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), null)))
+        final NewtonRaphsonParams params = createParams(List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), null);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params))
                 .isInstanceOf(InvalidInitialGuessException.class).hasMessage("Initial guess must not be null");
     }
 
     @Test
     void testFindRoot_NonPositiveEpsilon_ThrowsException() {
         // Epsilon must stay strictly positive to define convergence.
-        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(new NewtonRaphsonParams(
-                List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, BigDecimal.ZERO, 1000, 10)))
-                .isInstanceOf(InvalidToleranceException.class).hasMessage("Epsilon must be a positive number, got: 0");
+        final NewtonRaphsonParams params = new NewtonRaphsonParams(
+                List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, BigDecimal.ZERO, 1000, 10);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params)).isInstanceOf(InvalidToleranceException.class)
+                .hasMessage("Epsilon must be a positive number, got: 0");
     }
 
     @Test
     void testFindRoot_NullEpsilon_ThrowsException() {
         // Epsilon must always be present after application-level defaulting.
-        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(new NewtonRaphsonParams(
-                List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, null, 1000, 10)))
-                .isInstanceOf(InvalidToleranceException.class)
+        final NewtonRaphsonParams params = new NewtonRaphsonParams(
+                List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, null, 1000, 10);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params)).isInstanceOf(InvalidToleranceException.class)
                 .hasMessage("Epsilon must be a positive number, got: null");
     }
 
     @Test
     void testFindRoot_NonPositiveMaxIterations_ThrowsException() {
         // Iteration limit must allow at least one Newton step.
-        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(new NewtonRaphsonParams(
-                List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, DEFAULT_EPSILON, 0, 10)))
+        final NewtonRaphsonParams params = new NewtonRaphsonParams(
+                List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, DEFAULT_EPSILON, 0, 10);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params))
                 .isInstanceOf(InvalidMaxIterationsException.class)
                 .hasMessage("Max iterations must be a positive integer, got: 0");
     }
@@ -148,8 +155,10 @@ class NewtonRaphsonRootFinderTest {
     @Test
     void testFindRoot_NullMaxIterations_ThrowsException() {
         // Max iterations must always be present after application-level defaulting.
-        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(new NewtonRaphsonParams(
-                List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, DEFAULT_EPSILON, null, 10)))
+        final NewtonRaphsonParams params = new NewtonRaphsonParams(
+                List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, DEFAULT_EPSILON, null, 10);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params))
                 .isInstanceOf(InvalidMaxIterationsException.class)
                 .hasMessage("Max iterations must be a positive integer, got: null");
     }
@@ -157,34 +166,63 @@ class NewtonRaphsonRootFinderTest {
     @Test
     void testFindRoot_NonPositiveScale_ThrowsException() {
         // Scale must stay positive for deterministic BigDecimal division.
-        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(new NewtonRaphsonParams(
-                List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, DEFAULT_EPSILON, 1000, 0)))
-                .isInstanceOf(InvalidScaleException.class).hasMessage("Scale must be a positive integer, got: 0");
+        final NewtonRaphsonParams params = new NewtonRaphsonParams(
+                List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, DEFAULT_EPSILON, 1000, 0);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params)).isInstanceOf(InvalidScaleException.class)
+                .hasMessage("Scale must be a positive integer, got: 0");
     }
 
     @Test
     void testFindRoot_NullScale_ThrowsException() {
         // Scale must always be present after application-level defaulting.
-        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(new NewtonRaphsonParams(
-                List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, DEFAULT_EPSILON, 1000, null)))
-                .isInstanceOf(InvalidScaleException.class).hasMessage("Scale must be a positive integer, got: null");
+        final NewtonRaphsonParams params = new NewtonRaphsonParams(
+                List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, DEFAULT_EPSILON, 1000, null);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params)).isInstanceOf(InvalidScaleException.class)
+                .hasMessage("Scale must be a positive integer, got: null");
     }
 
     @Test
     void testFindRoot_ZeroDerivativeAtInitialGuess_ThrowsException() {
         // f(x) = 1 + x² has derivative 0 at x = 0 while not being a root.
-        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(
-                createParams(List.of(BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ONE), new BigDecimal("0.0"))))
-                .isInstanceOf(ZeroDerivativeException.class)
+        final NewtonRaphsonParams params = createParams(List.of(BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ONE),
+                new BigDecimal("0.0"));
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params)).isInstanceOf(ZeroDerivativeException.class)
                 .hasMessage("Derivative is zero at x = 0.0. Newton-Raphson cannot continue.");
     }
 
     @Test
     void testFindRoot_NonConvergence_ThrowsException() {
         // A very small tolerance with too few iterations should exhaust the limit.
-        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(new NewtonRaphsonParams(
+        final NewtonRaphsonParams params = new NewtonRaphsonParams(
                 List.of(new BigDecimal("2.0"), new BigDecimal("-2.0"), BigDecimal.ZERO, BigDecimal.ONE),
-                BigDecimal.ZERO, new BigDecimal("1e-20"), 4, 20))).isInstanceOf(ConvergenceFailedException.class)
+                BigDecimal.ZERO, new BigDecimal("1e-20"), 4, 20);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params))
+                .isInstanceOf(ConvergenceFailedException.class)
                 .hasMessage("Newton-Raphson did not converge within 4 iterations");
+    }
+
+    @Test
+    void testFindRoot_CubicCyclesFromZero_ThrowsConvergenceFailedException() {
+        // f(x) = x^3 - 2x + 2 with x0 = 0 alternates between 0 and 1 and does not
+        // satisfy convergence.
+        final List<BigDecimal> coefficients = List.of(new BigDecimal("2.0"), new BigDecimal("-2.0"), BigDecimal.ZERO,
+                BigDecimal.ONE);
+
+        final BigDecimal initialGuess = BigDecimal.ZERO;
+
+        final NewtonRaphsonParams params = createParams(coefficients, initialGuess);
+
+        assertThatThrownBy(() -> newtonRaphsonRootFinder.findRoot(params))
+                .isInstanceOf(ConvergenceFailedException.class)
+                .hasMessage("Newton-Raphson did not converge within 1000 iterations");
+    }
+
+    private NewtonRaphsonParams createParams(final List<BigDecimal> coefficients, final BigDecimal initialGuess) {
+        return new NewtonRaphsonParams(coefficients, initialGuess, DEFAULT_EPSILON, DEFAULT_MAX_ITERATIONS,
+                DEFAULT_SCALE);
     }
 }
