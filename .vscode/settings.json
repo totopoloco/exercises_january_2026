@@ -24,6 +24,8 @@
   "java.references.includeDecompiledSources": false,
   "java.eclipse.downloadSources": true,
   "java.settings.url": ".settings/org.eclipse.jdt.core.prefs",
+  "java.format.settings.url": ".settings/eclipse-formatter.xml",
+  "java.format.settings.profile": "ProjectFormatter",
   // Java Debug Settings - Disable Hot Code Replace
   "java.debug.settings.hotCodeReplace": "never",
   "java.debug.settings.enableRunDebugCodeLens": false,

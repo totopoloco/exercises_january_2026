@@ -27,6 +27,7 @@ out/
 .project
 .settings/*
 !.settings/org.eclipse.jdt.core.prefs
+!.settings/eclipse-formatter.xml
 .springBeans
 .sts4-cache
 bin/

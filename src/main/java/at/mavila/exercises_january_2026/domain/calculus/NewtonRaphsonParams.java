@@ -24,18 +24,22 @@ import jakarta.validation.constraints.Size;
  * @param epsilon       convergence tolerance that must be strictly positive
  * @param maxIterations maximum iteration count that must be strictly positive
  * @param scale         decimal scale used for division rounding, must be
- *                      strictly
- *                      positive
+ *                      strictly positive
  * @since 2026-03-29
  */
 public record NewtonRaphsonParams(
-        @NotEmpty(message = "Coefficients must not be null or empty") @Size(min = 2, message = "Polynomial must be at least linear (2 or more coefficients)") @NoNullElements(message = "All coefficients must be non-null") @LeadingCoefficientNonZero(message = "Leading coefficient must not be zero") List<BigDecimal> coefficients,
+        @NotEmpty(message = "Coefficients must not be null or empty") @Size(min = 2, message = "Polynomial must be at least linear (2 or more coefficients)") @NoNullElements(message = "All coefficients must be non-null") @LeadingCoefficientNonZero(message = "Leading coefficient must not be zero")
+        List<BigDecimal> coefficients,
 
-        @NotNull(message = "Initial guess must not be null") BigDecimal initialGuess,
+        @NotNull(message = "Initial guess must not be null")
+        BigDecimal initialGuess,
 
-        @NotNull(message = "Epsilon must be a positive number, got: null") @DecimalMin(value = "0", inclusive = false, message = "Epsilon must be a positive number") BigDecimal epsilon,
+        @NotNull(message = "Epsilon must be a positive number, got: null") @DecimalMin(value = "0", inclusive = false, message = "Epsilon must be a positive number")
+        BigDecimal epsilon,
 
-        @NotNull(message = "Max iterations must be a positive integer, got: null") @Positive(message = "Max iterations must be a positive integer") Integer maxIterations,
+        @NotNull(message = "Max iterations must be a positive integer, got: null") @Positive(message = "Max iterations must be a positive integer")
+        Integer maxIterations,
 
-        @NotNull(message = "Scale must be a positive integer, got: null") @Positive(message = "Scale must be a positive integer") Integer scale) {
+        @NotNull(message = "Scale must be a positive integer, got: null") @Positive(message = "Scale must be a positive integer")
+        Integer scale) {
 }
