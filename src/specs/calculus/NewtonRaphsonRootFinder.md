@@ -58,6 +58,8 @@ All exceptions are `RuntimeException` subclasses in the `domain.calculus.excepti
 
 ## Rules & Edge Cases
 
+> **Validation approach**: Rules 1–8 are **input-validation rules**. They must be implemented as Jakarta Bean Validation constraints on a `NewtonRaphsonParams` parameter record — **not** as manual `if`-checks inside the service class. Use standard annotations (`@NotNull`, `@NotEmpty`, `@Positive`, `@Size`) where possible and **custom constraint annotations** for domain-specific rules (e.g., “leading coefficient ≠ 0”, “no null elements in list”). Rules 9–15 are **algorithmic runtime rules** that remain as programmatic guards inside the iteration logic.
+
 1. **Null or empty coefficients**: Throw `InvalidPolynomialException` with message `"Coefficients must not be null or empty"`.
 2. **Single coefficient**: A constant polynomial (e.g., `[5]`) has no root. Throw `InvalidPolynomialException` with message `"Polynomial must be at least linear (2 or more coefficients)"`.
 3. **Leading coefficient is zero**: The last element in the list (highest-order term) must not be 0. Throw `InvalidPolynomialException` with message `"Leading coefficient must not be zero"`.
@@ -226,12 +228,27 @@ Explanation: BigDecimal handles arbitrarily large values without overflow.
 
 ## Implementation Notes
 
+### Polynomial Evaluation
+
 - Use **Horner's method** for evaluating $f(x)$ and $f'(x)$ to avoid computing powers explicitly:
     - $f(x) = a_0 + x(a_1 + x(a_2 + \cdots + x \cdot a_n))$
     - Horner's method translates directly to `BigDecimal.multiply(x).add(a_i)` in a reverse loop.
 - The derivative coefficients can be computed on the fly: the derivative of term $a_i x^i$ is $i \cdot a_i x^{i-1}$.
 - All division must use `BigDecimal.divide(divisor, scale, RoundingMode.HALF_UP)` to avoid `ArithmeticException` from non-terminating decimal expansions (e.g., $1 / 3$).
 - The `scale` parameter controls precision throughout the algorithm. Higher values yield more accurate results at the cost of performance.
+
+### Architecture — Dependency Injection
+
+The `NewtonRaphsonRootFinder` service must **not** implement all logic inline. Decompose the algorithm into focused, injected collaborators:
+
+| Component                 | Responsibility                                                                            |
+| ------------------------- | ----------------------------------------------------------------------------------------- |
+| `NewtonRaphsonParams`     | Parameter `record` with Jakarta Validation annotations (rules 1–8).                       |
+| `PolynomialEvaluator`     | Evaluates $f(x)$ and $f'(x)$ via Horner's method. `@Component`.                           |
+| `ConvergenceChecker`      | Checks $\lvert x_{k+1} - x_k \rvert < \epsilon$ and tracks iteration count. `@Component`. |
+| `NewtonRaphsonRootFinder` | Orchestrates: accept params → evaluate → check convergence → return root.                 |
+
+Each collaborator is a `@Component` injected into `NewtonRaphsonRootFinder` via `@RequiredArgsConstructor`. The `findRoot` method should read as a high-level recipe with **no inlined evaluation or validation logic**.
 
 ---
 
@@ -275,3 +292,9 @@ findPolynomialRoot(
     - `InvalidScaleException`
     - `ZeroDerivativeException`
     - `ConvergenceFailedException`
+- **Collaborator components** (same package):
+    - `NewtonRaphsonParams` — parameter `record` with Jakarta Validation constraints
+    - `PolynomialEvaluator` — evaluates $f(x)$ and $f'(x)$ via Horner's method (`@Component`)
+    - `ConvergenceChecker` — checks convergence criterion and iteration bounds (`@Component`)
+- **Validation artifacts** (same package or `validation` sub-package):
+    - Custom constraint annotations and their `ConstraintValidator` implementations for domain-specific rules (e.g., leading coefficient ≠ 0, no null elements)

@@ -8,16 +8,16 @@
 
 ## Project Context
 
-| Aspect               | Value                                                        |
-| -------------------- | ------------------------------------------------------------ |
-| **Language**         | Java 25 (toolchain), compiled to Java 21 bytecode            |
-| **Framework**        | Spring Boot 4.0.3                                            |
-| **API style**        | GraphQL (Spring for GraphQL) — no REST controllers           |
-| **Build tool**       | Gradle (Groovy DSL)                                          |
-| **Testing**          | JUnit 5 + AssertJ + `ExecutionGraphQlServiceTester`          |
-| **Libraries**        | Lombok, Apache Commons Lang 3, graphql-java-extended-scalars |
-| **Mutation testing** | Pitest                                                       |
-| **Base package**     | `at.mavila.exercises_january_2026`                           |
+| Aspect               | Value                                                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Language**         | Java 25 (toolchain), compiled to Java 21 bytecode                                                                      |
+| **Framework**        | Spring Boot 4.0.3                                                                                                      |
+| **API style**        | GraphQL (Spring for GraphQL) — no REST controllers                                                                     |
+| **Build tool**       | Gradle (Groovy DSL)                                                                                                    |
+| **Testing**          | JUnit 5 + AssertJ + `ExecutionGraphQlServiceTester`                                                                    |
+| **Libraries**        | Lombok, Apache Commons Lang 3, graphql-java-extended-scalars, spring-boot-starter-validation (Jakarta Bean Validation) |
+| **Mutation testing** | Pitest                                                                                                                 |
+| **Base package**     | `at.mavila.exercises_january_2026`                                                                                     |
 
 ---
 
@@ -73,7 +73,8 @@ src/main/java/at/mavila/exercises_january_2026/domain/<category>/<ClassName>.jav
 - Class name: descriptive `NounVerb` or `ActionNoun` pattern (e.g., `MedianCalculator`, `PinCracker`, `PalindromeExtractor`).
 - Comprehensive **Javadoc** on class and all public methods including `@param`, `@return`, `@throws`, algorithm description, and time/space complexity.
 - Add `@since` tag with the current date.
-- Validate inputs — throw `IllegalArgumentException` or a custom domain exception with a descriptive message.
+- **Do not validate inputs manually inside the service class.** Use Jakarta Bean Validation annotations on a parameter `record` (see §3.5) so that validation is declarative and decoupled from business logic. If a domain-specific constraint cannot be expressed with standard annotations (`@NotNull`, `@NotEmpty`, `@Positive`, etc.), create a **custom constraint annotation** with a corresponding `ConstraintValidator` implementation.
+- **Keep public methods thin.** A public method should read as a high-level recipe — delegate each meaningful step (validation, computation, transformation) to an injected collaborator (`@Component`) or a private helper. Avoid monolithic methods that mix validation, algorithm logic, and result assembly.
 - Define constraint boundaries as `private static final` fields (e.g., `MAX_LENGTH`, `MIN_VALUE`).
 - Prefer Java Streams and functional style where appropriate.
 - **No dependencies on application or infrastructure layers.**
@@ -100,6 +101,56 @@ If this is a **new subdomain**, create `package-info.java` with Javadoc describi
 - The subdomain's purpose
 - Key components
 - Design principles
+
+### 3.5 Input Validation Strategy (Jakarta Bean Validation)
+
+Input validation must be **declarative** and **decoupled** from domain-service logic. Follow these guidelines:
+
+#### Parameter record with constraint annotations
+
+Group public-method parameters into a `record` annotated with Jakarta Bean Validation constraints. The record lives in the same domain package as the service.
+
+```java
+import jakarta.validation.constraints.*;
+
+public record RootFinderParams(
+    @NotNull(message = "Coefficients must not be null")
+    @Size(min = 2, message = "Polynomial must be at least linear (2+ coefficients)")
+    List<@NotNull(message = "All coefficients must be non-null") BigDecimal> coefficients,
+
+    @NotNull(message = "Initial guess must not be null")
+    BigDecimal initialGuess,
+
+    @Positive(message = "Epsilon must be a positive number")
+    BigDecimal epsilon,
+
+    @Positive(message = "Max iterations must be a positive integer")
+    Integer maxIterations,
+
+    @Positive(message = "Scale must be a positive integer")
+    Integer scale
+) {}
+```
+
+#### Custom constraint annotations
+
+When a rule cannot be expressed with standard annotations (e.g., "leading coefficient must not be zero"), create a **custom constraint**:
+
+1. Define the annotation (e.g., `@LeadingCoefficientNonZero`) with `@Constraint(validatedBy = ...)`.
+2. Implement a `ConstraintValidator<LeadingCoefficientNonZero, List<BigDecimal>>`.
+3. Place both in the same domain package or a `validation` sub-package.
+
+#### Triggering validation
+
+- Inject a `Validator` (from `jakarta.validation`) into the domain service, or
+- Annotate the service method parameter with `@Valid` and enable method-level validation via Spring's `MethodValidationPostProcessor`.
+- Map `ConstraintViolationException` to the appropriate domain exception in a dedicated **exception-mapping component** if the GraphQL layer needs domain-specific exception types.
+
+#### What stays out of the service
+
+- **No `if (Objects.isNull(...))` guards for input validation** — these are replaced by `@NotNull`.
+- **No manual range/size checks** — use `@Positive`, `@Min`, `@Max`, `@Size`.
+- The service's public method body begins directly with business logic, not validation boilerplate.
 
 ---
 
@@ -367,6 +418,42 @@ private void validateNumericParams(final BigDecimal epsilon, final int maxIterat
 private void validateInputs(List<BigDecimal> coefficients, BigDecimal initialGuess,
     BigDecimal epsilon, int maxIterations, int scale) {
     // 8+ branching checks all in one method
+}
+```
+
+### Input validation
+
+- **Domain services must not contain manual input-validation logic** (`if (Objects.isNull(...)) throw ...`).
+- Use **Jakarta Bean Validation** annotations (`@NotNull`, `@NotEmpty`, `@Positive`, `@Size`, etc.) on parameter records or DTOs.
+- For domain-specific constraints that cannot be expressed with standard annotations, create **custom constraint annotations** with dedicated `ConstraintValidator` implementations.
+- Keep `Objects.isNull()` / `Objects.nonNull()` for **runtime branching logic** (e.g., optional parameter defaulting in the application layer), not for input validation in domain services.
+
+### Dependency injection & delegation
+
+- **Domain services must not be monolithic.** When a service orchestrates multiple concerns (validation, evaluation, iteration, transformation), extract each concern into a separate `@Component` collaborator injected via constructor.
+- Each collaborator should have a focused, single responsibility (e.g., `PolynomialEvaluator`, `ConvergenceChecker`, `InputValidator`).
+- The main service's public method should read as a **high-level orchestration** — a sequence of delegated calls, not inlined logic.
+- This keeps methods short, testable in isolation, and under the cyclomatic-complexity threshold.
+
+```java
+// ✅ Good — service delegates to injected collaborators
+@Component
+@RequiredArgsConstructor
+public class NewtonRaphsonRootFinder {
+    private final PolynomialEvaluator evaluator;
+    private final ConvergenceChecker convergenceChecker;
+
+    public BigDecimal findRoot(final RootFinderParams params) {
+        // orchestrate steps, delegate computation
+    }
+}
+
+// ❌ Bad — all logic crammed into one class with no collaborators
+@Component
+public class NewtonRaphsonRootFinder {
+    public BigDecimal findRoot(...) {
+        // 200+ lines of validation + evaluation + iteration
+    }
 }
 ```
 
