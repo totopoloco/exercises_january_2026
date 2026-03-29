@@ -401,6 +401,22 @@ public BigDecimal findRoot(List<BigDecimal> coefficients, BigDecimal initialGues
 - Keep methods short and single-purpose; extract **private helpers** for distinct logical steps (validation, evaluation, iteration, convergence checking).
 - Validation logic with many `if` guards must be **decomposed** — group related validations into focused helper methods (e.g., `validateCoefficients(...)`, `validateNumericParams(...)`) rather than placing all checks in a single method.
 - Prefer returning early (`guard clauses`) over deep nesting.
+- **Guard-clause pattern**: When a condition signals "nothing to do", check the **positive** (happy-path) condition and `return` early. Do **not** negate the condition and wrap the rest of the method in the `if` body. This keeps the main flow at the top indentation level and the exceptional path clearly separated.
+
+```java
+// ✅ Good — check positive condition, return early, then handle exceptional path
+if (violations.isEmpty()) {
+    return;
+}
+
+throw violationMapper.toDomainException(violations);
+
+// ❌ Bad — negated condition wraps the throw
+if (!violations.isEmpty()) {
+    throw violationMapper.toDomainException(violations);
+}
+```
+
 - Each private helper should have a clear, single responsibility and a descriptive name.
 
 ```java
