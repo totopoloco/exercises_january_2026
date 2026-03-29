@@ -69,9 +69,42 @@ type Query {
     Valid range: 1 to 3999 inclusive.
     """
     intToRoman(number: Int!): String!
+
+    """
+    Finds a root of a polynomial using the Newton-Raphson method.
+    The polynomial is defined by its coefficients [a₀, a₁, ..., aₙ] where
+    f(x) = a₀ + a₁x + a₂x² + ... + aₙxⁿ.
+    All numeric values use BigDecimal for arbitrary-precision arithmetic.
+    """
+    findPolynomialRoot(
+        "Input object containing polynomial coefficients, the initial guess, and optional convergence settings."
+        input: PolynomialRootInput!
+    ): BigDecimal!
+}
+
+"""
+Input model for the Newton-Raphson polynomial root finder.
+The polynomial coefficients are ordered from lowest to highest power.
+"""
+input PolynomialRootInput {
+    "Polynomial coefficients from lowest to highest order: [a₀, a₁, ..., aₙ]."
+    coefficients: [BigDecimal!]!
+    "The starting value for iteration."
+    initialGuess: BigDecimal!
+    "Optional convergence tolerance. Defaults to 1e-10."
+    epsilon: BigDecimal
+    "Optional maximum number of iterations. Defaults to 1000."
+    maxIterations: Int
+    "Optional number of decimal places for division rounding using HALF_UP. Defaults to 10."
+    scale: Int
 }
 
 """
 Custom scalar for Long values (64-bit integers)
 """
 scalar Long
+
+"""
+Custom scalar for arbitrary precision decimal values.
+"""
+scalar BigDecimal

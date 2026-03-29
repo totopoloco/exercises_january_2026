@@ -18,6 +18,7 @@
  * <li>{@code collection} - Collection operations (linked lists, matrices,
  * baskets)</li>
  * <li>{@code phonetic} - Phone-related operations (letter combinations)</li>
+ * <li>{@code calculus} - Calculus operations (Newton-Raphson root finding)</li>
  * </ul>
  *
  * <h2>Design Principles</h2>

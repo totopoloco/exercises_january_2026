@@ -17,6 +17,7 @@ import graphql.scalars.ExtendedScalars;
  * <h2>Custom Scalars</h2>
  * <ul>
  * <li>Long - Support for 64-bit integers</li>
+ * <li>BigDecimal - Support for arbitrary-precision decimal numbers</li>
  * </ul>
  *
  * @author mavila
@@ -34,7 +35,8 @@ public class GraphQLConfig {
   @Bean
   public RuntimeWiringConfigurer runtimeWiringConfigurer() {
     return wiringBuilder -> wiringBuilder
-        .scalar(ExtendedScalars.GraphQLLong);
+        .scalar(ExtendedScalars.GraphQLLong)
+        .scalar(ExtendedScalars.GraphQLBigDecimal);
   }
 
 }

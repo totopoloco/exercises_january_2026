@@ -1,13 +1,16 @@
 package at.mavila.exercises_january_2026.infrastructure.web.graphql;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 import at.mavila.exercises_january_2026.application.AlgorithmService;
+import at.mavila.exercises_january_2026.application.PolynomialRootRequest;
 import at.mavila.exercises_january_2026.domain.collection.ListNode;
 import lombok.RequiredArgsConstructor;
 
@@ -109,15 +112,38 @@ public class AlgorithmController {
     return algorithmService.intToRoman(number);
   }
 
+  @QueryMapping
+  /**
+   * Resolves the {@code findPolynomialRoot} GraphQL query.
+   *
+   * <p>
+   * The controller accepts a single GraphQL input object, converts it into an
+   * application request, and delegates all business logic and default handling
+   * to {@link AlgorithmService}.
+   * </p>
+   *
+   * @param input GraphQL input containing polynomial coefficients, an initial
+   *              guess, and optional Newton-Raphson settings
+   * @return approximate polynomial root as a {@link BigDecimal}
+   */
+  public BigDecimal findPolynomialRoot(@Argument final PolynomialRootInput input) {
+    return algorithmService.findPolynomialRoot(new PolynomialRootRequest(
+        input.coefficients(),
+        input.initialGuess(),
+        input.epsilon(),
+        input.maxIterations(),
+        input.scale()));
+  }
+
   /**
    * Helper method to create a linked list from a list of integers.
    */
-  private ListNode createLinkedList(List<Integer> values) {
-    if (values == null || values.isEmpty()) {
+  private ListNode createLinkedList(final List<Integer> values) {
+    if (Objects.isNull(values) || values.isEmpty()) {
       return null;
     }
 
-    ListNode head = new ListNode(values.getFirst());
+    final ListNode head = new ListNode(values.getFirst());
     ListNode current = head;
 
     for (int i = 1; i < values.size(); i++) {
@@ -131,11 +157,11 @@ public class AlgorithmController {
   /**
    * Helper method to convert a linked list back to a list of integers.
    */
-  private List<Integer> linkedListToList(ListNode head) {
-    List<Integer> result = new ArrayList<>();
+  private List<Integer> linkedListToList(final ListNode head) {
+    final List<Integer> result = new ArrayList<>();
     ListNode current = head;
 
-    while (current != null) {
+    while (Objects.nonNull(current)) {
       result.add(current.val);
       current = current.next;
     }

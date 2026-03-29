@@ -13,6 +13,10 @@ src/main/java/at/mavila/exercises_january_2026/
 │   │   └── MedianCalculator         # Merge arrays and calculate median
 │   ├── container/                   # Container optimization
 │   │   └── WaterCalculator          # Maximum water container problem
+│   ├── calculus/                    # Calculus and numerical methods
+│   │   ├── NewtonRaphsonRootFinder  # Polynomial root finding
+│   │   ├── RootFinderParams         # Root finder parameter object
+│   │   └── exception/               # Calculus-specific domain exceptions
 │   ├── string/                      # String processing
 │   │   ├── LongestSubstringFinder   # Longest substring without repeats
 │   │   ├── MaskService              # String masking
@@ -67,7 +71,8 @@ src/main/java/at/mavila/exercises_january_2026/
 11. [Roman Numeral to Integer](#11-roman-numeral-to-integer)
     - [11b. Integer to Roman Numeral](#11b-integer-to-roman-numeral)
     - [11c. Roman Numeral Validation](#11c-roman-numeral-validation)
-12. [GraphQL API](#12-graphql-api)
+12. [Newton-Raphson Polynomial Root Finder](#12-newton-raphson-polynomial-root-finder)
+13. [GraphQL API](#13-graphql-api)
 
 ---
 
@@ -1718,7 +1723,59 @@ curl -X POST http://localhost:8080/graphql \
 
 ---
 
-## 12. GraphQL API
+## 12. Newton-Raphson Polynomial Root Finder
+
+**Location:** `domain/calculus/NewtonRaphsonRootFinder.java`
+
+**GraphQL Query:** `findPolynomialRoot`
+
+### Problem
+
+Find an approximate root of a polynomial using the Newton-Raphson method with arbitrary-precision `BigDecimal` arithmetic.
+
+### Algorithm
+
+The implementation evaluates both $f(x)$ and $f'(x)$ with Horner's method and iteratively applies:
+
+$$
+x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)}
+$$
+
+Iteration stops when either $|f(x_k)| < \epsilon$ or $|x_{k+1} - x_k| < \epsilon$.
+
+### Complexity
+
+- **Time:** O($k \times n \times d^2$), where $k$ is the iteration count, $n$ is the polynomial degree, and $d$ is the precision scale
+- **Space:** O($n \times d$) for coefficients and intermediate `BigDecimal` values
+
+### Example GraphQL Query
+
+```graphql
+query {
+    findPolynomialRoot(
+        input: {
+            coefficients: [-2.0, 0.0, 1.0]
+            initialGuess: 1.0
+            epsilon: 0.001
+            scale: 4
+        }
+    )
+}
+```
+
+**Response:**
+
+```json
+{
+    "data": {
+        "findPolynomialRoot": 1.4142
+    }
+}
+```
+
+---
+
+## 13. GraphQL API
 
 All algorithms are exposed via a GraphQL API, allowing you to interact with them through HTTP requests or the built-in GraphiQL interface.
 
@@ -1765,6 +1822,17 @@ type Query {
 
     # Converts integer to Roman numeral (e.g., 1994 → "MCMXCIV")
     intToRoman(number: Int!): String!
+
+    # Finds a polynomial root using Newton-Raphson and a single input object
+    findPolynomialRoot(input: PolynomialRootInput!): BigDecimal!
+}
+
+input PolynomialRootInput {
+    coefficients: [BigDecimal!]!
+    initialGuess: BigDecimal!
+    epsilon: BigDecimal
+    maxIterations: Int
+    scale: Int
 }
 ```
 

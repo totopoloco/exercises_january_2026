@@ -6,6 +6,13 @@ import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.stereotype.Component;
 
+import at.mavila.exercises_january_2026.domain.calculus.exception.ConvergenceFailedException;
+import at.mavila.exercises_january_2026.domain.calculus.exception.InvalidInitialGuessException;
+import at.mavila.exercises_january_2026.domain.calculus.exception.InvalidMaxIterationsException;
+import at.mavila.exercises_january_2026.domain.calculus.exception.InvalidPolynomialException;
+import at.mavila.exercises_january_2026.domain.calculus.exception.InvalidScaleException;
+import at.mavila.exercises_january_2026.domain.calculus.exception.InvalidToleranceException;
+import at.mavila.exercises_january_2026.domain.calculus.exception.ZeroDerivativeException;
 import at.mavila.exercises_january_2026.domain.number.roman.InvalidRomanNumeralException;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
@@ -65,6 +72,55 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
           Map.of(
               "errorCode", "INVALID_ARGUMENT",
               "reason", illegalArgEx.getMessage()));
+    }
+
+    if (ex instanceof InvalidPolynomialException invalidPolynomialException) {
+      return buildBadRequestError(env, invalidPolynomialException.getMessage(),
+          Map.of(
+              "errorCode", "INVALID_POLYNOMIAL",
+              "reason", invalidPolynomialException.getReason()));
+    }
+
+    if (ex instanceof InvalidInitialGuessException invalidInitialGuessException) {
+      return buildBadRequestError(env, invalidInitialGuessException.getMessage(),
+          Map.of(
+              "errorCode", "INVALID_INITIAL_GUESS"));
+    }
+
+    if (ex instanceof InvalidToleranceException invalidToleranceException) {
+      return buildBadRequestError(env, invalidToleranceException.getMessage(),
+          Map.of(
+              "errorCode", "INVALID_TOLERANCE",
+              "epsilon", String.valueOf(invalidToleranceException.getEpsilon())));
+    }
+
+    if (ex instanceof InvalidMaxIterationsException invalidMaxIterationsException) {
+      return buildBadRequestError(env, invalidMaxIterationsException.getMessage(),
+          Map.of(
+              "errorCode", "INVALID_MAX_ITERATIONS",
+              "maxIterations", invalidMaxIterationsException.getMaxIterations()));
+    }
+
+    if (ex instanceof InvalidScaleException invalidScaleException) {
+      return buildBadRequestError(env, invalidScaleException.getMessage(),
+          Map.of(
+              "errorCode", "INVALID_SCALE",
+              "scale", invalidScaleException.getScale()));
+    }
+
+    if (ex instanceof ZeroDerivativeException zeroDerivativeException) {
+      return buildBadRequestError(env, zeroDerivativeException.getMessage(),
+          Map.of(
+              "errorCode", "ZERO_DERIVATIVE",
+              "x", zeroDerivativeException.getX().toPlainString(),
+              "iteration", zeroDerivativeException.getIteration()));
+    }
+
+    if (ex instanceof ConvergenceFailedException convergenceFailedException) {
+      return buildBadRequestError(env, convergenceFailedException.getMessage(),
+          Map.of(
+              "errorCode", "CONVERGENCE_FAILED",
+              "maxIterations", convergenceFailedException.getMaxIterations()));
     }
 
     // Let other exceptions be handled by the default resolver

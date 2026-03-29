@@ -1,5 +1,9 @@
 package at.mavila.exercises_january_2026.infrastructure.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -133,5 +137,36 @@ class AlgorithmControllerTest {
         .path("rearrangeFruits")
         .entity(Long.class)
         .isEqualTo(1L);
+  }
+
+  @Test
+  @DisplayName("Should find polynomial root via GraphQL")
+  void shouldFindPolynomialRoot() {
+    graphQlTester.document("""
+        query {
+            findPolynomialRoot(input: { coefficients: [-6.0, 3.0], initialGuess: 0.0 })
+        }
+        """)
+        .execute()
+        .path("findPolynomialRoot")
+        .entity(BigDecimal.class)
+        .satisfies(value -> assertThat(value).isEqualByComparingTo(new BigDecimal("2.0000000000")));
+  }
+
+  @Test
+  @DisplayName("Should return error for invalid polynomial via GraphQL")
+  void shouldReturnErrorForInvalidPolynomial() {
+    graphQlTester.document("""
+        query {
+            findPolynomialRoot(input: { coefficients: [5.0], initialGuess: 1.0 })
+        }
+        """)
+        .execute()
+        .errors()
+        .satisfy(errors -> {
+          assertThat(errors).hasSize(1);
+          assertThat(errors.getFirst().getMessage())
+              .contains("Polynomial must be at least linear (2 or more coefficients)");
+        });
   }
 }

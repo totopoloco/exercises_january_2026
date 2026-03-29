@@ -1,7 +1,11 @@
 package at.mavila.exercises_january_2026.application;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import at.mavila.exercises_january_2026.domain.calculus.exception.InvalidToleranceException;
 import at.mavila.exercises_january_2026.domain.collection.ListNode;
 
 @SpringBootTest
@@ -171,6 +176,55 @@ class AlgorithmServiceTest {
       int[] basket2 = { 4, 5, 6 };
       long result = algorithmService.rearrangeFruits(basket1, basket2);
       assertEquals(-1, result);
+    }
+  }
+
+  @Nested
+  @DisplayName("Newton-Raphson Root Finder")
+  class NewtonRaphsonRootFinderTests {
+
+    @Test
+    @DisplayName("Should find root with default optional parameters")
+    void shouldFindPolynomialRootWithDefaults() {
+      // Omitted optional values should default to epsilon=1e-10, maxIterations=1000,
+      // and scale=10.
+      BigDecimal result = algorithmService.findPolynomialRoot(
+          new PolynomialRootRequest(
+              List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")),
+              BigDecimal.ZERO,
+              null,
+              null,
+              null));
+
+      assertEquals(0, result.compareTo(new BigDecimal("2.0000000000")));
+    }
+
+    @Test
+    @DisplayName("Should find root with custom epsilon and scale")
+    void shouldFindPolynomialRootWithCustomPrecision() {
+      // A coarser epsilon and smaller scale should still converge to sqrt(2).
+      BigDecimal result = algorithmService.findPolynomialRoot(
+          new PolynomialRootRequest(
+              List.of(new BigDecimal("-2.0"), BigDecimal.ZERO, BigDecimal.ONE),
+              BigDecimal.ONE,
+              new BigDecimal("0.001"),
+              1000,
+              4));
+
+      assertEquals(0, result.compareTo(new BigDecimal("1.4142")));
+    }
+
+    @Test
+    @DisplayName("Should throw when custom epsilon is non-positive")
+    void shouldThrowWhenEpsilonIsInvalid() {
+      assertThrows(InvalidToleranceException.class,
+          () -> algorithmService.findPolynomialRoot(
+              new PolynomialRootRequest(
+                  List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")),
+                  BigDecimal.ZERO,
+                  BigDecimal.ZERO,
+                  null,
+                  null)));
     }
   }
 }
