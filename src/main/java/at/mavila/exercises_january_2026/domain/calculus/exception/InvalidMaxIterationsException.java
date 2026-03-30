@@ -1,32 +1,32 @@
 package at.mavila.exercises_january_2026.domain.calculus.exception;
 
 /**
- * Exception thrown when maximum iterations setting is invalid.
+ * Thrown when the maximum iteration count is {@code null} or not strictly positive.
  *
  * @author mavila
- * @since 2026-03-22
+ * @since 2026-03-30
  */
 public class InvalidMaxIterationsException extends RuntimeException {
 
-  private final int maxIterations;
+  private final Integer maxIterations;
 
   /**
-   * Creates a new exception with max iteration context.
+   * Constructs a new exception embedding the invalid iteration limit.
    *
-   * @param maxIterations invalid max iteration value
-   * @param message       validation message
+   * @param maxIterations
+   *                        the invalid value (may be {@code null})
    */
-  public InvalidMaxIterationsException(final int maxIterations, final String message) {
-    super(message);
+  public InvalidMaxIterationsException(final Integer maxIterations) {
+    super("Max iterations must be a positive integer, got: %s".formatted(maxIterations));
     this.maxIterations = maxIterations;
   }
 
   /**
-   * Returns invalid max iterations value.
+   * Returns the invalid max-iterations value that triggered this exception.
    *
-   * @return max iterations
+   * @return the max-iterations value, possibly {@code null}
    */
-  public int getMaxIterations() {
+  public Integer getMaxIterations() {
     return maxIterations;
   }
 }

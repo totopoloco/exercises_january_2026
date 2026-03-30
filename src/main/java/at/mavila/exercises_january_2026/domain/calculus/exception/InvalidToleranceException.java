@@ -3,30 +3,30 @@ package at.mavila.exercises_january_2026.domain.calculus.exception;
 import java.math.BigDecimal;
 
 /**
- * Exception thrown when epsilon tolerance is invalid.
+ * Thrown when the convergence tolerance (epsilon) is {@code null} or not strictly positive.
  *
  * @author mavila
- * @since 2026-03-22
+ * @since 2026-03-30
  */
 public class InvalidToleranceException extends RuntimeException {
 
   private final BigDecimal epsilon;
 
   /**
-   * Creates a new exception with epsilon context.
+   * Constructs a new exception embedding the invalid epsilon value.
    *
-   * @param epsilon invalid epsilon value
-   * @param message validation message
+   * @param epsilon
+   *                  the invalid tolerance value (may be {@code null})
    */
-  public InvalidToleranceException(final BigDecimal epsilon, final String message) {
-    super(message);
+  public InvalidToleranceException(final BigDecimal epsilon) {
+    super("Epsilon must be a positive number, got: %s".formatted(epsilon));
     this.epsilon = epsilon;
   }
 
   /**
-   * Returns invalid epsilon value.
+   * Returns the invalid epsilon that triggered this exception.
    *
-   * @return epsilon
+   * @return the epsilon value, possibly {@code null}
    */
   public BigDecimal getEpsilon() {
     return epsilon;

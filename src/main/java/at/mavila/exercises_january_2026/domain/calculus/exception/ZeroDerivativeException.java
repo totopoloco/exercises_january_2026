@@ -3,10 +3,11 @@ package at.mavila.exercises_january_2026.domain.calculus.exception;
 import java.math.BigDecimal;
 
 /**
- * Exception thrown when derivative is zero during Newton-Raphson iteration.
+ * Thrown when the polynomial's derivative evaluates to exactly zero at the current iterate, making the Newton-Raphson
+ * division undefined.
  *
  * @author mavila
- * @since 2026-03-22
+ * @since 2026-03-30
  */
 public class ZeroDerivativeException extends RuntimeException {
 
@@ -14,31 +15,32 @@ public class ZeroDerivativeException extends RuntimeException {
   private final int iteration;
 
   /**
-   * Creates a new exception with derivative-zero context.
+   * Constructs a new exception with the iterate and iteration index where the derivative vanished.
    *
-   * @param x         current x value where derivative is zero
-   * @param iteration iteration count where error occurred
-   * @param message   validation message
+   * @param x
+   *                    the iterate at which f′(x) = 0
+   * @param iteration
+   *                    the zero-based iteration index
    */
-  public ZeroDerivativeException(final BigDecimal x, final int iteration, final String message) {
-    super(message);
+  public ZeroDerivativeException(final BigDecimal x, final int iteration) {
+    super("Derivative is zero at x = %s. Newton-Raphson cannot continue.".formatted(x));
     this.x = x;
     this.iteration = iteration;
   }
 
   /**
-   * Returns x value where derivative is zero.
+   * Returns the iterate at which the derivative was zero.
    *
-   * @return x value
+   * @return the x value
    */
   public BigDecimal getX() {
     return x;
   }
 
   /**
-   * Returns iteration number where derivative became zero.
+   * Returns the zero-based iteration index at which the derivative vanished.
    *
-   * @return iteration number
+   * @return the iteration number
    */
   public int getIteration() {
     return iteration;

@@ -1,19 +1,17 @@
 package at.mavila.exercises_january_2026.domain.calculus.exception;
 
 /**
- * Exception thrown when the initial guess is invalid.
+ * Thrown when the initial guess supplied to Newton-Raphson is {@code null}.
  *
  * @author mavila
- * @since 2026-03-22
+ * @since 2026-03-30
  */
 public class InvalidInitialGuessException extends RuntimeException {
 
   /**
-   * Creates a new exception with a message.
-   *
-   * @param message validation message
+   * Constructs a new exception with a fixed descriptive message.
    */
-  public InvalidInitialGuessException(final String message) {
-    super(message);
+  public InvalidInitialGuessException() {
+    super("Initial guess must not be null");
   }
 }

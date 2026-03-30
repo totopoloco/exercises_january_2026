@@ -5,38 +5,45 @@ import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
 
 /**
- * Determines Newton-Raphson convergence conditions.
+ * Checks whether Newton-Raphson iteration has converged by evaluating two independent criteria:
  *
- * <p>
- * This component centralizes convergence predicates so the root finder can
- * focus on high-level orchestration.
- * </p>
+ * <ul>
+ * <li><strong>Function-value convergence</strong>: {@code |f(x)| < ε} — the current iterate is close enough to a
+ * root.</li>
+ * <li><strong>Step-size convergence</strong>: {@code |x_{k+1} − x_k| < ε} — successive iterates are close enough.</li>
+ * </ul>
  *
- * @since 2026-03-29
+ * @author mavila
+ * @since 2026-03-30
  */
 @Component
 public class ConvergenceChecker {
 
-    /**
-     * Checks convergence using residual magnitude.
-     *
-     * @param value   current polynomial value
-     * @param epsilon positive convergence tolerance
-     * @return {@code true} when {@code |value| < epsilon}
-     */
-    public boolean hasConvergedByResidual(final BigDecimal value, final BigDecimal epsilon) {
-        return value.abs().compareTo(epsilon) < 0;
-    }
+  /**
+   * Returns {@code true} when the absolute function value at the current iterate is smaller than the tolerance.
+   *
+   * @param fx
+   *                  the polynomial value {@code f(x)}
+   * @param epsilon
+   *                  the convergence tolerance
+   * @return {@code true} if {@code |f(x)| < ε}
+   */
+  public boolean hasConvergedByFunctionValue(final BigDecimal fx, final BigDecimal epsilon) {
+    return fx.abs().compareTo(epsilon) < 0;
+  }
 
-    /**
-     * Checks convergence using the iteration step size.
-     *
-     * @param currentX current Newton-Raphson value
-     * @param nextX    next Newton-Raphson value
-     * @param epsilon  positive convergence tolerance
-     * @return {@code true} when {@code |nextX - currentX| < epsilon}
-     */
-    public boolean hasConvergedByDelta(final BigDecimal currentX, final BigDecimal nextX, final BigDecimal epsilon) {
-        return nextX.subtract(currentX).abs().compareTo(epsilon) < 0;
-    }
+  /**
+   * Returns {@code true} when the absolute difference between two successive iterates is smaller than the tolerance.
+   *
+   * @param xNew
+   *                  the new iterate {@code x_{k+1}}
+   * @param xOld
+   *                  the previous iterate {@code x_k}
+   * @param epsilon
+   *                  the convergence tolerance
+   * @return {@code true} if {@code |x_{k+1} − x_k| < ε}
+   */
+  public boolean hasConvergedByStepSize(final BigDecimal xNew, final BigDecimal xOld, final BigDecimal epsilon) {
+    return xNew.subtract(xOld).abs().compareTo(epsilon) < 0;
+  }
 }

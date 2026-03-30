@@ -1,31 +1,31 @@
 package at.mavila.exercises_january_2026.domain.calculus.exception;
 
 /**
- * Exception thrown when Newton-Raphson does not converge within the iteration
- * limit.
+ * Thrown when Newton-Raphson iteration exhausts the maximum number of iterations without satisfying the convergence
+ * criterion.
  *
  * @author mavila
- * @since 2026-03-22
+ * @since 2026-03-30
  */
 public class ConvergenceFailedException extends RuntimeException {
 
   private final int maxIterations;
 
   /**
-   * Creates a new exception with max iteration limit context.
+   * Constructs a new exception embedding the iteration limit that was exhausted.
    *
-   * @param maxIterations iteration limit used
-   * @param message       validation message
+   * @param maxIterations
+   *                        the iteration limit that was reached
    */
-  public ConvergenceFailedException(final int maxIterations, final String message) {
-    super(message);
+  public ConvergenceFailedException(final int maxIterations) {
+    super("Newton-Raphson did not converge within %d iterations".formatted(maxIterations));
     this.maxIterations = maxIterations;
   }
 
   /**
-   * Returns max iterations limit used.
+   * Returns the maximum iteration count that was exhausted.
    *
-   * @return max iterations
+   * @return the max-iterations value
    */
   public int getMaxIterations() {
     return maxIterations;

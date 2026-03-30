@@ -1,19 +1,21 @@
 package at.mavila.exercises_january_2026.domain.calculus.exception;
 
 /**
- * Exception thrown when polynomial coefficients are invalid.
+ * Thrown when the polynomial coefficient list violates one of the input rules: null or empty list, fewer than two
+ * coefficients, null element, or zero leading coefficient.
  *
  * @author mavila
- * @since 2026-03-22
+ * @since 2026-03-30
  */
 public class InvalidPolynomialException extends RuntimeException {
 
   private final String reason;
 
   /**
-   * Creates a new exception with a reason message.
+   * Constructs a new exception whose message is the validation reason itself.
    *
-   * @param reason the validation reason
+   * @param reason
+   *                 human-readable description of the violated constraint
    */
   public InvalidPolynomialException(final String reason) {
     super(reason);
@@ -21,9 +23,9 @@ public class InvalidPolynomialException extends RuntimeException {
   }
 
   /**
-   * Returns the validation reason.
+   * Returns the reason the polynomial was considered invalid.
    *
-   * @return reason
+   * @return the violation reason
    */
   public String getReason() {
     return reason;

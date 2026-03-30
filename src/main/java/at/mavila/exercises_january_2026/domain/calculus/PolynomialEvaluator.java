@@ -6,65 +6,63 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * Evaluates polynomials and their derivatives using Horner's method.
+ * Evaluates a polynomial and its first derivative at a given point using <strong>Horner's method</strong> for numerical
+ * stability and efficiency.
  *
  * <p>
- * This component provides numerically stable and efficient evaluation for
- * Newton-Raphson iteration without computing explicit powers.
+ * A polynomial {@code f(x) = a₀ + a₁x + a₂x² + … + aₙxⁿ} is represented by its coefficient list {@code [a₀, a₁, …, aₙ]}
+ * (lowest order first). Horner's scheme rewrites the polynomial as {@code a₀ + x(a₁ + x(a₂ + … + x·aₙ))}, avoiding
+ * explicit power computation and reducing the number of multiplications to O(n).
  * </p>
  *
- * @since 2026-03-29
+ * <h2>Complexity</h2>
+ * <ul>
+ * <li>Time: O(n) per evaluation, where n is the polynomial degree</li>
+ * <li>Space: O(1) beyond the input list</li>
+ * </ul>
+ *
+ * @author mavila
+ * @since 2026-03-30
  */
 @Component
 public class PolynomialEvaluator {
 
   /**
-   * Evaluates a polynomial and its derivative at a given point.
+   * Evaluates {@code f(x)} using Horner's method.
+   *
+   * @param coefficients
+   *                       the polynomial coefficients {@code [a₀, a₁, …, aₙ]}
+   * @param x
+   *                       the point at which to evaluate
+   * @return the value {@code f(x)}
+   */
+  public BigDecimal evaluate(final List<BigDecimal> coefficients, final BigDecimal x) {
+    BigDecimal result = coefficients.getLast();
+    for (int i = coefficients.size() - 2; i >= 0; i--) {
+      result = result.multiply(x).add(coefficients.get(i));
+    }
+    return result;
+  }
+
+  /**
+   * Evaluates the first derivative {@code f′(x)} using Horner's method.
    *
    * <p>
-   * Uses a reverse Horner pass over coefficients in ascending order
-   * {@code [a0, a1, ..., an]} to compute both values in O(n) time.
+   * The derivative coefficients are computed on the fly: {@code f′(x) = a₁ + 2a₂x + 3a₃x² + … + n·aₙxⁿ⁻¹}.
    * </p>
    *
-   * @param coefficients polynomial coefficients from constant to highest order
-   * @param x            evaluation point
-   * @return evaluated polynomial and derivative at {@code x}
+   * @param coefficients
+   *                       the polynomial coefficients {@code [a₀, a₁, …, aₙ]}
+   * @param x
+   *                       the point at which to evaluate the derivative
+   * @return the value {@code f′(x)}
    */
-  public EvaluationResult evaluatePolynomialAndDerivative(final List<BigDecimal> coefficients, final BigDecimal x) {
-    BigDecimal polynomial = coefficients.getLast();
-    BigDecimal derivative = BigDecimal.ZERO;
-
-    for (int i = coefficients.size() - 2; i >= 0; i--) {
-      derivative = derivative.multiply(x).add(polynomial);
-      polynomial = polynomial.multiply(x).add(coefficients.get(i));
+  public BigDecimal evaluateDerivative(final List<BigDecimal> coefficients, final BigDecimal x) {
+    final int n = coefficients.size() - 1;
+    BigDecimal result = coefficients.get(n).multiply(BigDecimal.valueOf(n));
+    for (int i = n - 1; i >= 1; i--) {
+      result = result.multiply(x).add(coefficients.get(i).multiply(BigDecimal.valueOf(i)));
     }
-
-    return new EvaluationResult(polynomial, derivative);
-  }
-
-  /**
-   * Evaluates a polynomial at a given point using Horner's method.
-   *
-   * @param coefficients polynomial coefficients from constant to highest order
-   * @param x            evaluation point
-   * @return polynomial value at {@code x}
-   */
-  public BigDecimal evaluatePolynomial(final List<BigDecimal> coefficients, final BigDecimal x) {
-    BigDecimal value = coefficients.getLast();
-
-    for (int i = coefficients.size() - 2; i >= 0; i--) {
-      value = value.multiply(x).add(coefficients.get(i));
-    }
-
-    return value;
-  }
-
-  /**
-   * Immutable pair containing evaluated polynomial and derivative values.
-   *
-   * @param polynomial value of {@code f(x)}
-   * @param derivative value of {@code f'(x)}
-   */
-  public record EvaluationResult(BigDecimal polynomial, BigDecimal derivative) {
+    return result;
   }
 }
