@@ -34,9 +34,20 @@ $$f'(x) = a_1 + 2a_2 x + 3a_3 x^2 + \cdots + n \cdot a_n x^{n-1}$$
 
 ### Output
 
-| Type         | Description                                                                                                                                                         |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `BigDecimal` | An approximate root $r$ of $f(x)$ such that $\lvert f(r) \rvert < \epsilon$ or $\lvert x_{k+1} - x_k \rvert < \epsilon$. The result is rounded to `scale` decimals. |
+The method returns a `NewtonRaphsonResult` record containing:
+
+| Field            | Type                           | Mandatory | Description                                                                                                                                                                     |
+| ---------------- | ------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `root`           | `BigDecimal`                   | Yes       | An approximate root $r$ of $f(x)$ such that $\lvert f(r) \rvert < \epsilon$ or $\lvert x_{k+1} - x_k \rvert < \epsilon$. The result is rounded to `scale` decimals.             |
+| `iterationCount` | `int`                          | Yes       | The number of iterations the algorithm performed before converging. A 1-based count (e.g., convergence on the first Newton step yields `iterationCount = 1`).                   |
+| `iterations`     | `List<NewtonRaphsonIteration>` | Yes       | An ordered list of every iteration performed. Each entry records the iteration number and the $x$ value computed at that step. The client may choose not to request this field. |
+
+#### `NewtonRaphsonIteration` record
+
+| Field    | Type         | Description                                                            |
+| -------- | ------------ | ---------------------------------------------------------------------- |
+| `number` | `int`        | The 1-based iteration number.                                          |
+| `value`  | `BigDecimal` | The $x$ value computed at this iteration, rounded to `scale` decimals. |
 
 ---
 
@@ -114,9 +125,10 @@ public record NewtonRaphsonParams(
 ```
 Input:  coefficients = [-6.0, 3.0], initialGuess = 0.0
         f(x) = -6 + 3x
-Output: 2.0
+Output: root = 2.0, iterationCount = 1
+        iterations = [{ number: 1, value: 2.0 }]
 
-Explanation: The root of 3x - 6 = 0 is x = 2. Converges in one iteration.
+Explanation: The root of 3x - 6 = 0 is x = 2. Converges in exactly one iteration.
 ```
 
 ### Example 2 — Quadratic with two roots
@@ -124,10 +136,12 @@ Explanation: The root of 3x - 6 = 0 is x = 2. Converges in one iteration.
 ```
 Input:  coefficients = [-6.0, 1.0, 1.0], initialGuess = 3.0
         f(x) = -6 + x + x²
-Output: 2.0
+Output: root = 2.0, iterationCount = 4
+        iterations = [{ number: 1, value: 2.1428571429 }, ...]
 
 Explanation: x² + x - 6 = (x + 3)(x - 2) = 0 has roots at x = 2 and x = -3.
              Starting from x₀ = 3.0, the method converges to the nearby root x = 2.
+             The iterations list records each successive approximation.
 ```
 
 ### Example 3 — Quadratic converging to negative root
@@ -135,7 +149,8 @@ Explanation: x² + x - 6 = (x + 3)(x - 2) = 0 has roots at x = 2 and x = -3.
 ```
 Input:  coefficients = [-6.0, 1.0, 1.0], initialGuess = -4.0
         f(x) = -6 + x + x²
-Output: -3.0
+Output: root = -3.0, iterationCount = 4
+        iterations = [{ number: 1, value: -3.1428571429 }, ...]
 
 Explanation: Same polynomial as Example 2, but starting from x₀ = -4.0
              converges to the other root x = -3.
@@ -146,7 +161,8 @@ Explanation: Same polynomial as Example 2, but starting from x₀ = -4.0
 ```
 Input:  coefficients = [0.0, 0.0, 0.0, 1.0], initialGuess = 1.0
         f(x) = x³
-Output: 0.0
+Output: root = 0.0, iterationCount = k (converges slowly for triple root)
+        iterations = [{ number: 1, value: 0.6666666667 }, { number: 2, value: 0.4444444444 }, ...]
 
 Explanation: x³ = 0 has a triple root at x = 0.
              Starting from x₀ = 1.0, the method converges to 0.
@@ -157,7 +173,8 @@ Explanation: x³ = 0 has a triple root at x = 0.
 ```
 Input:  coefficients = [-1.0, 0.0, 1.0], initialGuess = 0.5
         f(x) = -1 + x²
-Output: 1.0
+Output: root = 1.0, iterationCount = k
+        iterations = [{ number: 1, value: 1.25 }, ...]
 
 Explanation: x² - 1 = 0 has roots at x = 1 and x = -1.
              Starting from x₀ = 0.5, the method converges to x = 1.
@@ -168,10 +185,13 @@ Explanation: x² - 1 = 0 has roots at x = 1 and x = -1.
 ```
 Input:  coefficients = [-2.0, 0.0, 1.0], initialGuess = 1.0, epsilon = 0.001
         f(x) = x² - 2
-Output: ≈ 1.4142 (any value where |result - √2| < 0.001)
+Output: root ≈ 1.4142 (any value where |result - √2| < 0.001)
+        iterationCount = k (fewer iterations than default tolerance)
+        iterations = [{ number: 1, value: 1.5 }, ...]
 
 Explanation: Finding √2 via Newton-Raphson on x² - 2 = 0.
              With coarser tolerance, fewer iterations are needed.
+             The iterations list shows the convergence path.
 ```
 
 ### Example 7 — Derivative zero (error)
@@ -203,7 +223,8 @@ Output: InvalidPolynomialException("Polynomial must be at least linear (2 or mor
 ```
 Input:  coefficients = [-16.0, 0.0, 0.0, 0.0, 1.0], initialGuess = 3.0
         f(x) = x⁴ - 16
-Output: 2.0
+Output: root = 2.0, iterationCount = k
+        iterations = [{ number: 1, value: ... }, ...]
 
 Explanation: x⁴ - 16 = 0 → x = ±2, ±2i. Starting from x₀ = 3.0, converges to x = 2.
 ```
@@ -227,10 +248,13 @@ Explanation: f'(x) = 3x². Iteration from x₀ = -1 yields x₁ = -2/3, x₂ = -
 ```
 Input:  coefficients = [-2.0, 0.0, 1.0], initialGuess = 1.0, scale = 20
         f(x) = -2 + x²
-Output: 1.41421356237309504880 (√2 to 20 decimal places)
+Output: root = 1.41421356237309504880 (√2 to 20 decimal places)
+        iterationCount = k
+        iterations = [{ number: 1, value: 1.50000000000000000000 }, ...]
 
 Explanation: With scale = 20, the result preserves 20 decimal places,
              providing much higher precision than IEEE 754 double (≈15 digits).
+             Each iteration value is also rounded to 20 decimal places.
 ```
 
 ### Example 13 — Large coefficients without overflow
@@ -238,7 +262,9 @@ Explanation: With scale = 20, the result preserves 20 decimal places,
 ```
 Input:  coefficients = [-1.0E+1000, 0.0, 1.0], initialGuess = 1.0E+500
         f(x) = -10^1000 + x²
-Output: ≈ 1.0E+500 (the square root of 10^1000)
+Output: root ≈ 1.0E+500 (the square root of 10^1000)
+        iterationCount = k
+        iterations = [{ number: 1, value: ... }, ...]
 
 Explanation: BigDecimal handles arbitrarily large values without overflow.
              With IEEE 754 double, these coefficients would produce Infinity.
@@ -251,7 +277,7 @@ Explanation: BigDecimal handles arbitrarily large values without overflow.
 | Metric    | Target                                                                                                                                                                                                                                  |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Time**  | O(k × n × d²) per call, where k = number of iterations, n = polynomial order, and d = number of digits (`scale`). Newton-Raphson converges quadratically, so k is typically O(log(1/ε)). The d² factor is from `BigDecimal` arithmetic. |
-| **Space** | O(n × d) — storing the `BigDecimal` coefficients and intermediate values.                                                                                                                                                               |
+| **Space** | O((n + k) × d) — storing the `BigDecimal` coefficients, intermediate values, and the iteration history list (k entries).                                                                                                                |
 
 ---
 
@@ -270,18 +296,46 @@ Explanation: BigDecimal handles arbitrarily large values without overflow.
 
 The `NewtonRaphsonRootFinder` service must **not** implement all logic inline. Decompose the algorithm into focused, injected collaborators:
 
-| Component                 | Responsibility                                                                            |
-| ------------------------- | ----------------------------------------------------------------------------------------- |
-| `NewtonRaphsonParams`     | Parameter `record` with Jakarta Validation annotations (rules 1–8).                       |
-| `PolynomialEvaluator`     | Evaluates $f(x)$ and $f'(x)$ via Horner's method. `@Component`.                           |
-| `ConvergenceChecker`      | Checks $\lvert x_{k+1} - x_k \rvert < \epsilon$ and tracks iteration count. `@Component`. |
-| `NewtonRaphsonRootFinder` | Orchestrates: accept params → evaluate → check convergence → return root.                 |
+| Component                 | Responsibility                                                                                      |
+| ------------------------- | --------------------------------------------------------------------------------------------------- |
+| `NewtonRaphsonParams`     | Parameter `record` with Jakarta Validation annotations (rules 1–8).                                 |
+| `NewtonRaphsonResult`     | Immutable `record` holding `root`, `iterationCount`, and `iterations` list. Returned by `findRoot`. |
+| `NewtonRaphsonIteration`  | Immutable `record` with `number` (int) and `value` (BigDecimal). One entry per Newton step.         |
+| `PolynomialEvaluator`     | Evaluates $f(x)$ and $f'(x)$ via Horner's method. `@Component`.                                     |
+| `ConvergenceChecker`      | Checks $\lvert x_{k+1} - x_k \rvert < \epsilon$ and tracks iteration count. `@Component`.           |
+| `NewtonRaphsonRootFinder` | Orchestrates: accept params → evaluate → check convergence → return `NewtonRaphsonResult`.          |
 
 Each collaborator is a `@Component` injected into `NewtonRaphsonRootFinder` via `@RequiredArgsConstructor`. The `findRoot` method should read as a high-level recipe with **no inlined evaluation or validation logic**.
 
 ---
 
 ## GraphQL API
+
+### Types
+
+```graphql
+"""
+A single Newton-Raphson iteration recording the step number and the x value computed.
+"""
+type NewtonRaphsonIteration {
+    "The 1-based iteration number."
+    number: Int!
+    "The x value computed at this iteration."
+    value: BigDecimal!
+}
+
+"""
+The result of a Newton-Raphson root-finding computation.
+"""
+type PolynomialRootResult {
+    "The approximate root of the polynomial, rounded to the requested scale."
+    root: BigDecimal!
+    "The number of iterations performed before convergence."
+    iterationCount: Int!
+    "Ordered list of every iteration performed. Optional — the client may omit this field from the query."
+    iterations: [NewtonRaphsonIteration!]!
+}
+```
 
 ### Query signature
 
@@ -302,7 +356,58 @@ findPolynomialRoot(
   maxIterations: Int
   "Optional number of decimal places for division rounding (RoundingMode.HALF_UP). Defaults to 10."
   scale: Int
-): BigDecimal!
+): PolynomialRootResult!
+```
+
+### Example query
+
+```graphql
+query {
+    findPolynomialRoot(
+        coefficients: ["-6.0", "1.0", "1.0"]
+        initialGuess: "3.0"
+    ) {
+        root
+        iterationCount
+        iterations {
+            number
+            value
+        }
+    }
+}
+```
+
+### Example response
+
+```json
+{
+    "data": {
+        "findPolynomialRoot": {
+            "root": "2.0000000000",
+            "iterationCount": 4,
+            "iterations": [
+                { "number": 1, "value": "2.1428571429" },
+                { "number": 2, "value": "2.0045351474" },
+                { "number": 3, "value": "2.0000051464" },
+                { "number": 4, "value": "2.0000000000" }
+            ]
+        }
+    }
+}
+```
+
+### Minimal query (without iterations)
+
+```graphql
+query {
+    findPolynomialRoot(
+        coefficients: ["-6.0", "1.0", "1.0"]
+        initialGuess: "3.0"
+    ) {
+        root
+        iterationCount
+    }
+}
 ```
 
 ---
@@ -323,6 +428,8 @@ findPolynomialRoot(
     - `ConvergenceFailedException`
 - **Collaborator components** (same package):
     - `NewtonRaphsonParams` — parameter `record` with Jakarta Validation constraints
+    - `NewtonRaphsonResult` — immutable `record` holding `root` (`BigDecimal`), `iterationCount` (`int`), and `iterations` (`List<NewtonRaphsonIteration>`)
+    - `NewtonRaphsonIteration` — immutable `record` with `number` (`int`) and `value` (`BigDecimal`)
     - `PolynomialEvaluator` — evaluates $f(x)$ and $f'(x)$ via Horner's method (`@Component`)
     - `ConvergenceChecker` — checks convergence criterion and iteration bounds (`@Component`)
 - **Validation artifacts** (same package or `validation` sub-package):
