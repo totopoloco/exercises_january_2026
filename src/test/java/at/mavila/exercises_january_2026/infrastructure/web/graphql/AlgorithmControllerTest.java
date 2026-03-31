@@ -34,11 +34,7 @@ class AlgorithmControllerTest {
         query {
             calculateMedian(array1: [1, 3], array2: [2])
         }
-        """)
-        .execute()
-        .path("calculateMedian")
-        .entity(Double.class)
-        .isEqualTo(2.0);
+        """).execute().path("calculateMedian").entity(Double.class).isEqualTo(2.0);
   }
 
   @Test
@@ -48,11 +44,7 @@ class AlgorithmControllerTest {
         query {
             calculateMaxWaterArea(heights: [1, 8, 6, 2, 5, 4, 8, 3, 7])
         }
-        """)
-        .execute()
-        .path("calculateMaxWaterArea")
-        .entity(Integer.class)
-        .isEqualTo(49);
+        """).execute().path("calculateMaxWaterArea").entity(Integer.class).isEqualTo(49);
   }
 
   @Test
@@ -62,11 +54,7 @@ class AlgorithmControllerTest {
         query {
             countNegatives(grid: [[4, 3, 2, -1], [3, 2, 1, -1], [1, 1, -1, -2], [-1, -1, -2, -3]])
         }
-        """)
-        .execute()
-        .path("countNegatives")
-        .entity(Integer.class)
-        .isEqualTo(8);
+        """).execute().path("countNegatives").entity(Integer.class).isEqualTo(8);
   }
 
   @Test
@@ -76,11 +64,7 @@ class AlgorithmControllerTest {
         query {
             getLetterCombinations(digits: "23")
         }
-        """)
-        .execute()
-        .path("getLetterCombinations")
-        .entityList(String.class)
-        .hasSize(9);
+        """).execute().path("getLetterCombinations").entityList(String.class).hasSize(9);
   }
 
   @Test
@@ -90,11 +74,7 @@ class AlgorithmControllerTest {
         query {
             mergeKSortedLists(lists: [[1, 4, 5], [1, 3, 4], [2, 6]])
         }
-        """)
-        .execute()
-        .path("mergeKSortedLists")
-        .entityList(Integer.class)
-        .containsExactly(1, 1, 2, 3, 4, 4, 5, 6);
+        """).execute().path("mergeKSortedLists").entityList(Integer.class).containsExactly(1, 1, 2, 3, 4, 4, 5, 6);
   }
 
   @Test
@@ -104,11 +84,7 @@ class AlgorithmControllerTest {
         query {
             findLongestPalindrome(input: "cbbd")
         }
-        """)
-        .execute()
-        .path("findLongestPalindrome")
-        .entity(String.class)
-        .isEqualTo("bb");
+        """).execute().path("findLongestPalindrome").entity(String.class).isEqualTo("bb");
   }
 
   @Test
@@ -118,11 +94,7 @@ class AlgorithmControllerTest {
         query {
             findLongestUniqueSubstringLength(input: "abcabcbb")
         }
-        """)
-        .execute()
-        .path("findLongestUniqueSubstringLength")
-        .entity(Integer.class)
-        .isEqualTo(3);
+        """).execute().path("findLongestUniqueSubstringLength").entity(Integer.class).isEqualTo(3);
   }
 
   @Test
@@ -132,11 +104,7 @@ class AlgorithmControllerTest {
         query {
             rearrangeFruits(basket1: [4, 2, 2, 2], basket2: [1, 4, 1, 2])
         }
-        """)
-        .execute()
-        .path("rearrangeFruits")
-        .entity(Long.class)
-        .isEqualTo(1L);
+        """).execute().path("rearrangeFruits").entity(Long.class).isEqualTo(1L);
   }
 
   @Test
@@ -144,12 +112,16 @@ class AlgorithmControllerTest {
   void shouldFindPolynomialRoot() {
     graphQlTester.document("""
         query {
-            findPolynomialRoot(coefficients: [-6.0, 3.0], initialGuess: 0.0)
+            findPolynomialRoot(coefficients: ["-6.0", "3.0"], initialGuess: "0.0") {
+                root
+                iterationCount
+                iterations {
+                    number
+                    value
+                }
+            }
         }
-        """)
-        .execute()
-        .path("findPolynomialRoot")
-        .entity(BigDecimal.class)
+        """).execute().path("findPolynomialRoot.root").entity(BigDecimal.class)
         .satisfies(value -> assertThat(value).isEqualByComparingTo(new BigDecimal("2.0000000000")));
   }
 
@@ -158,15 +130,15 @@ class AlgorithmControllerTest {
   void shouldReturnErrorForInvalidPolynomial() {
     graphQlTester.document("""
         query {
-            findPolynomialRoot(coefficients: [5.0], initialGuess: 1.0)
+            findPolynomialRoot(coefficients: ["5.0"], initialGuess: "1.0") {
+                root
+                iterationCount
+            }
         }
-        """)
-        .execute()
-        .errors()
-        .satisfy(errors -> {
-          assertThat(errors).hasSize(1);
-          assertThat(errors.getFirst().getMessage())
-              .contains("Polynomial must be at least linear (2 or more coefficients)");
-        });
+        """).execute().errors().satisfy(errors -> {
+      assertThat(errors).hasSize(1);
+      assertThat(errors.getFirst().getMessage())
+          .contains("Polynomial must be at least linear (2 or more coefficients)");
+    });
   }
 }

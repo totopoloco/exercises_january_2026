@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 
 import at.mavila.exercises_january_2026.application.AlgorithmService;
 import at.mavila.exercises_january_2026.application.PolynomialRootRequest;
+import at.mavila.exercises_january_2026.domain.calculus.NewtonRaphsonResult;
 import at.mavila.exercises_january_2026.domain.collection.ListNode;
 import lombok.RequiredArgsConstructor;
 
@@ -18,10 +19,8 @@ import lombok.RequiredArgsConstructor;
  * GraphQL Controller that exposes all algorithm operations as queries.
  *
  * <p>
- * This controller acts as a GraphQL adapter, translating GraphQL queries
- * into application service calls and converting domain models to
- * GraphQL-compatible
- * representations.
+ * This controller acts as a GraphQL adapter, translating GraphQL queries into application service calls and converting
+ * domain models to GraphQL-compatible representations.
  * </p>
  *
  * <h2>Responsibilities</h2>
@@ -38,142 +37,151 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AlgorithmController {
 
-  private final AlgorithmService algorithmService;
+    private final AlgorithmService algorithmService;
 
-  @QueryMapping
-  public double calculateMedian(@Argument List<Integer> array1, @Argument List<Integer> array2) {
-    return algorithmService.calculateMedian(
-        array1.stream().mapToInt(Integer::intValue).toArray(),
-        array2.stream().mapToInt(Integer::intValue).toArray());
-  }
-
-  @QueryMapping
-  public int calculateMaxWaterArea(@Argument List<Integer> heights) {
-    return algorithmService.calculateMaxWaterArea(
-        heights.stream().mapToInt(Integer::intValue).toArray());
-  }
-
-  @QueryMapping
-  public int countNegatives(@Argument List<List<Integer>> grid) {
-    int[][] gridArray = grid.stream()
-        .map(row -> row.stream().mapToInt(Integer::intValue).toArray())
-        .toArray(int[][]::new);
-    return algorithmService.countNegatives(gridArray);
-  }
-
-  @QueryMapping
-  public List<String> getLetterCombinations(@Argument String digits) {
-    return algorithmService.getLetterCombinations(digits);
-  }
-
-  @QueryMapping
-  public List<Integer> mergeKSortedLists(@Argument List<List<Integer>> lists) {
-    // Convert List<List<Integer>> to ListNode[]
-    ListNode[] listNodes = lists.stream()
-        .map(this::createLinkedList)
-        .toArray(ListNode[]::new);
-
-    // Merge the lists
-    ListNode merged = algorithmService.mergeKSortedLists(listNodes);
-
-    // Convert back to List<Integer>
-    return linkedListToList(merged);
-  }
-
-  @QueryMapping
-  public String findLongestPalindrome(@Argument String input) {
-    return algorithmService.findLongestPalindrome(input);
-  }
-
-  @QueryMapping
-  public int findLongestUniqueSubstringLength(@Argument String input) {
-    return algorithmService.findLongestUniqueSubstringLength(input);
-  }
-
-  @QueryMapping
-  public long rearrangeFruits(@Argument List<Integer> basket1, @Argument List<Integer> basket2) {
-    return algorithmService.rearrangeFruits(
-        basket1.stream().mapToInt(Integer::intValue).toArray(),
-        basket2.stream().mapToInt(Integer::intValue).toArray());
-  }
-
-  @QueryMapping
-  public String crackPin(@Argument String hash, @Argument Integer maxLen) {
-    return algorithmService.crackPin(hash, maxLen);
-  }
-
-  @QueryMapping
-  public int romanToInt(@Argument String roman) {
-    return algorithmService.romanToInt(roman);
-  }
-
-  @QueryMapping
-  public String intToRoman(@Argument int number) {
-    return algorithmService.intToRoman(number);
-  }
-
-  /**
-   * Resolves the {@code findPolynomialRoot} GraphQL query.
-   *
-   * <p>
-   * This adapter forwards raw query arguments to the application service, which
-   * applies defaults and delegates Newton-Raphson execution to the domain layer.
-   * </p>
-   *
-   * @param coefficients  polynomial coefficients from lowest to highest order
-   * @param initialGuess  starting value for Newton-Raphson iteration
-   * @param epsilon       optional convergence tolerance
-   * @param maxIterations optional iteration cap
-   * @param scale         optional decimal scale used for division rounding
-   * @return approximate polynomial root as a {@link BigDecimal}
-   */
-  @QueryMapping
-  public BigDecimal findPolynomialRoot(
-      @Argument final List<BigDecimal> coefficients,
-      @Argument final BigDecimal initialGuess,
-      @Argument final BigDecimal epsilon,
-      @Argument final Integer maxIterations,
-      @Argument final Integer scale) {
-    return algorithmService.findPolynomialRoot(new PolynomialRootRequest(
-        coefficients,
-        initialGuess,
-        epsilon,
-        maxIterations,
-        scale));
-  }
-
-  /**
-   * Helper method to create a linked list from a list of integers.
-   */
-  private ListNode createLinkedList(final List<Integer> values) {
-    if (Objects.isNull(values) || values.isEmpty()) {
-      return null;
+    @QueryMapping
+    public double calculateMedian(@Argument
+    List<Integer> array1, @Argument
+    List<Integer> array2) {
+        return algorithmService.calculateMedian(array1.stream().mapToInt(Integer::intValue).toArray(),
+                array2.stream().mapToInt(Integer::intValue).toArray());
     }
 
-    final ListNode head = new ListNode(values.getFirst());
-    ListNode current = head;
-
-    for (int i = 1; i < values.size(); i++) {
-      current.next = new ListNode(values.get(i));
-      current = current.next;
+    @QueryMapping
+    public int calculateMaxWaterArea(@Argument
+    List<Integer> heights) {
+        return algorithmService.calculateMaxWaterArea(heights.stream().mapToInt(Integer::intValue).toArray());
     }
 
-    return head;
-  }
-
-  /**
-   * Helper method to convert a linked list back to a list of integers.
-   */
-  private List<Integer> linkedListToList(final ListNode head) {
-    final List<Integer> result = new ArrayList<>();
-    ListNode current = head;
-
-    while (Objects.nonNull(current)) {
-      result.add(current.val);
-      current = current.next;
+    @QueryMapping
+    public int countNegatives(@Argument
+    List<List<Integer>> grid) {
+        int[][] gridArray = grid.stream().map(row -> row.stream().mapToInt(Integer::intValue).toArray())
+                .toArray(int[][]::new);
+        return algorithmService.countNegatives(gridArray);
     }
 
-    return result;
-  }
+    @QueryMapping
+    public List<String> getLetterCombinations(@Argument
+    String digits) {
+        return algorithmService.getLetterCombinations(digits);
+    }
+
+    @QueryMapping
+    public List<Integer> mergeKSortedLists(@Argument
+    List<List<Integer>> lists) {
+        // Convert List<List<Integer>> to ListNode[]
+        ListNode[] listNodes = lists.stream().map(this::createLinkedList).toArray(ListNode[]::new);
+
+        // Merge the lists
+        ListNode merged = algorithmService.mergeKSortedLists(listNodes);
+
+        // Convert back to List<Integer>
+        return linkedListToList(merged);
+    }
+
+    @QueryMapping
+    public String findLongestPalindrome(@Argument
+    String input) {
+        return algorithmService.findLongestPalindrome(input);
+    }
+
+    @QueryMapping
+    public int findLongestUniqueSubstringLength(@Argument
+    String input) {
+        return algorithmService.findLongestUniqueSubstringLength(input);
+    }
+
+    @QueryMapping
+    public long rearrangeFruits(@Argument
+    List<Integer> basket1, @Argument
+    List<Integer> basket2) {
+        return algorithmService.rearrangeFruits(basket1.stream().mapToInt(Integer::intValue).toArray(),
+                basket2.stream().mapToInt(Integer::intValue).toArray());
+    }
+
+    @QueryMapping
+    public String crackPin(@Argument
+    String hash, @Argument
+    Integer maxLen) {
+        return algorithmService.crackPin(hash, maxLen);
+    }
+
+    @QueryMapping
+    public int romanToInt(@Argument
+    String roman) {
+        return algorithmService.romanToInt(roman);
+    }
+
+    @QueryMapping
+    public String intToRoman(@Argument
+    int number) {
+        return algorithmService.intToRoman(number);
+    }
+
+    /**
+     * Resolves the {@code findPolynomialRoot} GraphQL query.
+     *
+     * <p>
+     * This adapter forwards raw query arguments to the application service, which applies defaults and delegates
+     * Newton-Raphson execution to the domain layer.
+     * </p>
+     *
+     * @param coefficients
+     *                          polynomial coefficients from lowest to highest order
+     * @param initialGuess
+     *                          starting value for Newton-Raphson iteration
+     * @param epsilon
+     *                          optional convergence tolerance
+     * @param maxIterations
+     *                          optional iteration cap
+     * @param scale
+     *                          optional decimal scale used for division rounding
+     * @return a {@link NewtonRaphsonResult} containing the root, iteration count, and iteration history
+     */
+    @QueryMapping
+    public NewtonRaphsonResult findPolynomialRoot(@Argument
+    final List<BigDecimal> coefficients, @Argument
+    final BigDecimal initialGuess, @Argument
+    final BigDecimal epsilon, @Argument
+    final Integer maxIterations, @Argument
+    final Integer scale) {
+        return algorithmService.findPolynomialRoot(
+                new PolynomialRootRequest(coefficients, initialGuess, epsilon, maxIterations, scale));
+    }
+
+    /**
+     * Helper method to create a linked list from a list of integers.
+     */
+    private ListNode createLinkedList(final List<Integer> values) {
+        if (Objects.isNull(values) || values.isEmpty()) {
+            return null;
+        }
+
+        final ListNode head = new ListNode(values.getFirst());
+        ListNode current = head;
+
+        for (int i = 1; i < values.size(); i++) {
+            current.next = new ListNode(values.get(i));
+            current = current.next;
+        }
+
+        return head;
+    }
+
+    /**
+     * Helper method to convert a linked list back to a list of integers.
+     */
+    private List<Integer> linkedListToList(final ListNode head) {
+        final List<Integer> result = new ArrayList<>();
+        ListNode current = head;
+
+        while (Objects.nonNull(current)) {
+            result.add(current.val);
+            current = current.next;
+        }
+
+        return result;
+    }
 
 }

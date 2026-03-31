@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import at.mavila.exercises_january_2026.domain.calculus.NewtonRaphsonResult;
 import at.mavila.exercises_january_2026.domain.calculus.exception.InvalidToleranceException;
 import at.mavila.exercises_january_2026.domain.collection.ListNode;
 
@@ -67,12 +68,7 @@ class AlgorithmServiceTest {
     @Test
     @DisplayName("Should count negative numbers in grid")
     void shouldCountNegatives() {
-      int[][] grid = {
-          { 4, 3, 2, -1 },
-          { 3, 2, 1, -1 },
-          { 1, 1, -1, -2 },
-          { -1, -1, -2, -3 }
-      };
+      int[][] grid = { { 4, 3, 2, -1 }, { 3, 2, 1, -1 }, { 1, 1, -1, -2 }, { -1, -1, -2, -3 } };
       int result = algorithmService.countNegatives(grid);
       assertEquals(8, result);
     }
@@ -188,43 +184,29 @@ class AlgorithmServiceTest {
     void shouldFindPolynomialRootWithDefaults() {
       // Omitted optional values should default to epsilon=1e-10, maxIterations=1000,
       // and scale=10.
-      BigDecimal result = algorithmService.findPolynomialRoot(
-          new PolynomialRootRequest(
-              List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")),
-              BigDecimal.ZERO,
-              null,
-              null,
-              null));
+      NewtonRaphsonResult result = algorithmService.findPolynomialRoot(new PolynomialRootRequest(
+          List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, null, null, null));
 
-      assertEquals(0, result.compareTo(new BigDecimal("2.0000000000")));
+      assertEquals(0, result.root().compareTo(new BigDecimal("2.0000000000")));
+      assertEquals(1, result.iterationCount());
     }
 
     @Test
     @DisplayName("Should find root with custom epsilon and scale")
     void shouldFindPolynomialRootWithCustomPrecision() {
       // A coarser epsilon and smaller scale should still converge to sqrt(2).
-      BigDecimal result = algorithmService.findPolynomialRoot(
-          new PolynomialRootRequest(
-              List.of(new BigDecimal("-2.0"), BigDecimal.ZERO, BigDecimal.ONE),
-              BigDecimal.ONE,
-              new BigDecimal("0.001"),
-              1000,
-              4));
+      NewtonRaphsonResult result = algorithmService.findPolynomialRoot(
+          new PolynomialRootRequest(List.of(new BigDecimal("-2.0"), BigDecimal.ZERO, BigDecimal.ONE), BigDecimal.ONE,
+              new BigDecimal("0.001"), 1000, 4));
 
-      assertEquals(0, result.compareTo(new BigDecimal("1.4142")));
+      assertEquals(0, result.root().compareTo(new BigDecimal("1.4142")));
     }
 
     @Test
     @DisplayName("Should throw when custom epsilon is non-positive")
     void shouldThrowWhenEpsilonIsInvalid() {
-      assertThrows(InvalidToleranceException.class,
-          () -> algorithmService.findPolynomialRoot(
-              new PolynomialRootRequest(
-                  List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")),
-                  BigDecimal.ZERO,
-                  BigDecimal.ZERO,
-                  null,
-                  null)));
+      assertThrows(InvalidToleranceException.class, () -> algorithmService.findPolynomialRoot(new PolynomialRootRequest(
+          List.of(new BigDecimal("-6.0"), new BigDecimal("3.0")), BigDecimal.ZERO, BigDecimal.ZERO, null, null)));
     }
   }
 }

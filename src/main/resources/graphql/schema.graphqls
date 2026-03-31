@@ -74,7 +74,7 @@ type Query {
     Finds a root of a polynomial using the Newton-Raphson method.
     The polynomial is defined by its coefficients [a₀, a₁, ..., aₙ] where
     f(x) = a₀ + a₁x + a₂x² + ... + aₙxⁿ.
-    All numeric values use BigDecimal for arbitrary-precision arithmetic.
+    All numeric values use BigDecimal (serialised as strings in JSON) for arbitrary-precision arithmetic.
     """
     findPolynomialRoot(
         "Polynomial coefficients from lowest to highest order: [a₀, a₁, ..., aₙ]."
@@ -85,9 +85,31 @@ type Query {
         epsilon: BigDecimal
         "Optional maximum number of iterations. Defaults to 1000."
         maxIterations: Int
-        "Optional number of decimal places for division rounding using HALF_UP. Defaults to 10."
+        "Optional number of decimal places for division rounding (RoundingMode.HALF_UP). Defaults to 10."
         scale: Int
-    ): BigDecimal!
+    ): PolynomialRootResult!
+}
+
+"""
+A single Newton-Raphson iteration recording the step number and the x value computed.
+"""
+type NewtonRaphsonIteration {
+    "The 1-based iteration number."
+    number: Int!
+    "The x value computed at this iteration."
+    value: BigDecimal!
+}
+
+"""
+The result of a Newton-Raphson root-finding computation.
+"""
+type PolynomialRootResult {
+    "The approximate root of the polynomial, rounded to the requested scale."
+    root: BigDecimal!
+    "The number of iterations performed before convergence."
+    iterationCount: Int!
+    "Ordered list of every iteration performed. Optional — the client may omit this field from the query."
+    iterations: [NewtonRaphsonIteration!]!
 }
 
 """

@@ -2,6 +2,7 @@ package at.mavila.exercises_january_2026.domain.calculus;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -69,7 +70,7 @@ public class NewtonRaphsonRootFinder {
      * @param params
      *                   the validated parameter set including coefficients, initial guess, epsilon, max iterations, and
      *                   scale
-     * @return an approximate root rounded to {@code params.scale()} decimal places
+     * @return a {@link NewtonRaphsonResult} containing the approximate root, iteration count, and iteration history
      * @throws at.mavila.exercises_january_2026.domain.calculus.exception.InvalidPolynomialException
      *                                                                                                      if the
      *                                                                                                      coefficient
@@ -104,7 +105,7 @@ public class NewtonRaphsonRootFinder {
      *                                                                                                      limit is
      *                                                                                                      exhausted
      */
-    public BigDecimal findRoot(final NewtonRaphsonParams params) {
+    public NewtonRaphsonResult findRoot(final NewtonRaphsonParams params) {
         final Set<ConstraintViolation<NewtonRaphsonParams>> violations = validator.validate(params);
         violationMapper.throwOnViolation(violations, params);
 
@@ -114,14 +115,15 @@ public class NewtonRaphsonRootFinder {
         final int scale = params.scale();
 
         BigDecimal x = params.initialGuess();
+        final List<NewtonRaphsonIteration> iterations = new ArrayList<>();
 
-        for (int iteration = 0; iteration < maxIterations; iteration++) {
-            final BigDecimal fx = polynomialEvaluator.evaluate(coefficients, x);
+        BigDecimal fx = polynomialEvaluator.evaluate(coefficients, x);
 
-            if (convergenceChecker.hasConvergedByFunctionValue(fx, epsilon)) {
-                return x.setScale(scale, RoundingMode.HALF_UP);
-            }
+        if (convergenceChecker.hasConvergedByFunctionValue(fx, epsilon)) {
+            return new NewtonRaphsonResult(x.setScale(scale, RoundingMode.HALF_UP), 0, iterations);
+        }
 
+        for (int iteration = 1; iteration <= maxIterations; iteration++) {
             final BigDecimal fpx = polynomialEvaluator.evaluateDerivative(coefficients, x);
 
             if (fpx.compareTo(BigDecimal.ZERO) == 0) {
@@ -129,9 +131,16 @@ public class NewtonRaphsonRootFinder {
             }
 
             final BigDecimal xNew = x.subtract(fx.divide(fpx, scale, RoundingMode.HALF_UP));
+            iterations.add(new NewtonRaphsonIteration(iteration, xNew.setScale(scale, RoundingMode.HALF_UP)));
 
             if (convergenceChecker.hasConvergedByStepSize(xNew, x, epsilon)) {
-                return xNew.setScale(scale, RoundingMode.HALF_UP);
+                return new NewtonRaphsonResult(xNew.setScale(scale, RoundingMode.HALF_UP), iteration, iterations);
+            }
+
+            fx = polynomialEvaluator.evaluate(coefficients, xNew);
+
+            if (convergenceChecker.hasConvergedByFunctionValue(fx, epsilon)) {
+                return new NewtonRaphsonResult(xNew.setScale(scale, RoundingMode.HALF_UP), iteration, iterations);
             }
 
             x = xNew;
