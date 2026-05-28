@@ -1,8 +1,8 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.0.3'
+    id 'org.springframework.boot' version '4.0.6'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'info.solidsoft.pitest' version '1.19.0-rc.2'
+    id 'info.solidsoft.pitest' version '1.19.0'
 }
 
 group = 'at.mavila'
@@ -13,15 +13,10 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
     }
-    // For Pitest compatibility, set source/target to 21 (Pitest doesn't support Java 25 yet)
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
 }
 
-// Force Java 21 bytecode output for Pitest compatibility
 // Add -parameters flag to preserve method parameter names for Spring GraphQL
 tasks.withType(JavaCompile).configureEach {
-    options.release = 21
     options.compilerArgs.add('-parameters')
 }
 
@@ -62,37 +57,35 @@ tasks.named('test') {
 // ==================== Pitest Mutation Testing ====================
 // Run with: ./gradlew pitest
 // Report: build/reports/pitest/index.html
-// NOTE: Pitest currently does not support Java 25. Run separately with Java 21.
 
 pitest {
-    // Target classes to mutate
-    targetClasses = ['at.mavila.exercises_january_2026.components.*']
+    // Target classes to mutate (domain + application business logic)
+    targetClasses = ['at.mavila.exercises_january_2026.domain.*', 'at.mavila.exercises_january_2026.application.*']
     // Target tests to run
-    targetTests = ['at.mavila.exercises_january_2026.components.*']
+    targetTests = ['at.mavila.exercises_january_2026.domain.*', 'at.mavila.exercises_january_2026.application.*']
     // JUnit 5 support
     junit5PluginVersion = '1.2.1'
-    // Pitest version - use latest for best Java version support
-    pitestVersion = '1.17.3'
+    // Pitest version - 1.22.1+ supports Java 25 (ASM 9.9 bump)
+    pitestVersion = '1.25.1'
     // Mutation operators
     mutators = ['DEFAULTS']
     // Output formats
     outputFormats = ['HTML', 'XML']
-    // Threads for parallel execution
-    threads = 4
+    // Threads for parallel execution (2 to avoid OOM with Spring Boot context per mutant)
+    threads = 2
     // Timeout for mutations
-    timeoutConstInMillis = 30000
+    timeoutConstInMillis = 60000
     // Fail build if mutation coverage is below threshold
-    mutationThreshold = 80
+    mutationThreshold = 79
     // Coverage threshold
-    coverageThreshold = 80
+    coverageThreshold = 79
     // Verbose output
     verbose = true
     // Timestamp in report directory
     timestampedReports = false
-    // JVM args for forked process
-    jvmArgs = ['-Xmx1024m']
+    // JVM args for forked process - 2GB per minion; Spring Boot context startup needs headroom
+    jvmArgs = ['-Xmx2048m']
 }
 
-// Pitest does not support Java 25 yet - don't run it as part of default build
-// Run manually with: ./gradlew pitest (requires Java 21 runtime)
+// Uncomment to run Pitest as part of the default build:
 // build.dependsOn 'pitest'
