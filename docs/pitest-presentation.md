@@ -1,36 +1,3 @@
----
-marp: true
-theme: default
-paginate: true
-backgroundColor: #ffffff
----
-
-<style>
-section {
-  font-family: 'Segoe UI', Arial, sans-serif;
-}
-section.lead h1 {
-  font-size: 2.4rem;
-  color: #1a1a2e;
-}
-section.lead p {
-  color: #555;
-}
-h1 { color: #1a1a2e; border-bottom: 3px solid #e63946; padding-bottom: 8px; }
-h2 { color: #457b9d; }
-code { background: #f1faee; padding: 2px 6px; border-radius: 4px; color: #e63946; }
-pre { background: #f4f4f4; color: #1d3557; border-radius: 8px; border: 1px solid #ddd; }
-pre code { background: none; color: inherit; padding: 0; }
-blockquote { border-left: 4px solid #e63946; background: #f1faee; padding: 10px 20px; }
-table { width: 100%; border-collapse: collapse; }
-th { background: #1d3557; color: white; padding: 8px 12px; }
-td { border: 1px solid #ddd; padding: 8px 12px; }
-tr:nth-child(even) { background: #f1faee; }
-.columns { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-</style>
-
-<!-- _class: lead -->
-
 # Mutation Testing with PIT
 
 ## Knowing _when_ your tests actually test
