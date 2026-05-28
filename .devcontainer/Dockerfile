@@ -14,7 +14,12 @@ RUN apt-get update && apt-get install -y \
   procps \
   lsof \
   htop \
+  nodejs \
+  npm \
   && rm -rf /var/lib/apt/lists/*
+
+RUN npm install -g n && n 20
+RUN npm install -g @anthropic-ai/claude-code
 
 # Create a non-root user with sudo access
 ARG USERNAME=vscode

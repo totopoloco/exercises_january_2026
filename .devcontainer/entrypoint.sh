@@ -39,10 +39,8 @@ fi
 # Show src.zip status (non-fatal)
 ls -la /opt/java/openjdk/lib/src.zip 2>/dev/null || echo "Note: src.zip not available."
 
+
 echo "Development environment initialized successfully!"
-
-
 
 # Execute the main command
 exec "$@"
-

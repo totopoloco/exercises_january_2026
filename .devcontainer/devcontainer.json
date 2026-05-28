@@ -36,7 +36,8 @@
         "sureshnettur.jsonutil",
         "yashar-zolmajdi.graphql-complexity-vscode",
         "codescene.codescene-vscode",
-        "sonarsource.sonarlint-vscode"
+        "sonarsource.sonarlint-vscode",
+        "anthropic.claude-code"
       ],
       // VS Code settings
       "settings": {
