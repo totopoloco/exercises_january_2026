@@ -150,5 +150,7 @@
     "org.mockito.Answers.*"
   ],
   "java.dependency.packagePresentation": "hierarchical",
-  "codescene.enableTelemetry": false
+  "codescene.enableTelemetry": false,
+  "editor.inlineSuggest.enabled": true,
+  "chat.disableAIFeatures": true
 }
